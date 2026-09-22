@@ -20,7 +20,9 @@ jobs:
         run: python -m pip install --upgrade uv
       - name: Sync locked environment
         run: uv sync --frozen --all-groups
-      - name: Validate F1 repository boundaries
+      - name: Validate phase gates
+        run: uv run python scripts/validate_phase_gates.py
+      - name: Validate F1 repository foundation
         run: uv run python scripts/validate_f1.py
       - name: Ruff format check
         run: uv run ruff format --check .

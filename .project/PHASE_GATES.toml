@@ -1,0 +1,22 @@
+schema_version = "1.0"
+project = "SPORTS_QUANT"
+current_phase = "F1_REPOSITORY_SKELETON"
+
+[foundation_review]
+status = "PENDING"
+independent_reviewer = ""
+review_artifact = ""
+p0_open = 0
+p1_open = 0
+blocking_findings_cleared = false
+issue = 1
+
+[f2]
+authorized = false
+authorization_basis = "PENDING_INDEPENDENT_F0_REVIEW"
+implementation_issue = 2
+spec = "docs/contracts/F2_READY_TO_IMPLEMENT_SPEC.md"
+
+[notes]
+rule = "F2 authorization requires a recorded independent F0 review with no unresolved P0/P1 findings."
+future_phase_rule = "F3+ authorization is governed by each phase handoff and will be added to this machine gate when the preceding phase becomes active."
