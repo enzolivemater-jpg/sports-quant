@@ -7,6 +7,7 @@ It does not replace an independent critical review.
 from __future__ import annotations
 
 import re
+import subprocess
 import sys
 import tomllib
 from pathlib import Path
@@ -20,6 +21,20 @@ PASS_REVIEW_STATES = {"PASS", "PASS_WITH_P2"}
 ALLOWED_REVIEW_STATES = PASS_REVIEW_STATES | {"PENDING", "BLOCKED", "NEEDS_DECISION"}
 REVIEW_FINAL_STATUSES = {"GO", "GO_WITH_CONDITIONS"}
 FULL_SHA_RE = re.compile(r"^[0-9a-f]{40}$")
+
+REVIEW_PROTECTED_PATHS = (
+    ".project/FOUNDATION_DECISIONS_v0.1.yaml",
+    ".project/OPEN_DECISIONS.yaml",
+    ".project/SPORT_PREDICTABILITY_POLICY.yaml",
+    ".project/PROJECT_PROFILE.yaml",
+    "docs/adr/ADR-0001-foundation-v0.1.md",
+    "docs/adr/ADR-0002-mandatory-sports-scope.md",
+    "docs/adr/ADR-0003-additional-sports-allowlist.md",
+    "docs/adr/ADR-0004-football-first-pilot.md",
+    ".ai/AI_CHARTER.md",
+    ".ai/AI_DECISIONS.md",
+    ".ai/handoffs/F0_INDEPENDENT_REVIEW.md",
+)
 
 
 def _load_gates() -> dict[str, Any]:
@@ -62,6 +77,53 @@ def _extract_final_status(text: str) -> str | None:
     return None
 
 
+def _git(args: list[str]) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        ["git", *args],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+
+def _validate_reviewed_head_scope(reviewed_head: str) -> list[str]:
+    if not (ROOT / ".git").exists():
+        return []
+
+    errors: list[str] = []
+
+    exists = _git(["cat-file", "-e", f"{reviewed_head}^{{commit}}"])
+    if exists.returncode != 0:
+        return [f"Reviewed HEAD is not available in this Git checkout: {reviewed_head}"]
+
+    ancestor = _git(["merge-base", "--is-ancestor", reviewed_head, "HEAD"])
+    if ancestor.returncode != 0:
+        return [f"Reviewed HEAD is not an ancestor of current HEAD: {reviewed_head}"]
+
+    diff = _git(
+        [
+            "diff",
+            "--name-only",
+            f"{reviewed_head}..HEAD",
+            "--",
+            *REVIEW_PROTECTED_PATHS,
+        ]
+    )
+    if diff.returncode != 0:
+        errors.append("Unable to compare reviewed HEAD with current protected F0 files")
+        return errors
+
+    changed = [line.strip() for line in diff.stdout.splitlines() if line.strip()]
+    if changed:
+        errors.append(
+            "Protected F0 files changed after the independent review; re-review is required: "
+            + ", ".join(changed)
+        )
+
+    return errors
+
+
 def _validate_review_artifact(artifact: str) -> list[str]:
     errors: list[str] = []
 
@@ -87,6 +149,8 @@ def _validate_review_artifact(artifact: str) -> list[str]:
     reviewed_head = _extract_value(text, "Reviewed HEAD")
     if reviewed_head is None or not FULL_SHA_RE.fullmatch(reviewed_head):
         errors.append("F0 review artifact requires a full 40-character Reviewed HEAD SHA")
+    else:
+        errors.extend(_validate_reviewed_head_scope(reviewed_head))
 
     p0 = _extract_value(text, "P0 open")
     p1 = _extract_value(text, "P1 open")
