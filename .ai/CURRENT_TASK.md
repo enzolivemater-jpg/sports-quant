@@ -65,3 +65,13 @@ Pilot sport decision recorded 2026-09-22:
 - the pilot must exercise the full chain: data -> PIT -> features -> model -> calibration -> P_safe -> market -> gate -> backtest;
 - no Football model-family champion is selected by this decision;
 - no F2+ implementation starts until the independent F0 review gate is resolved.
+
+
+Execution acceleration update 2026-09-22:
+- documentation/specification path is prepared through F12 PWA;
+- active master execution plan: `docs/runbooks/FAST_EXECUTION_PLAN.md`;
+- Football research artifacts now include provider bake-off, evidence matrix, pilot dataset manifest, feature governance, StatsBomb open-data probe and model benchmark protocol;
+- downstream draft specs prepared: F3 PIT, F4 Football Data Layer, F5 Modeling Harness, F6 Market Engine, F7 Calibration/Uncertainty/P_safe, F8 S-Tier, F9 Backtesting, F10 Dependency/Parlay, F11 Paper Betting/Monitoring, F12 PWA;
+- GitHub issue #16 tracks the fast execution path;
+- independent F0 review issue #1 is still OPEN and currently has no review comment/artifact;
+- therefore F2+ implementation remains blocked by governance, while research/specification work may continue.
