@@ -3,7 +3,7 @@ project = "SPORTS_QUANT"
 current_phase = "F1_REPOSITORY_SKELETON"
 
 [foundation_review]
-status = "PASS"
+status = "BLOCKED"
 independent_reviewer = "separate-gpt-codex-independent-review"
 review_artifact = ".project/reviews/F0_REVIEW_RECORD_2026-09-22_d4d6c0ce.md"
 p0_open = 0
@@ -12,11 +12,11 @@ blocking_findings_cleared = true
 issue = 1
 
 [f2]
-authorized = true
-authorization_basis = "F0 independent review GO at d4d6c0ce4d26f42183312b6386b7d0e00ab46f88; P0=0; P1=0"
+authorized = false
+authorization_basis = "POST_REVIEW_CI_HISTORY_INTEGRATION_FIX_REQUIRES_TARGETED_REREVIEW"
 implementation_issue = 2
 spec = "docs/contracts/F2_READY_TO_IMPLEMENT_SPEC.md"
 
 [notes]
-rule = "F2 authorization requires a recorded independent F0 review with no unresolved P0/P1 findings."
+rule = "F2 authorization requires a recorded independent F0 review with no unresolved P0/P1 findings and a green machine gate on the authorization commit."
 future_phase_rule = "F3+ authorization is governed by each phase handoff and will be added to this machine gate when the preceding phase becomes active."
