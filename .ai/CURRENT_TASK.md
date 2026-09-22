@@ -4,16 +4,16 @@ Phase:
 `F2_DOMAIN_CONTRACTS`
 
 Status:
-`AUTHORIZED_PENDING_GREEN_AUTHORIZATION_HEAD`
+`READY_TO_IMPLEMENT`
 
 Date:
 2026-09-22
 
 ## F0 governance
 
-Independent F0 review cycle is complete.
+F0 independent review is complete and the gate is closed successfully.
 
-Final reviewed HEAD:
+Final independently reviewed HEAD:
 `e5220707b018dee501a2a9757c3e31d5bb41683a`
 
 Final review result:
@@ -23,25 +23,26 @@ Final review result:
 - final status: GO
 - explicit authorization: F2 MAY BEGIN
 
-Canonical review record:
-`.project/reviews/F0_REVIEW_RECORD_2026-09-22_e5220707.md`
+Final authorization commit:
+`eed1e41f0b045b8d11e38770b032f8e802a02a64`
 
-Verbatim micro-review:
-`.project/reviews/F0_CI_HISTORY_MICRO_REREVIEW_RAW_2026-09-22_e5220707.md`
+Authorization-head validation:
+- CI: SUCCESS
+- Security: SUCCESS
+- phase gate: SUCCESS
+- PostgreSQL integration: SUCCESS
 
-## Machine state
-
+Machine state:
 - foundation_review.status = PASS
 - f2.authorized = true
 
-Before implementation begins, the authorization commit itself must pass:
-- CI
-- Security
-- phase-gate validation
+Issue #1:
+CLOSED
 
-If it fails, F2 implementation must not start until corrected.
+## Active implementation task
 
-## F2 implementation
+Issue:
+#2 — F2 Domain Contracts
 
 Primary handoff:
 `.ai/handoffs/CLAUDE_F2_IMPLEMENTATION_HANDOFF.md`
@@ -49,21 +50,54 @@ Primary handoff:
 Primary spec:
 `docs/contracts/F2_READY_TO_IMPLEMENT_SPEC.md`
 
-Scope:
-domain-contract layer only.
+## F2 scope
 
-Do not start F3 in the same change.
+Implement the smallest stable domain-contract layer only.
+
+Expected modules under `src/sports_quant/contracts/`:
+- common.py
+- time.py
+- source.py
+- data_state.py
+- entity.py
+- provenance.py
+- market.py
+- probability.py
+- edge.py
+- decision.py
+- predictability.py
+
+Follow the handoff/spec if they include additional contract modules already approved.
+
+## Hard boundaries
+
+Do not implement:
+- provider ingestion;
+- F3 PIT kernel beyond contract validation;
+- Football feature engineering;
+- model training;
+- calibration algorithms;
+- a production P_safe formula;
+- no-vig Champion;
+- S-Tier engine;
+- backtests;
+- parlay optimizer;
+- API/frontend.
+
+Do not resolve any OPEN_DECISION silently.
 
 ## Completion discipline
 
 F2 must:
-- preserve all OPEN_DECISIONS;
-- implement only approved contracts;
+- preserve OD-01 through OD-29;
 - pass formatter/Ruff/mypy/pytest/Alembic/PostgreSQL/CI/Security;
+- satisfy the F2 acceptance criteria;
 - receive independent critical review;
 - have no unresolved P0/P1 before F3.
 
-## Parallel work
+Do not start F3 in the same change.
+
+## Parallel non-blocking work
 
 Issue #17:
 repository privacy / main protection remains admin work.
