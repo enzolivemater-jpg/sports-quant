@@ -1,0 +1,222 @@
+{
+  "schema_version": "1.0",
+  "project": "SPORTS_QUANT",
+  "status": "VERIFIED_RESEARCH_BASELINE_MANIFEST__NOT_PRODUCTION_DATASET",
+  "source_repository": "openfootball/england",
+  "source_ref": "master",
+  "competition": "English Premier League",
+  "season_range": "2000/01-2024/25",
+  "completed_season_count": 25,
+  "verified_matches_per_season": 380,
+  "total_verified_matches": 9500,
+  "canonical_known_at_assigned": false,
+  "canonical_entity_ids_assigned": false,
+  "verification_method": [
+    "Fetched each season file individually from the public source repository.",
+    "Counted match records using both observed Football.TXT line formats.",
+    "Compared the detected count against each file's '# Matches' header.",
+    "All 25 completed seasons returned 380 detected matches and header_matches=380."
+  ],
+  "seasons": [
+    {
+      "season": "2000-01",
+      "path": "2000-01/1-premierleague.txt",
+      "blob_sha": "7c86400402b30aca32235b506e86112bc6fd8e0e",
+      "detected_matches": 380,
+      "header_matches": 380,
+      "verification": "VERIFIED_PASS"
+    },
+    {
+      "season": "2001-02",
+      "path": "2001-02/1-premierleague.txt",
+      "blob_sha": "fa5ddd286d91d6485e1f7189b1d85383496a8dcb",
+      "detected_matches": 380,
+      "header_matches": 380,
+      "verification": "VERIFIED_PASS"
+    },
+    {
+      "season": "2002-03",
+      "path": "2002-03/1-premierleague.txt",
+      "blob_sha": "9247fdb533cc535f721267f869eaaca54ab97103",
+      "detected_matches": 380,
+      "header_matches": 380,
+      "verification": "VERIFIED_PASS"
+    },
+    {
+      "season": "2003-04",
+      "path": "2003-04/1-premierleague.txt",
+      "blob_sha": "9e0fe7cc14dd65728b4e8631c4c7b340a5a9cc2f",
+      "detected_matches": 380,
+      "header_matches": 380,
+      "verification": "VERIFIED_PASS"
+    },
+    {
+      "season": "2004-05",
+      "path": "2004-05/1-premierleague.txt",
+      "blob_sha": "4e8376eecbc0a6eaafd279c3143cdb33734eb311",
+      "detected_matches": 380,
+      "header_matches": 380,
+      "verification": "VERIFIED_PASS"
+    },
+    {
+      "season": "2005-06",
+      "path": "2005-06/1-premierleague.txt",
+      "blob_sha": "82e6171a5213f2e9c96641ba51a6fb3537040215",
+      "detected_matches": 380,
+      "header_matches": 380,
+      "verification": "VERIFIED_PASS"
+    },
+    {
+      "season": "2006-07",
+      "path": "2006-07/1-premierleague.txt",
+      "blob_sha": "4173f58318121b1870e90bd1ffbd1407e78aa520",
+      "detected_matches": 380,
+      "header_matches": 380,
+      "verification": "VERIFIED_PASS"
+    },
+    {
+      "season": "2007-08",
+      "path": "2007-08/1-premierleague.txt",
+      "blob_sha": "0f561e3a675f01226260417de1d2a210b227e6e1",
+      "detected_matches": 380,
+      "header_matches": 380,
+      "verification": "VERIFIED_PASS"
+    },
+    {
+      "season": "2008-09",
+      "path": "2008-09/1-premierleague.txt",
+      "blob_sha": "b236c7cd41b45cca707b59bd7c9c99dbb303986b",
+      "detected_matches": 380,
+      "header_matches": 380,
+      "verification": "VERIFIED_PASS"
+    },
+    {
+      "season": "2009-10",
+      "path": "2009-10/1-premierleague.txt",
+      "blob_sha": "78ba66cd59dcbd879efdfda75713bb173e842ccc",
+      "detected_matches": 380,
+      "header_matches": 380,
+      "verification": "VERIFIED_PASS"
+    },
+    {
+      "season": "2010-11",
+      "path": "2010-11/1-premierleague.txt",
+      "blob_sha": "66e71ad9a1cbd73ae44b59012149f963bcb8aa25",
+      "detected_matches": 380,
+      "header_matches": 380,
+      "verification": "VERIFIED_PASS"
+    },
+    {
+      "season": "2011-12",
+      "path": "2011-12/1-premierleague.txt",
+      "blob_sha": "c012fca8562648cb139cfde5846d1499cac5d16b",
+      "detected_matches": 380,
+      "header_matches": 380,
+      "verification": "VERIFIED_PASS"
+    },
+    {
+      "season": "2012-13",
+      "path": "2012-13/1-premierleague.txt",
+      "blob_sha": "37421a31e8249bebb67c0a3488c398f76793efe8",
+      "detected_matches": 380,
+      "header_matches": 380,
+      "verification": "VERIFIED_PASS"
+    },
+    {
+      "season": "2013-14",
+      "path": "2013-14/1-premierleague.txt",
+      "blob_sha": "467de287fd2bcf305a0159e6791856377640b6a0",
+      "detected_matches": 380,
+      "header_matches": 380,
+      "verification": "VERIFIED_PASS"
+    },
+    {
+      "season": "2014-15",
+      "path": "2014-15/1-premierleague.txt",
+      "blob_sha": "2279c41b3f10669c454b2b8f2408bd745ac52e88",
+      "detected_matches": 380,
+      "header_matches": 380,
+      "verification": "VERIFIED_PASS"
+    },
+    {
+      "season": "2015-16",
+      "path": "2015-16/1-premierleague.txt",
+      "blob_sha": "e08302680948f511c85c347dcc6d3900a15c7b53",
+      "detected_matches": 380,
+      "header_matches": 380,
+      "verification": "VERIFIED_PASS"
+    },
+    {
+      "season": "2016-17",
+      "path": "2016-17/1-premierleague.txt",
+      "blob_sha": "feb36a2417f9c8168b1f0f45a24436c6e426bdd6",
+      "detected_matches": 380,
+      "header_matches": 380,
+      "verification": "VERIFIED_PASS"
+    },
+    {
+      "season": "2017-18",
+      "path": "2017-18/1-premierleague.txt",
+      "blob_sha": "c69c9fbf93520900fdbe44fd333d4a33121cefa3",
+      "detected_matches": 380,
+      "header_matches": 380,
+      "verification": "VERIFIED_PASS"
+    },
+    {
+      "season": "2018-19",
+      "path": "2018-19/1-premierleague.txt",
+      "blob_sha": "1f36615f21448b5ca7bc1c4a32b9bb9ba4b3ca41",
+      "detected_matches": 380,
+      "header_matches": 380,
+      "verification": "VERIFIED_PASS"
+    },
+    {
+      "season": "2019-20",
+      "path": "2019-20/1-premierleague.txt",
+      "blob_sha": "e567ddbea2eb6b75e7cb402d7a058f08a51dfb91",
+      "detected_matches": 380,
+      "header_matches": 380,
+      "verification": "VERIFIED_PASS"
+    },
+    {
+      "season": "2020-21",
+      "path": "2020-21/1-premierleague.txt",
+      "blob_sha": "80232f0a9f5122b288d69cdd20717f9d4542d0c4",
+      "detected_matches": 380,
+      "header_matches": 380,
+      "verification": "VERIFIED_PASS"
+    },
+    {
+      "season": "2021-22",
+      "path": "2021-22/1-premierleague.txt",
+      "blob_sha": "d7e11e9134bfd03a7e847848f50029473bf9af9a",
+      "detected_matches": 380,
+      "header_matches": 380,
+      "verification": "VERIFIED_PASS"
+    },
+    {
+      "season": "2022-23",
+      "path": "2022-23/1-premierleague.txt",
+      "blob_sha": "3ef9d512d2150732c18ff6e39c9d7b20f446a050",
+      "detected_matches": 380,
+      "header_matches": 380,
+      "verification": "VERIFIED_PASS"
+    },
+    {
+      "season": "2023-24",
+      "path": "2023-24/1-premierleague.txt",
+      "blob_sha": "23cdd8a340b72f6f30c514fbf609d5cf252723aa",
+      "detected_matches": 380,
+      "header_matches": 380,
+      "verification": "VERIFIED_PASS"
+    },
+    {
+      "season": "2024-25",
+      "path": "2024-25/1-premierleague.txt",
+      "blob_sha": "ca0fe4923f0164d0f879f796ab0759253e13bc06",
+      "detected_matches": 380,
+      "header_matches": 380,
+      "verification": "VERIFIED_PASS"
+    }
+  ]
+}
