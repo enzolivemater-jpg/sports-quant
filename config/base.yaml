@@ -1,0 +1,8 @@
+# Infrastructure-only F1 configuration.
+environment: local
+logging:
+  level: INFO
+  format: json
+observability:
+  service_name: sports-quant
+# Domain, market, probability, gate and model configuration is intentionally absent in F1.

@@ -1,0 +1,91 @@
+schema_version: "1.0"
+policy: SPORTS_QUANT_SPORT_PREDICTABILITY
+status: APPROVED_FOUNDATION_AMENDMENT
+scope: GOVERNANCE_ONLY_F0
+
+purpose: >-
+  Describe how structurally and empirically predictable a sport/market-family scope is without conflating
+  predictability with selection probability, Market Risk, edge, odds, or profitability.
+
+classification:
+  primary_scope: SPORT_X_MARKET_FAMILY
+  optional_dimension: COMPETITION
+  classes:
+    SP1: VERY_HIGH
+    SP2: HIGH
+    SP3: MODERATE
+    SP4: LOW
+    SP5: VERY_LOW
+  prior_field: predictability_prior
+  empirical_field: predictability_empirical
+  evidence_status:
+    - INSUFFICIENT
+    - PROVISIONAL
+    - VALIDATED
+    - DEGRADED
+  arbitrary_numeric_score: PROHIBITED
+
+separation_invariants:
+  - SP_is_not_P_safe
+  - SP_is_not_Market_Risk
+  - SP_is_not_edge
+  - SP_is_not_odds
+  - SP_is_not_profitability
+  - SP_does_not_directly_modify_P_safe
+  - SP_does_not_directly_modify_edge
+  - SP_does_not_directly_modify_uncertainty
+  - SP_does_not_directly_modify_Market_Risk
+  - SP_does_not_bypass_any_gate
+
+predictability_assessment:
+  versioned: true
+  immutable: true
+  point_in_time_retrievable: true
+  required_fields:
+    - assessment_version
+    - sport
+    - market_family
+    - competition_optional
+    - predictability_prior
+    - predictability_empirical
+    - evidence_status
+    - oos_brier
+    - oos_log_loss
+    - oos_ece
+    - oos_skill
+    - sample_sizes
+    - evaluation_period
+    - stability
+    - data_quality
+    - drift
+    - baseline_scope
+    - model_scope
+    - dataset_version_or_snapshot
+    - code_version
+    - known_at
+  evidence_basis:
+    - out_of_sample_calibration
+    - Brier_Score
+    - Log_Loss
+    - ECE
+    - skill_vs_baseline
+    - sample_size
+    - stability
+    - data_quality
+    - model_scope
+    - drift
+
+usage:
+  predictability_evidence_gate_required: true
+  predictability_evidence_gate_thresholds: NOT_DEFINED_DO_NOT_IMPLEMENT
+  optimizer_rule: >-
+    Only PIT-valid empirical predictability may be used secondarily after an opportunity has otherwise qualified.
+  parlay_aggregation: NOT_DEFINED_DO_NOT_IMPLEMENT
+  signature_example: P60/L2/R4/MR2/SP1
+
+f0_constraints:
+  implement_contract_code: false
+  implement_predictability_module: false
+  implement_tests: false
+  set_empirical_thresholds: false
+  assign_sport_or_market_empirical_classes_without_evidence: false

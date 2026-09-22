@@ -1,0 +1,7 @@
+schema_version: "1.0"
+active: C2_DECISION_SUPPORT
+deferred:
+  - C2_PLUS_BANKROLL_SUPPORT
+prohibited:
+  - AUTOMATED_REAL_MONEY_WAGERING
+  - AUTOMATIC_STAKING

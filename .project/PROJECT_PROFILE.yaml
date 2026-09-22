@@ -1,0 +1,12 @@
+schema_version: "1.0"
+project: SPORTS_QUANT
+authority: Enzo
+architecture: MODULAR_MONOLITH
+criticality: C2_DECISION_SUPPORT
+v1_sports:
+  - TENNIS
+  - FOOTBALL
+native_no_bet: true
+automated_real_money_wagering: PROHIBITED
+current_repository_phase: F1_REPOSITORY_SKELETON
+f2_or_later_business_logic_started: false

@@ -1,0 +1,102 @@
+schema_version: "1.0"
+project: SPORTS_QUANT
+status: OPEN_DECISIONS_NON_BLOCKING_FOR_FOUNDATION_v0.1
+authority_note: >-
+  Ces décisions sont intentionnellement non résolues et ne bloquent pas Foundation v0.1.
+  Aucune nouvelle OPEN DECISION numérotée ne doit être créée sans décision explicite approuvée d'Enzo.
+
+decisions:
+  - id: OD-01
+    decision: "formule exacte de P_safe"
+    due_phase: "Calibration/P_safe"
+  - id: OD-02
+    decision: "méthode principale d'incertitude"
+    due_phase: "Calibration/P_safe"
+  - id: OD-03
+    decision: "critères numériques Calibration=VALID"
+    due_phase: "Modèles"
+  - id: OD-04
+    decision: "tailles minimales d'échantillon par sport/famille marché"
+    due_phase: "Modèles"
+  - id: OD-05
+    decision: "segmentation exacte des calibrateurs"
+    due_phase: "Calibration"
+  - id: OD-06
+    decision: "seuil edge_safe positif éventuel au-delà de 0"
+    due_phase: "S-Tier validation"
+  - id: OD-07
+    decision: "méthode no-vig champion par sport/marché/source"
+    due_phase: "Market validation"
+  - id: OD-08
+    decision: "définition/threshold model agreement"
+    due_phase: "Ensemble"
+  - id: OD-09
+    decision: "seuils data/concept/calibration drift"
+    due_phase: "Monitoring"
+  - id: OD-10
+    decision: "modèles champions Tennis par famille"
+    due_phase: "Tennis"
+  - id: OD-11
+    decision: "modèles champions Football par famille"
+    due_phase: "Football"
+  - id: OD-12
+    decision: "formule/scoring historique de fiabilité Sports Intelligence"
+    due_phase: "Sports Intelligence validation"
+  - id: OD-13
+    decision: "fenêtres numériques de fraîcheur par type de claim"
+    due_phase: "Sports Intelligence"
+  - id: OD-14
+    decision: "seuils exacts exigeant cross-confirmation"
+    due_phase: "Sports Intelligence"
+  - id: OD-15
+    decision: "règles d'auto-promotion/rétrogradation des sources"
+    due_phase: "Later"
+  - id: OD-16
+    decision: "composite Dynamic Market Risk Score"
+    due_phase: "DEFERRED"
+  - id: OD-17
+    decision: "weighted_average_mr"
+    due_phase: "DEFERRED"
+  - id: OD-18
+    decision: "limites additionnelles des modes MR au-delà des bandes de classes"
+    due_phase: "Optimizer validation"
+  - id: OD-19
+    decision: "méthode quantitative de dépendance par cas"
+    due_phase: "Dependency"
+  - id: OD-20
+    decision: "critère de valeur marginale d'une jambe"
+    due_phase: "Optimizer"
+  - id: OD-21
+    decision: "seuil « amélioration significative » multi-sport"
+    due_phase: "Optimizer"
+  - id: OD-22
+    decision: "OR-Tools vs autre solveur"
+    due_phase: "Optimizer"
+  - id: OD-23
+    decision: "modèle joint / Monte-Carlo exact"
+    due_phase: "Dependency/Optimizer"
+  - id: OD-24
+    decision: "fournisseurs sportifs/odds payants"
+    due_phase: "Data procurement"
+  - id: OD-25
+    decision: "Supabase ou autre hébergement PostgreSQL"
+    due_phase: "Deployment"
+  - id: OD-26
+    decision: "déclencheur concret d'adoption Dagster"
+    due_phase: "Data scaling"
+  - id: OD-27
+    decision: "déclencheur concret d'adoption MLflow"
+    due_phase: "Experiment scaling"
+  - id: OD-28
+    decision: "passage C2 → C2+"
+    due_phase: "Future"
+  - id: OD-29
+    decision: "NBA/MMA"
+    due_phase: "Future expansion"
+
+sport_predictability_amendment:
+  numbered_open_decisions_added: []
+  note: >-
+    L'amendement Sport Predictability approuvé ajoute des invariants de gouvernance et un contrat
+    d'évaluation PIT/versionné, mais aucune nouvelle OPEN DECISION numérotée n'a été identifiée dans
+    le record approuvé. Ne pas en inventer pendant F0.

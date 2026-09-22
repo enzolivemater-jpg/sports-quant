@@ -1,0 +1,7 @@
+schema_version: "1.0"
+status: REPOSITORY_SLOT_ONLY
+canonical_authority: FOUNDATION_DECISIONS_v0.1.yaml
+implementation_due_phase: F7_AND_EXISTING_CANONICAL_POLICY
+rule: >-
+  This F1 file reserves the canonical repository path only. It introduces no new policy and must not
+  be treated as resolving any OPEN_DECISION. Populate only in the phase authorized by the handover.

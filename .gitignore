@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.venv/
+
+# Local environment / secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Build
+build/
+dist/
+*.egg-info/
+
+# Runtime data and artifacts
+/data/*
+!/data/README.md
+!/data/.gitignore
+!/data/manifests/
+!/data/manifests/.gitkeep
+/artifacts/*
+!/artifacts/README.md
+!/artifacts/.gitignore
+
+# Local database volumes / scratch
+.pgdata/
+.tmp/

@@ -1,0 +1,36 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-sports_quant}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-local_dev_only_change_me}
+      POSTGRES_DB: ${POSTGRES_DB:-sports_quant}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-sports_quant} -d ${POSTGRES_DB:-sports_quant}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - sports_quant_pgdata:/var/lib/postgresql/data
+
+  postgres-test:
+    image: postgres:16-alpine
+    profiles: ["test"]
+    environment:
+      POSTGRES_USER: ${POSTGRES_TEST_USER:-sports_quant_test}
+      POSTGRES_PASSWORD: ${POSTGRES_TEST_PASSWORD:-local_test_only_change_me}
+      POSTGRES_DB: ${POSTGRES_TEST_DB:-sports_quant_test}
+    ports:
+      - "${POSTGRES_TEST_PORT:-5433}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_TEST_USER:-sports_quant_test} -d ${POSTGRES_TEST_DB:-sports_quant_test}"]
+      interval: 3s
+      timeout: 3s
+      retries: 15
+    tmpfs:
+      - /var/lib/postgresql/data
+
+volumes:
+  sports_quant_pgdata:

@@ -1,0 +1,54 @@
+[build-system]
+requires = ["setuptools>=82,<83"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sports-quant"
+version = "0.1.0.dev1"
+description = "SPORTS QUANT repository foundation"
+readme = "README.md"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+  "alembic>=1.16,<2",
+  "fastapi>=0.116,<1",
+  "opentelemetry-api>=1.36,<2",
+  "opentelemetry-sdk>=1.36,<2",
+  "psycopg[binary]>=3.2,<4",
+  "sqlalchemy>=2.0,<3",
+]
+
+[dependency-groups]
+dev = [
+  "mypy>=1.17,<2",
+  "pip-audit>=2.9,<3",
+  "pytest>=8.4,<9",
+  "pytest-cov>=6.2,<8",
+  "ruff>=0.12,<1",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+markers = [
+  "integration: requires external infrastructure such as PostgreSQL",
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.mypy]
+python_version = "3.13"
+strict = true
+packages = ["sports_quant"]
+mypy_path = "src"
+
+[tool.coverage.run]
+source = ["sports_quant"]
+branch = true

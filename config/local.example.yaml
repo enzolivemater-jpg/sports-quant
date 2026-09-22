@@ -1,0 +1,3 @@
+# Copy to an ignored local file only if file-based local overrides are introduced later.
+# Never place secrets in tracked config.
+environment: local

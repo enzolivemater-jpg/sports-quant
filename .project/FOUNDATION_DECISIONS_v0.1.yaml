@@ -1,0 +1,347 @@
+schema_version: '1.0'
+record:
+  id: FOUNDATION_DECISIONS_v0.1
+  project: SPORTS_QUANT
+  status: APPROVED
+  authority: Enzo
+  implementation_scope: F0_GOVERNANCE_CANONICALIZATION
+  implementation_authority: Claude_Pro
+  independent_reviewer: GPT_Codex
+  external_research_audit: Gemini_Pro
+  criticality: C2_DECISION_SUPPORT
+  sports_scope:
+  - TENNIS
+  - FOOTBALL
+  foundation_status: READY_TO_IMPLEMENT
+priority_order:
+- accuracy
+- calibration
+- robustness
+- safety
+- return
+- frequency
+architecture:
+  style: MODULAR_MONOLITH
+  rules:
+  - logical_modules_are_isolated_by_contracts_and_package_boundaries
+  - logical_modules_are_not_microservices
+  - domain_layer_must_not_depend_on_fastapi_or_frontend
+  - fastapi_is_thin_api_composition_boundary
+  rejected_for_foundation:
+  - MICROSERVICES
+  - KUBERNETES
+  - KAFKA
+  - DEDICATED_FEATURE_STORE
+criticality:
+  active: C2_DECISION_SUPPORT
+  deferred:
+  - C2_PLUS_BANKROLL_SUPPORT
+  prohibited:
+  - AUTOMATED_REAL_MONEY_WAGERING
+  - AUTOMATIC_STAKING
+probability_invariants:
+  distinct_outputs:
+  - P_raw
+  - P_calibrated
+  - P_safe
+  invariant: 0 <= P_safe <= P_calibrated <= 1
+  decision_authority: P_safe
+  llm_or_human_may_directly_assign_final_p_safe: false
+  production_p_safe_formula: DEFERRED
+  no_bet_is_native_result: true
+temporal_semantics:
+  canonical_fields:
+  - event_time
+  - published_at
+  - received_at
+  - valid_from
+  - valid_to
+  - expires_at
+  - known_at
+  - known_at_basis
+  - decision_cutoff_at
+  known_at_definition: Earliest verifiable instant at which the information could legitimately be used by SPORTS
+    QUANT.
+  known_at_must_not_be_reconstructed_speculatively: true
+  known_at_basis:
+  - SYSTEM_RECEIPT
+  - VERIFIED_SOURCE_AVAILABILITY
+  critical_pit_rule: known_at <= decision_cutoff_at
+  missing_defensible_known_at_is_critical_pit_eligible: false
+  strict_point_in_time_integrity: true
+  temporal_leakage_prohibited: true
+source_taxonomy:
+  canonical_values:
+  - OFFICIAL
+  - LICENSED_PRO
+  - TRUSTED_SPECIALIST
+  - TRUSTED_JOURNALIST
+  - AGGREGATOR
+  - SOCIAL_UNVERIFIED
+  legacy_normalization:
+    LICENSED DATA: LICENSED_PRO
+    LICENSED PROFESSIONAL: LICENSED_PRO
+    SOCIAL: SOCIAL_UNVERIFIED
+    SOCIAL/UNVERIFIED: SOCIAL_UNVERIFIED
+  rule: legacy_terms_must_be_normalized_before_canonical_storage
+data_state_dimensions:
+  orthogonal: true
+  quality_state:
+  - VALID
+  - PARTIAL
+  - UNAVAILABLE
+  - ERROR
+  freshness_state:
+  - LIVE
+  - RECENT
+  - DELAYED
+  - STALE
+  - SUPERSEDED
+  verification_state:
+  - NOT_REQUIRED
+  - UNVERIFIED
+  - VERIFIED
+  - CROSS_CONFIRMED
+  conflict_state:
+  - NONE
+  - OPEN
+  - RESOLVED
+  rule: CONFLICT and UNVERIFIED must not be encoded as freshness states; claim_type CONFLICT is distinct from conflict_state.
+sports_intelligence:
+  claim_types:
+  - FACT
+  - EXPERT_ASSESSMENT
+  - OPINION
+  - RUMOR
+  - CONFLICT
+  fact_implies_verified: false
+  human_or_llm_direct_probability_assignment: false
+  allowed_effect_channels:
+  - VALIDATED_MODEL_FEATURES
+  - STRUCTURED_CONTEXT
+  - UNCERTAINTY
+  - REVIEW_STATE
+  - RESTRICTIONS
+  - GATES
+  - NO_BET_REASONS
+market_risk:
+  classes:
+  - MR1
+  - MR2
+  - MR3
+  - MR4
+  - MR5
+  - MR6
+  sport_specific_map_precedes_generic_examples: true
+  mr_base_is_ordinal_and_structural: true
+  mr_base_is_probability: false
+  mr_base_directly_modifies_p_safe: false
+  retain_dynamic_factors_individually: true
+  composite_dynamic_market_risk_score: DEFERRED
+  weighted_average_mr: DEFERRED
+  parlay_summary_contract:
+  - max_mr
+  - count_by_mr
+  - count_mr4_plus
+  - market_risk_mode
+  - dependency_profile
+  modes:
+  - CONSERVATIVE
+  - BALANCED
+  - AGGRESSIVE
+  - SPECULATIVE
+  mode_must_not:
+  - alter_p_safe
+  - weaken_calibration_requirements
+  - weaken_uncertainty_requirements
+  - lower_edge_requirements
+  - bypass_data_quality_gates
+  - bypass_dependency_gates
+business_decision_states:
+  canonical_values:
+  - QUALIFIED
+  - WAIT
+  - REVIEW
+  - NO_BET
+  - BLOCKED
+  precedence:
+  - BLOCKED
+  - REVIEW
+  - WAIT
+  - NO_BET
+  - QUALIFIED
+  definitions:
+    QUALIFIED: every_mandatory_gate_passes_for_current_evaluation_and_cutoff
+    WAIT: material_information_expected_before_cutoff_is_not_yet_available
+    REVIEW: ambiguity_or_conflict_requires_human_validation
+    NO_BET: opportunity_fails_qualification_for_current_cutoff
+    BLOCKED: technical_integrity_licensing_or_pit_condition_makes_valid_decision_impossible
+  cutoff_resolution:
+    unresolved_wait: NO_BET
+    unresolved_decision_critical_review: NO_BET
+    technical_integrity_licensing_or_pit_failure: BLOCKED
+  evaluation_snapshots_are_immutable: true
+edge:
+  edge_calibrated: P_calibrated - P_market_no_vig
+  edge_safe: P_safe - P_market_no_vig
+  s_tier_uses: edge_safe
+  invariant: edge_safe < 0 => not QUALIFIED
+  edge_safe_nonnegative_is_sufficient_for_qualification: false
+  stricter_positive_minimum_threshold: DEFERRED
+market_catalog:
+  taxonomy_dimensions:
+  - sport
+  - market_family
+  - market_type
+  - market_instance
+  - MR_base
+  rule: MR_class_is_not_a_model_family
+  tennis:
+    phase_1:
+    - market_family: TENNIS_MATCH_WINNER
+      MR_base: MR1
+    phase_2:
+    - market_family: TENNIS_TOTAL_GAMES
+      MR_base: MR2
+    - market_family: TENNIS_GAME_HANDICAP
+      MR_base: MR2
+    deferred:
+    - SET_MARKETS
+    - PLAYER_PROPS
+    - EXACT_SCORE_TIEBREAK_MARKETS
+    - MICRO_MARKETS
+  football:
+    phase_1:
+    - market_family: FOOTBALL_1X2
+      MR_base: MR2
+    - market_family: FOOTBALL_TOTAL_GOALS_MAIN
+      MR_base: MR2
+    phase_2:
+    - market_family: FOOTBALL_ASIAN_HANDICAP
+      MR_base: MR2
+    - market_family: FOOTBALL_BTTS
+      MR_base: MR2
+    - market_family: FOOTBALL_TEAM_TOTALS
+      MR_base: MR2
+    deferred:
+    - GOALSCORERS
+    - PLAYER_PROPS
+    - EXACT_SCORES
+    - PRECISE_TIMING_MARKETS
+    - MICRO_SAME_GAME_COMPOUND_MARKETS
+sport_predictability:
+  status: APPROVED_AMENDMENT
+  classes:
+    SP1: VERY_HIGH
+    SP2: HIGH
+    SP3: MODERATE
+    SP4: LOW
+    SP5: VERY_LOW
+  primary_scope: SPORT_X_MARKET_FAMILY
+  optional_scope_dimension: COMPETITION
+  separate_prior_and_empirical: true
+  fields:
+  - predictability_prior
+  - predictability_empirical
+  - evidence_status
+  evidence_status_values:
+  - INSUFFICIENT
+  - PROVISIONAL
+  - VALIDATED
+  - DEGRADED
+  predictability_assessment_requires:
+  - assessment_version
+  - sport
+  - market_family
+  - competition_optional
+  - predictability_prior
+  - predictability_empirical
+  - evidence_status
+  - oos_brier
+  - oos_log_loss
+  - oos_ece
+  - oos_skill
+  - sample_sizes
+  - evaluation_period
+  - stability
+  - data_quality
+  - drift
+  - baseline_scope
+  - model_scope
+  - dataset_version_or_snapshot
+  - code_version
+  - known_at
+  point_in_time_retrieval_required: true
+  immutable_versioning_required: true
+  arbitrary_numeric_predictability_score_prohibited: true
+  direct_effects_prohibited:
+  - P_safe
+  - edge
+  - uncertainty
+  - Market_Risk
+  - bypassing_gates
+  predictability_evidence_gate_required: true
+  predictability_evidence_gate_thresholds: NOT_DEFINED_DO_NOT_IMPLEMENT
+  optimizer_use: Only PIT-valid empirical Sport Predictability may be used secondarily after qualification.
+  parlay_sp_aggregation: NOT_DEFINED_DO_NOT_IMPLEMENT
+  signature_extension_example: P60/L2/R4/MR2/SP1
+technology_disposition:
+  retain_for_foundation:
+  - Python
+  - FastAPI_thin_boundary
+  - PostgreSQL
+  - Parquet
+  - DuckDB
+  - GitHub_Actions_or_equivalent_CI
+  - minimal_structured_observability_OpenTelemetry_conventions
+  defer:
+  - NextJS_PWA
+  - Dagster
+  - MLflow_full_deployment
+  - PyMC
+  - MAPIE
+  - OR_Tools
+  - Optuna
+  - CatBoost_LightGBM_XGBoost_beyond_later_model_phases
+  - Prometheus_Grafana
+  - Supabase_selection
+  - C2_PLUS
+  - NBA_MMA
+  reject_for_foundation:
+  - microservices
+  - dedicated_feature_store
+  - Kubernetes
+  - Kafka
+  - automated_wagering
+  - autonomous_LLM_probability_adjustment
+governance:
+  roles:
+    Enzo: final_authority
+    GPT_Codex: architecture_math_specification_anti_leakage_and_independent_critical_review
+    Claude_Pro: primary_implementation_integration_tests_refactoring_and_technical_documentation
+    Gemini_Pro: external_research_supplier_licence_and_methodological_audit
+  implementer_must_not_be_sole_reviewer: true
+  p0_p1_divergence: NEEDS_DECISION
+  f1_may_start_before_independent_review_of_f0: false
+superseded_for_foundation:
+- weighted_average_mr
+- composite_dynamic_market_risk_score
+- C2_PLUS_as_active_foundation_criticality
+- NBA_MMA_packages
+- legacy_source_taxonomy_names
+- ambiguous_generic_edge_field
+- P_model_or_safe_minus_P_market_no_vig
+- combined_quality_freshness_conflict_state
+f0_scope:
+  required_actions:
+  - create_FOUNDATION_DECISIONS_v0.1_yaml
+  - create_OPEN_DECISIONS_yaml
+  - create_ADR_0001
+  - normalize_source_names
+  - document_four_orthogonal_state_axes
+  - record_C2
+  - mark_weighted_MR_and_dynamic_composite_MR_DEFERRED
+  - freeze_phase_1_phase_2_market_catalog
+  - incorporate_approved_Sport_Predictability_amendment
+  business_code_allowed: false
+  next_phase: F1_REPOSITORY_SKELETON

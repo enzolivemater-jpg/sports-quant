@@ -1,0 +1,17 @@
+schema_version: "1.0"
+project: SPORTS_QUANT
+architecture: MODULAR_MONOLITH
+logical_modules:
+  - config
+  - data
+  - sports_intelligence
+  - market
+  - modeling
+  - calibration
+  - uncertainty
+  - risk
+  - dependency
+  - optimizer
+  - backtesting
+  - observability
+rule: logical_modules_are_package_boundaries_not_microservices
