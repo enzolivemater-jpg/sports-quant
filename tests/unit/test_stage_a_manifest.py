@@ -6,10 +6,7 @@ from pathlib import Path
 from types import ModuleType
 
 SCRIPT = (
-    Path(__file__).resolve().parents[2]
-    / "scripts"
-    / "research"
-    / "validate_stage_a_manifest.py"
+    Path(__file__).resolve().parents[2] / "scripts" / "research" / "validate_stage_a_manifest.py"
 )
 MANIFEST = (
     Path(__file__).resolve().parents[2]
