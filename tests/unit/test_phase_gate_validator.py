@@ -219,9 +219,7 @@ def test_reviewed_head_scope_rejects_protected_file_drift(monkeypatch, tmp_path:
     )
     monkeypatch.setattr(module, "_git", lambda _args: next(responses))
 
-    errors = module._validate_reviewed_head_scope(
-        "0123456789abcdef0123456789abcdef01234567"
-    )
+    errors = module._validate_reviewed_head_scope("0123456789abcdef0123456789abcdef01234567")
 
     assert errors
     assert "re-review is required" in errors[0]
