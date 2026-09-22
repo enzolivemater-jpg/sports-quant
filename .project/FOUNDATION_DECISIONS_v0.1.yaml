@@ -382,5 +382,6 @@ f0_scope:
   - incorporate_approved_Sport_Predictability_amendment
   - incorporate_approved_mandatory_sports_scope_amendment_ADR_0002
   - incorporate_approved_additional_sports_allowlist_ADR_0003
+  - incorporate_approved_football_first_pilot_ADR_0004
   business_code_allowed: false
   next_phase: F1_REPOSITORY_SKELETON

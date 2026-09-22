@@ -1,6 +1,6 @@
 # ADR-0001 — SPORTS QUANT Foundation v0.1 Governance Canonicalization
 
-> **Partially superseded by ADR-0002 (2026-09-22)** for the active sport scope. Tennis is no longer a mandatory V1 sport; Basketball, Football and MMA are mandatory, with UFC as the mandatory initial MMA competition scope.
+> **Supersession map (current authority):** ADR-0002 supersedes this ADR's active sport scope; ADR-0003 defines the only additional validation-sport allowlist; ADR-0004 fixes Football as the first implementation pilot. Historical Tennis-as-mandatory statements and Tennis Phase 1/2 catalog entries below are retained only as history and are **not active implementation authority**. Basketball, Football and MMA are mandatory; UFC is the initial mandatory MMA competition scope; Handball, Volleyball and Tennis are validation-only additions.
 
 - **Status:** APPROVED
 - **Authority:** Enzo
@@ -64,9 +64,11 @@ Canonical parlay MR summary is limited to `max_mr`, `count_by_mr`, `count_mr4_pl
 
 ### 7. Frozen Phase 1 / Phase 2 market catalog
 
-**Tennis Phase 1:** `TENNIS_MATCH_WINNER` (MR1).
+> **Current-state clarification:** the Tennis entries in this section are historical and inactive after ADR-0002/ADR-0003. They must not be implemented as a production catalog unless Tennis is later promoted through the approved Sport Predictability process and its production catalog is authorized. The Football entries remain active Foundation authority.
 
-**Tennis Phase 2:** `TENNIS_TOTAL_GAMES` (MR2), `TENNIS_GAME_HANDICAP` (MR2).
+**Tennis Phase 1 (historical/inactive):** `TENNIS_MATCH_WINNER` (MR1).
+
+**Tennis Phase 2 (historical/inactive):** `TENNIS_TOTAL_GAMES` (MR2), `TENNIS_GAME_HANDICAP` (MR2).
 
 **Football Phase 1:** `FOOTBALL_1X2` (MR2), `FOOTBALL_TOTAL_GOALS_MAIN` (MR2).
 

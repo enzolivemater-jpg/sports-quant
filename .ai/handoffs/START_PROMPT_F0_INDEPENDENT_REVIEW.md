@@ -23,6 +23,9 @@ Read and review at minimum:
 - `docs/adr/ADR-0004-football-first-pilot.md`
 - `.ai/AI_CHARTER.md`
 - `.ai/AI_DECISIONS.md`
+- `docs/runbooks/GOVERNANCE_DEVIATION_F1_BEFORE_F0_REVIEW.md`
+- `scripts/validate_phase_gates.py`
+- `.project/PHASE_GATES.toml`
 - `.ai/handoffs/F0_INDEPENDENT_REVIEW.md`
 
 Project authority and roles:
@@ -81,7 +84,8 @@ Review questions:
 15. Does Sport Predictability remain PIT/OOS/versioned and non-arbitrary?
 16. Are weighted_average_mr and composite Dynamic Market Risk still deferred?
 17. Are exactly OD-01 through OD-29 present?
-18. Do any P0/P1 issues remain that must block F2?
+18. Is the historical F1-before-review deviation honestly recorded and effectively contained by the machine gate so it cannot silently authorize F2?
+19. Do any P0/P1 issues remain that must block F2?
 
 Severity:
 - P0 = correctness/safety/PIT/governance defect making implementation unsafe

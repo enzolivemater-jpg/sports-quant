@@ -23,6 +23,9 @@ Review at minimum:
 - docs/adr/ADR-0004-football-first-pilot.md
 - .ai/AI_CHARTER.md
 - .ai/AI_DECISIONS.md
+- docs/runbooks/GOVERNANCE_DEVIATION_F1_BEFORE_F0_REVIEW.md
+- scripts/validate_phase_gates.py
+- .project/PHASE_GATES.toml
 
 ## Mandatory review questions
 
@@ -51,7 +54,8 @@ Review at minimum:
 16. Does Sport Predictability require PIT-valid OOS evidence and avoid arbitrary numeric scoring?
 17. Are weighted_average_mr and composite Dynamic Market Risk still deferred?
 18. Are exactly OD-01 through OD-29 present, with no invented numbered decision?
-19. Do any P0/P1 inconsistencies remain that should block F2?
+19. Is the historical F1-before-review deviation explicitly documented, honestly preserved, and effectively contained by the current F2 machine gate?
+20. Do any P0/P1 inconsistencies remain that should block F2?
 
 ## Severity
 

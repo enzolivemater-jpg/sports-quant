@@ -1,5 +1,7 @@
 # ADR-0002 — Mandatory Sports Scope and Predictability-Gated Expansion
 
+> **Subsequent amendments:** ADR-0003 supersedes this ADR's statement that no optional sport is pre-approved by establishing a validation-only allowlist of Handball, Volleyball and Tennis. ADR-0004 supersedes the statement that implementation order is unfixed by selecting Football as the first end-to-end pilot. Neither amendment promotes an additional sport into production or selects a model champion.
+
 - **Status:** APPROVED
 - **Authority:** Enzo
 - **Date:** 2026-09-22

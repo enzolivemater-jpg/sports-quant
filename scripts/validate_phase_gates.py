@@ -34,6 +34,8 @@ REVIEW_PROTECTED_PATHS = (
     ".ai/AI_CHARTER.md",
     ".ai/AI_DECISIONS.md",
     ".ai/handoffs/F0_INDEPENDENT_REVIEW.md",
+    "scripts/validate_phase_gates.py",
+    "docs/runbooks/GOVERNANCE_DEVIATION_F1_BEFORE_F0_REVIEW.md",
 )
 
 

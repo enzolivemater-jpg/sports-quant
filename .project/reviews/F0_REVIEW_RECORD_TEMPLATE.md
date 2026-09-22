@@ -20,6 +20,9 @@ Required files:
 - .ai/AI_CHARTER.md
 - .ai/AI_DECISIONS.md
 - .ai/handoffs/F0_INDEPENDENT_REVIEW.md
+- docs/runbooks/GOVERNANCE_DEVIATION_F1_BEFORE_F0_REVIEW.md
+- scripts/validate_phase_gates.py
+- .project/PHASE_GATES.toml
 
 Additional files reviewed:
 - <list>
@@ -96,6 +99,12 @@ Deferred weighted_average_mr:
 - PASS / FAIL
 
 Deferred composite Dynamic Market Risk:
+- PASS / FAIL
+
+Historical F1-before-review deviation containment:
+- PASS / FAIL
+
+F2 machine-gate containment:
 - PASS / FAIL
 
 ## Blocking findings state
