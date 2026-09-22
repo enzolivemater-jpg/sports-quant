@@ -15,9 +15,7 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
-FIXTURE_MANIFEST = (
-    ROOT / "data" / "manifests" / "football_odds_stage_a_epl_2024_25_fixtures.json"
-)
+FIXTURE_MANIFEST = ROOT / "data" / "manifests" / "football_odds_stage_a_epl_2024_25_fixtures.json"
 
 
 def _load_json(path: Path) -> Any:
@@ -40,7 +38,10 @@ def _provider_events(payload: Any) -> list[dict[str, Any]]:
         commence_time = event.get("commence_time")
         home_team = event.get("home_team")
         away_team = event.get("away_team")
-        if not all(isinstance(value, str) and value for value in (event_id, commence_time, home_team, away_team)):
+        if not all(
+            isinstance(value, str) and value
+            for value in (event_id, commence_time, home_team, away_team)
+        ):
             continue
         result.append(
             {
@@ -58,7 +59,9 @@ def _load_alias_map(path: Path | None) -> dict[str, str]:
         return {}
     data = _load_json(path)
     if not isinstance(data, dict):
-        raise ValueError("Alias map must be a JSON object mapping provider label -> source identity key")
+        raise ValueError(
+            "Alias map must be a JSON object mapping provider label -> source identity key"
+        )
     result: dict[str, str] = {}
     for provider_label, source_key in data.items():
         if not isinstance(provider_label, str) or not isinstance(source_key, str):

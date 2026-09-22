@@ -4,12 +4,7 @@ import importlib.util
 from pathlib import Path
 from types import ModuleType
 
-SCRIPT = (
-    Path(__file__).resolve().parents[2]
-    / "scripts"
-    / "research"
-    / "reconcile_odds_stage_a.py"
-)
+SCRIPT = Path(__file__).resolve().parents[2] / "scripts" / "research" / "reconcile_odds_stage_a.py"
 
 
 def _load_module() -> ModuleType:
