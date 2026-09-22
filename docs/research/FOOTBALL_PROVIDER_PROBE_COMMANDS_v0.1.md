@@ -2,382 +2,194 @@
 
 Date: 2026-09-22
 
-Status: READY_FOR_CREDENTIALLED_RESEARCH
+Status: READY_FOR_LOCAL_RESEARCH_USE
 
-Purpose:
-provide reproducible, low-risk commands for provider trials using the research-only capture harness.
+These commands use the research-only harness:
+`scripts/research/capture_provider_json.py`
 
-These commands do not approve any provider and do not resolve OD-24.
+They are intentionally local/manual research commands. They do not belong to F4 production ingestion.
 
-## Global safety
+## Security rule
 
-Before every probe:
+Never paste a real key into a URL or committed command.
 
-- use `scripts/research/capture_provider_json.py`;
-- export the provider secret into an environment variable;
-- never place the secret value directly in `--url`;
-- use `--header-env` or `--query-env`;
-- keep raw captures under ignored `data/research-probes/`;
-- do not assign canonical `known_at`;
-- record the result in `docs/research/PROVIDER_PROBE_EVIDENCE_RECORD_TEMPLATE.md`.
+Export secrets only into the local shell environment.
+
+Raw responses are written under ignored `data/research-probes/`.
 
 ## API-Football
 
-Official base URL:
-`https://v3.football.api-sports.io/`
-
 Official authentication:
-request header `x-apisports-key`.
+- direct API base: `https://v3.football.api-sports.io/`
+- request header: `x-apisports-key`
 
-Environment:
+Local secret:
 
 ```bash
 export API_FOOTBALL_KEY='...'
 ```
 
-### P1.1 — basic authenticated connectivity
+### Authentication/schema probe
 
 ```bash
 python scripts/research/capture_provider_json.py \
   --research-only \
   --provider api-football \
-  --probe-name countries-connectivity \
+  --probe-name countries-auth-schema \
   --url 'https://v3.football.api-sports.io/countries' \
   --header-env 'x-apisports-key=API_FOOTBALL_KEY'
 ```
 
-### P1.2 — EPL league/season coverage
+### EPL competition/season discovery
 
-API-Football documentation currently uses league id `39` for the English Premier League.
-
-For EPL 2024/25, season is represented by starting year `2024`.
+Do not initially hardcode an EPL provider ID from memory.
 
 ```bash
 python scripts/research/capture_provider_json.py \
   --research-only \
   --provider api-football \
-  --probe-name epl-2024-league-coverage \
-  --url 'https://v3.football.api-sports.io/leagues?id=39&season=2024' \
+  --probe-name england-leagues-2024 \
+  --url 'https://v3.football.api-sports.io/leagues?country=England&season=2024' \
   --header-env 'x-apisports-key=API_FOOTBALL_KEY'
 ```
 
-Inspect:
-- league/season IDs;
-- coverage flags;
-- injuries;
-- lineups;
-- statistics;
-- odds availability flags.
+Resolve the Premier League provider ID from the captured response and record it in the probe evidence record.
 
-### P1.3 — EPL 2024/25 fixture spine
+Then continue the matrix in:
+`FOOTBALL_PROVIDER_PROBE_EXECUTION_MATRIX_v0.1.md`.
 
-```bash
-python scripts/research/capture_provider_json.py \
-  --research-only \
-  --provider api-football \
-  --probe-name epl-2024-fixtures \
-  --url 'https://v3.football.api-sports.io/fixtures?league=39&season=2024' \
-  --header-env 'x-apisports-key=API_FOOTBALL_KEY'
-```
+Official auth reference:
+https://www.api-football.com/news/post/how-to-get-started-with-api-football-the-complete-beginners-guide
 
-Validate:
-- expected fixture count;
-- fixture IDs;
-- team IDs;
-- ISO fixture date;
-- Unix timestamp;
-- timezone;
-- paging;
-- postponed/cancelled state behavior.
+## Sportmonks
 
-Do not treat current final results/status as pre-match information.
+Official authentication supports:
+- query parameter `api_token`; or
+- `Authorization` request header.
 
-### P1.4 — selected fixture lineups
+SPORTS QUANT research preference:
+use the header so the token never becomes part of the request URL.
 
-After obtaining a real `fixture_id` from P1.3:
+Local secret:
 
 ```bash
-export API_FOOTBALL_FIXTURE_ID='<fixture_id>'
-
-python scripts/research/capture_provider_json.py \
-  --research-only \
-  --provider api-football \
-  --probe-name selected-fixture-lineup \
-  --url "https://v3.football.api-sports.io/fixtures/lineups?fixture=${API_FOOTBALL_FIXTURE_ID}" \
-  --header-env 'x-apisports-key=API_FOOTBALL_KEY'
+export SPORTMONKS_API_TOKEN='...'
 ```
 
-For prospective matches repeat captures around the documented probe windows in the existing PIT mapping.
-
-A historical final lineup retrieved today is not historical publication-time evidence.
-
-### P1.5 — selected fixture injuries
-
-```bash
-python scripts/research/capture_provider_json.py \
-  --research-only \
-  --provider api-football \
-  --probe-name selected-fixture-injuries \
-  --url "https://v3.football.api-sports.io/injuries?fixture=${API_FOOTBALL_FIXTURE_ID}" \
-  --header-env 'x-apisports-key=API_FOOTBALL_KEY'
-```
-
-Do not map injury dates to historical `known_at`.
-
----
-
-## Sportmonks Football API v3
-
-Official Football base:
-`https://api.sportmonks.com/v3/football`
-
-Official authentication supports query parameter `api_token`.
-Use query environment injection so the token is not typed into the URL.
-
-Environment:
-
-```bash
-export SPORTMONKS_TOKEN='...'
-```
-
-### P2.1 — fixtures connectivity/schema
+### Authentication/schema probe
 
 ```bash
 python scripts/research/capture_provider_json.py \
   --research-only \
   --provider sportmonks \
-  --probe-name fixtures-connectivity \
+  --probe-name fixtures-auth-schema \
   --url 'https://api.sportmonks.com/v3/football/fixtures' \
-  --query-env 'api_token=SPORTMONKS_TOKEN'
+  --header-env 'Authorization=SPORTMONKS_API_TOKEN'
 ```
 
-Inspect:
-- fixture ID;
-- league/season/team IDs;
-- `starting_at`;
-- `starting_at_timestamp`;
-- `last_processed_at`;
-- `has_odds`;
-- paging/links.
+Before EPL-specific probes:
+- query/inspect leagues through the provider API/docs;
+- resolve the exact EPL provider league/season IDs from authenticated data;
+- do not infer IDs from another vendor.
 
-### P2.2 — fixture by ID
-
-After selecting a fixture ID from P2.1:
-
-```bash
-export SPORTMONKS_FIXTURE_ID='<fixture_id>'
-
-python scripts/research/capture_provider_json.py \
-  --research-only \
-  --provider sportmonks \
-  --probe-name selected-fixture \
-  --url "https://api.sportmonks.com/v3/football/fixtures/${SPORTMONKS_FIXTURE_ID}" \
-  --query-env 'api_token=SPORTMONKS_TOKEN'
-```
-
-Then repeat with documented includes only when needed for the specific evidence question.
-
-Do not request every include by default.
-
-### P2.3 — latest-updated fixture behavior
-
-```bash
-python scripts/research/capture_provider_json.py \
-  --research-only \
-  --provider sportmonks \
-  --probe-name latest-updated-fixtures \
-  --url 'https://api.sportmonks.com/v3/football/fixtures/latest' \
-  --query-env 'api_token=SPORTMONKS_TOKEN'
-```
-
-Use only to study update/change behavior.
-Do not equate a current update signal with historical publication time.
-
----
+Official auth reference:
+https://docs.sportmonks.com/v3/welcome/authentication
 
 ## Sportradar Soccer v4
 
-Official trial URL pattern:
-`https://api.sportradar.com/soccer/trial/v4/en/...json`
-
 Official authentication:
-request header `x-api-key`.
+- `x-api-key` request header.
 
-Environment:
+Local secret:
 
 ```bash
 export SPORTRADAR_API_KEY='...'
 ```
 
-### P3.1 — competition list / connectivity
+### Competition/schema probe
 
 ```bash
 python scripts/research/capture_provider_json.py \
   --research-only \
   --provider sportradar \
-  --probe-name soccer-competitions \
+  --probe-name soccer-v4-competitions \
   --url 'https://api.sportradar.com/soccer/trial/v4/en/competitions.json' \
   --header-env 'x-api-key=SPORTRADAR_API_KEY'
 ```
 
-Premier League competition ID is documented as:
-`sr:competition:17`.
+Then resolve:
+- Premier League competition ID;
+- season ID;
+- coverage metadata;
 
-### P3.2 — seasons
+from authenticated provider responses before deeper lineup/missing-player probes.
 
-```bash
-python scripts/research/capture_provider_json.py \
-  --research-only \
-  --provider sportradar \
-  --probe-name soccer-seasons \
-  --url 'https://api.sportradar.com/soccer/trial/v4/en/seasons.json' \
-  --header-env 'x-api-key=SPORTRADAR_API_KEY'
-```
+Official auth reference:
+https://developer.sportradar.com/getting-started/docs/authentication
 
-Resolve the exact EPL season ID from provider data rather than hardcoding a current-season ID.
+## The Odds API
 
-### P3.3 — selected season info
-
-After resolving the season ID:
-
-```bash
-export SPORTRADAR_SEASON_ID='<sr:season:...>'
-
-python scripts/research/capture_provider_json.py \
-  --research-only \
-  --provider sportradar \
-  --probe-name epl-season-info \
-  --url "https://api.sportradar.com/soccer/trial/v4/en/seasons/${SPORTRADAR_SEASON_ID}/info.json" \
-  --header-env 'x-api-key=SPORTRADAR_API_KEY'
-```
-
-Inspect:
-- coverage properties;
-- schedules;
-- missing players;
-- team squads;
-- lineups;
-- scores;
-- `generated_at`.
-
-Do not map response `generated_at` directly to historical `known_at`.
-
-### P3.4 — selected season schedule
-
-```bash
-python scripts/research/capture_provider_json.py \
-  --research-only \
-  --provider sportradar \
-  --probe-name epl-season-schedule \
-  --url "https://api.sportradar.com/soccer/trial/v4/en/seasons/${SPORTRADAR_SEASON_ID}/schedules.json" \
-  --header-env 'x-api-key=SPORTRADAR_API_KEY'
-```
-
-Preserve:
-- sport-event IDs;
-- start time;
-- `start_time_confirmed`;
-- `date_confirmed` when present.
-
----
-
-## The Odds API v4
-
-Official historical featured-market endpoint:
-
-`GET /v4/historical/sports/{sport}/odds`
+Official historical endpoint:
+`/v4/historical/sports/{sport}/odds`
 
 EPL sport key:
 `soccer_epl`
 
 Historical access is paid.
 
-Authentication:
-query parameter `apiKey`.
+Authentication is a query parameter named `apiKey`.
 
-Environment:
+SPORTS QUANT MUST inject it with `--query-env`; never place the value inside `--url`.
+
+Local secret:
 
 ```bash
 export THE_ODDS_API_KEY='...'
 ```
 
-### P4.0 — do not execute until Stage A spend is approved
+### Historical Stage A command shape
 
-Use:
-`docs/research/FOOTBALL_ODDS_BAKEOFF_STAGE_A_SAMPLE_v0.1.md`
-
-Initial markets:
-- `h2h` = 1X2;
-- `totals` = over/under totals.
-
-Initial region:
-- one region only.
-
-### P4.1 — one historical schema/timestamp probe
-
-Set a historical ISO-8601 snapshot timestamp from the Stage A plan:
+Replace:
+- `<REGION>` with the explicitly selected single Stage A region;
+- `<ISO8601_CUTOFF>` with one planned historical cutoff.
 
 ```bash
-export ODDS_SNAPSHOT_AT='<YYYY-MM-DDTHH:MM:SSZ>'
-
 python scripts/research/capture_provider_json.py \
   --research-only \
   --provider the-odds-api \
-  --probe-name epl-historical-schema \
-  --url "https://api.the-odds-api.com/v4/historical/sports/soccer_epl/odds?regions=eu&markets=h2h,totals&oddsFormat=decimal&date=${ODDS_SNAPSHOT_AT}" \
+  --probe-name epl-stage-a-historical \
+  --url 'https://api.the-odds-api.com/v4/historical/sports/soccer_epl/odds?regions=<REGION>&markets=h2h,totals&oddsFormat=decimal&date=<ISO8601_CUTOFF>' \
   --query-env 'apiKey=THE_ODDS_API_KEY'
 ```
 
-Collect:
-- requested date;
-- returned wrapper timestamp;
-- previous/next timestamps;
-- event IDs;
-- commence times;
-- bookmaker IDs;
-- bookmaker/market last-update times;
-- h2h completeness;
-- totals points/lines;
-- payload hash;
-- received_at.
+Do not execute the full Stage A loop until:
+- historical-enabled access is active;
+- pricing/quota is rechecked;
+- Stage A spend is explicitly authorized.
 
-The documented endpoint returns the closest historical snapshot equal to or earlier than the requested date.
+Official references:
+- https://the-odds-api.com/liveapi/guides/v4/
+- https://the-odds-api.com/sports-odds-data/epl-odds.html
 
-### P4.2 — Stage A
+## Evidence recording
 
-Only after P4.1 passes:
-- run 23 kickoff groups;
-- T-24h;
-- T-1h;
-- T-15m;
-- h2h + totals;
-- one region.
+After each probe:
+1. retain local raw capture;
+2. copy the template:
+   `docs/research/PROVIDER_PROBE_EVIDENCE_RECORD_TEMPLATE.md`;
+3. fill only verified observations;
+4. mark unknowns as UNKNOWN;
+5. never assign canonical historical `known_at` from a probe script;
+6. update issue #3 with non-secret findings only.
 
-Keep all misses/errors in the denominator.
+## Stop conditions
 
----
+Stop a provider-role probe when:
+- auth/plan does not expose the required EPL sample;
+- timestamps cannot support the proposed role;
+- historical versions required for the role are unavailable;
+- licensing/storage constraints conflict with the role;
+- quota economics are materially worse than planned;
+- provider IDs/market records cannot be reconciled reliably.
 
-## Evidence completion
-
-After each probe, create a result from:
-
-`docs/research/PROVIDER_PROBE_EVIDENCE_RECORD_TEMPLATE.md`
-
-Allowed evidence statuses:
-- VERIFIED_PASS
-- VERIFIED_FAIL
-- PARTIAL
-- DOCUMENTED_NOT_PROBED
-- UNKNOWN
-- NOT_APPLICABLE
-
-Never use a numeric vendor score.
-
-## Sources verified for command syntax
-
-- API-Football official beginner guide / API-Football documentation.
-- Sportmonks API 3.0 authentication and fixture documentation.
-- Sportradar official authentication and Soccer v4 documentation.
-- The Odds API v4 historical odds documentation.
-
-Re-check provider docs immediately before paid execution because endpoint behavior, pricing and quotas may change.
+A failed role test is useful evidence. Do not keep spending quota to force a provider to pass.
