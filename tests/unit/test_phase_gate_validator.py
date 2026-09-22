@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import subprocess
 from pathlib import Path
 from types import ModuleType
 
@@ -197,3 +198,31 @@ def test_fully_supported_authorized_gate_passes(tmp_path: Path) -> None:
     )
 
     assert module.main() == 0
+
+
+def test_reviewed_head_scope_rejects_protected_file_drift(monkeypatch, tmp_path: Path) -> None:
+    module = _load_module()
+    _configure_module(module, tmp_path)
+    (tmp_path / ".git").mkdir()
+
+    responses = iter(
+        [
+            subprocess.CompletedProcess(args=[], returncode=0, stdout="", stderr=""),
+            subprocess.CompletedProcess(args=[], returncode=0, stdout="", stderr=""),
+            subprocess.CompletedProcess(
+                args=[],
+                returncode=0,
+                stdout=".project/OPEN_DECISIONS.yaml\n",
+                stderr="",
+            ),
+        ]
+    )
+    monkeypatch.setattr(module, "_git", lambda _args: next(responses))
+
+    errors = module._validate_reviewed_head_scope(
+        "0123456789abcdef0123456789abcdef01234567"
+    )
+
+    assert errors
+    assert "re-review is required" in errors[0]
+    assert ".project/OPEN_DECISIONS.yaml" in errors[0]
