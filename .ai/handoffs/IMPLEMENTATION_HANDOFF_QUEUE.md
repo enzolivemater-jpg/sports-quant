@@ -49,13 +49,30 @@ Each phase must satisfy:
 - no unresolved P0/P1;
 - Enzo decision where NEEDS_DECISION is raised.
 
-## Next handoffs to prepare
+5. `.ai/handoffs/CLAUDE_F6_IMPLEMENTATION_HANDOFF.md`
+   - issue #9
+   - after F5 acceptance and stable PIT odds
 
-After F5 design stabilizes:
-- F6 Market Engine
-- F7 Calibration/Uncertainty/P_safe
-- F8 S-Tier
-- F9 Backtest
-- F10 Dependency/Parlay
-- F11 Paper Betting/Monitoring
-- F12 PWA
+6. `.ai/handoffs/CLAUDE_F7_IMPLEMENTATION_HANDOFF.md`
+   - issue #10
+   - after F6/model evidence; unresolved OD-01..05 may block full completion
+
+7. `.ai/handoffs/CLAUDE_F8_IMPLEMENTATION_HANDOFF.md`
+   - issue #11
+   - after F7 acceptance
+
+8. `.ai/handoffs/CLAUDE_F9_IMPLEMENTATION_HANDOFF.md`
+   - issue #12
+   - after F8 acceptance
+
+9. `.ai/handoffs/CLAUDE_F10_IMPLEMENTATION_HANDOFF.md`
+   - issue #13
+   - after valid single-leg/backtest stack
+
+10. `.ai/handoffs/CLAUDE_F11_IMPLEMENTATION_HANDOFF.md`
+    - issue #14
+    - prospective Football paper betting
+
+11. `.ai/handoffs/CLAUDE_F12_IMPLEMENTATION_HANDOFF.md`
+    - issue #15
+    - only after backend decision contracts stabilize
