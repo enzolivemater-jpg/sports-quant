@@ -104,7 +104,7 @@ class _FakeResponse:
             }
         )
 
-    def __enter__(self) -> "_FakeResponse":
+    def __enter__(self) -> _FakeResponse:
         return self
 
     def __exit__(self, *_args: object) -> None:

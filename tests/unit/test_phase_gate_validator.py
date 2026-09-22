@@ -4,8 +4,6 @@ import importlib.util
 from pathlib import Path
 from types import ModuleType
 
-import pytest
-
 SCRIPT = Path(__file__).resolve().parents[2] / "scripts" / "validate_phase_gates.py"
 
 
