@@ -30,6 +30,12 @@ record:
     supersedes:
     - TENNIS_AS_MANDATORY_V1_SPORT
     - BASKETBALL_AND_MMA_AS_FUTURE_ONLY
+  pilot_sport:
+    sport: FOOTBALL
+    authority: Enzo
+    approved_at: 2026-09-22
+    purpose: FIRST_END_TO_END_VERTICAL_VALIDATION
+    does_not_change_mandatory_scope: true
   foundation_status: READY_TO_IMPLEMENT
 priority_order:
 - accuracy

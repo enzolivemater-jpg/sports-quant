@@ -38,7 +38,8 @@ decisions:
     due_phase: "Conditional optional-sport admission"
   - id: OD-11
     decision: "modèles champions Football par famille"
-    due_phase: "Football"
+    due_phase: "Football pilot modeling"
+    note: "Football is the approved first pilot sport; champion model remains intentionally unresolved until OOS comparison."
   - id: OD-12
     decision: "formule/scoring historique de fiabilité Sports Intelligence"
     due_phase: "Sports Intelligence validation"
@@ -116,3 +117,13 @@ mandatory_sports_scope_amendment:
   note: >-
     OD-29 no longer asks whether Basketball/MMA belong in scope; that inclusion is resolved.
     OD-29 now tracks only the still-undefined competition/market-family details needed before implementation.
+
+
+pilot_sport_decision:
+  sport: FOOTBALL
+  approved_by: Enzo
+  approved_at: 2026-09-22
+  purpose: FIRST_END_TO_END_VERTICAL_VALIDATION
+  note: >-
+    This resolves the choice of first implementation sport only. It does not resolve OD-11,
+    model-family selection, calibration thresholds, data-provider choice, or any other open decision.

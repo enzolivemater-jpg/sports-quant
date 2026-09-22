@@ -22,6 +22,12 @@ F1 contains repository structure, Python packaging, CI, secret-handling conventi
 - Handball, Volleyball and Tennis still require PIT-valid empirical Sport Predictability evidence before production-model promotion.
 - `NO_BET` is a native outcome.
 
+## Pilot vertical
+
+- First pilot sport: **Football**.
+- Football is used to validate the complete end-to-end quantitative chain before replication across the other sports.
+- This pilot choice does not preselect a model champion and does not relax PIT, calibration, uncertainty, market or backtesting requirements.
+
 ## Local bootstrap
 
 ```bash

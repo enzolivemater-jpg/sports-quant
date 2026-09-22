@@ -58,3 +58,10 @@ Additional-sports scope decision recorded 2026-09-22:
 - Rugby Union, Futsal, Lacrosse, Roller Hockey and every other non-core sport are excluded from the current roadmap;
 - approval means "allowed into empirical validation", not automatic SP validation or production promotion;
 - no SP class is assigned until PIT-valid OOS evidence exists.
+
+
+Pilot sport decision recorded 2026-09-22:
+- Football is the first end-to-end implementation and validation sport;
+- the pilot must exercise the full chain: data -> PIT -> features -> model -> calibration -> P_safe -> market -> gate -> backtest;
+- no Football model-family champion is selected by this decision;
+- no F2+ implementation starts until the independent F0 review gate is resolved.

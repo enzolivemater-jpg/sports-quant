@@ -16,6 +16,8 @@ approved_additional_sports_for_validation:
   - TENNIS
 other_sports: EXCLUDED_UNLESS_NEW_ENZO_DECISION
 additional_sports_promotion_requirement: EMPIRICAL_SPORT_PREDICTABILITY
+pilot_sport: FOOTBALL
+pilot_purpose: FIRST_END_TO_END_VERTICAL_VALIDATION
 native_no_bet: true
 automated_real_money_wagering: PROHIBITED
 current_repository_phase: F1_REPOSITORY_SKELETON
