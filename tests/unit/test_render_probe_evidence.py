@@ -8,9 +8,7 @@ from types import ModuleType
 
 import pytest
 
-SCRIPT = (
-    Path(__file__).resolve().parents[2] / "scripts" / "research" / "render_probe_evidence.py"
-)
+SCRIPT = Path(__file__).resolve().parents[2] / "scripts" / "research" / "render_probe_evidence.py"
 
 
 def _load_module() -> ModuleType:

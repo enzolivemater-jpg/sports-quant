@@ -97,7 +97,10 @@ def test_execute_requires_provider_secret(monkeypatch: pytest.MonkeyPatch) -> No
         module._validate_execution([specs[0]], True)
 
 
-def test_dry_run_is_default(monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
+def test_dry_run_is_default(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     module = _load_module()
     monkeypatch.setattr(module, "load_manifest", _manifest)
     monkeypatch.setattr(sys, "argv", [str(SCRIPT)])
