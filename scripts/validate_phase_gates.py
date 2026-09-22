@@ -53,8 +53,7 @@ def _load_gates() -> dict[str, Any]:
 def _load_f1_source_allowlist() -> tuple[set[str], str]:
     if not F1_SOURCE_ALLOWLIST_FILE.exists():
         raise RuntimeError(
-            "Missing F1 source allowlist: "
-            f"{F1_SOURCE_ALLOWLIST_FILE.relative_to(ROOT)}"
+            f"Missing F1 source allowlist: {F1_SOURCE_ALLOWLIST_FILE.relative_to(ROOT)}"
         )
 
     with F1_SOURCE_ALLOWLIST_FILE.open("rb") as handle:
@@ -74,8 +73,7 @@ def _load_f1_source_allowlist() -> tuple[set[str], str]:
         normalized = path.as_posix()
         if not normalized.startswith("src/sports_quant/"):
             raise RuntimeError(
-                "F1 source allowlist entries must live under src/sports_quant/: "
-                f"{item!r}"
+                f"F1 source allowlist entries must live under src/sports_quant/: {item!r}"
             )
         allowed.add(normalized)
 
