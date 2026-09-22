@@ -17,7 +17,12 @@ record:
     mandatory_competition_scope:
       MMA:
       - UFC
-    optional_sports_admission: EMPIRICAL_SPORT_PREDICTABILITY_ONLY
+    approved_additional_sports_for_validation:
+    - HANDBALL
+    - VOLLEYBALL
+    - TENNIS
+    other_sports: EXCLUDED_UNLESS_NEW_ENZO_DECISION
+    additional_sports_promotion_requirement: EMPIRICAL_SPORT_PREDICTABILITY
   scope_amendment:
     adr: ADR-0002
     authority: Enzo
@@ -239,15 +244,21 @@ market_catalog:
     - UFC
     phase_1_market_families: NOT_DEFINED_DO_NOT_IMPLEMENT
     phase_2_market_families: NOT_DEFINED_DO_NOT_IMPLEMENT
-  optional_sports:
-    admission_basis: EMPIRICAL_SPORT_PREDICTABILITY
-    admission_scope: SPORT_X_MARKET_FAMILY
-    automatic_admission: false
-    candidate_list_preapproved: false
+  additional_sports:
+    approved_for_validation:
+    - HANDBALL
+    - VOLLEYBALL
+    - TENNIS
+    excluded_without_new_enzo_decision:
+    - ALL_OTHER_SPORTS
+    promotion_basis: EMPIRICAL_SPORT_PREDICTABILITY
+    promotion_scope: SPORT_X_MARKET_FAMILY
     empirical_thresholds: NOT_DEFINED_DO_NOT_IMPLEMENT
     rule: >-
-      Additional sports may enter the active roadmap only after PIT-valid out-of-sample evidence
-      demonstrates sufficiently strong and stable predictability for the relevant market families.
+      Handball, Volleyball and Tennis are the only additional sports approved for SPORTS QUANT validation.
+      They are not empirically SP-validated by this approval. Promotion into production modeling still
+      requires PIT-valid out-of-sample evidence demonstrating sufficiently strong and stable predictability
+      for the relevant market families.
 sport_predictability:
   status: APPROVED_AMENDMENT
   classes:
@@ -364,5 +375,6 @@ f0_scope:
   - freeze_phase_1_phase_2_market_catalog
   - incorporate_approved_Sport_Predictability_amendment
   - incorporate_approved_mandatory_sports_scope_amendment_ADR_0002
+  - incorporate_approved_additional_sports_allowlist_ADR_0003
   business_code_allowed: false
   next_phase: F1_REPOSITORY_SKELETON

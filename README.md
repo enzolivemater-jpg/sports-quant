@@ -17,7 +17,9 @@ F1 contains repository structure, Python packaging, CI, secret-handling conventi
 - No direct LLM assignment of final `P_safe`.
 - No future information in backtests.
 - Mandatory V1 sports: Basketball, Football and MMA; UFC is the mandatory initial MMA competition scope.
-- Additional sports are admitted only through PIT-valid empirical Sport Predictability evidence; no optional sport is pre-approved.
+- Additional disciplines approved for validation: Handball, Volleyball and Tennis only.
+- No other sport is in the roadmap unless Enzo explicitly changes the scope.
+- Handball, Volleyball and Tennis still require PIT-valid empirical Sport Predictability evidence before production-model promotion.
 - `NO_BET` is a native outcome.
 
 ## Local bootstrap

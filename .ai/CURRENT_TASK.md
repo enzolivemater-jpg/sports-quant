@@ -51,3 +51,10 @@ Scope amendment recorded 2026-09-22:
 - additional sports are evidence-gated by empirical Sport Predictability;
 - Tennis is no longer a mandatory V1 sport;
 - Basketball and MMA/UFC market-family catalogs remain intentionally undefined until their authorized decision phase.
+
+
+Additional-sports scope decision recorded 2026-09-22:
+- approved additional disciplines: Handball, Volleyball and Tennis only;
+- Rugby Union, Futsal, Lacrosse, Roller Hockey and every other non-core sport are excluded from the current roadmap;
+- approval means "allowed into empirical validation", not automatic SP validation or production promotion;
+- no SP class is assigned until PIT-valid OOS evidence exists.

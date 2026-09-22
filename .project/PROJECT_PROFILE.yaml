@@ -10,8 +10,12 @@ mandatory_sports:
 mandatory_competition_scope:
   MMA:
     - UFC
-optional_sports_admission: EMPIRICAL_SPORT_PREDICTABILITY_ONLY
-optional_sports_are_preapproved: false
+approved_additional_sports_for_validation:
+  - HANDBALL
+  - VOLLEYBALL
+  - TENNIS
+other_sports: EXCLUDED_UNLESS_NEW_ENZO_DECISION
+additional_sports_promotion_requirement: EMPIRICAL_SPORT_PREDICTABILITY
 native_no_bet: true
 automated_real_money_wagering: PROHIBITED
 current_repository_phase: F1_REPOSITORY_SKELETON
