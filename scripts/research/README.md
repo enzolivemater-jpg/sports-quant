@@ -92,3 +92,18 @@ For each probe:
 Using this harness is allowed before F2 because it is provider research tooling only.
 
 Production ingestion remains F4 and must use the approved F2/F3 contracts and PIT kernel.
+\n\n# Local Provider Evidence Rendering
+
+After a successful or failed research capture, render a local evidence skeleton:
+
+```bash
+python scripts/research/render_probe_evidence.py \
+  --research-only \
+  --metadata data/research-probes/<provider>/<probe>/<capture>.metadata.json
+```
+
+The generated Markdown remains inside ignored `data/research-probes/`.
+
+It pre-fills only safe capture facts and deliberately leaves semantic/PIT/licensing conclusions as `UNKNOWN`.
+
+Human review is required before any evidence summary is committed or used to resolve OD-24.
