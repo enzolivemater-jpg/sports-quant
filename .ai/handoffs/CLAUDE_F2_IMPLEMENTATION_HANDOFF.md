@@ -14,7 +14,12 @@ Do not begin implementation unless:
 1. GitHub issue #1 contains an independent F0 review;
 2. no unresolved P0/P1 blocks F2;
 3. any required corrections from the review are merged;
-4. current `main` CI and Security are green.
+4. `.project/PHASE_GATES.toml` has `f2.authorized = true`;
+5. the review artifact referenced by `foundation_review.review_artifact` exists in the repository;
+6. `foundation_review.p0_open = 0` and `foundation_review.p1_open = 0`;
+7. current `main` CI and Security are green.
+
+Before writing code, run `python scripts/validate_phase_gates.py`. If it fails, STOP.
 
 If the review returns NEEDS_DECISION, STOP and escalate to Enzo.
 
