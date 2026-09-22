@@ -110,7 +110,7 @@ Any field defensibly usable as historical known_at:
 UNKNOWN
 
 Important:
-SPORTS QUANT received_at is retrieval evidence only and must not be silently converted into historical known_at for underlying provider facts.
+SPORTS QUANT received_at is retrieval evidence only and must not be silently\nconverted into historical known_at for underlying provider facts.
 
 ## Historical as-of behavior
 
@@ -252,7 +252,7 @@ UNKNOWN
 ## OD-24 impact
 
 Does this probe justify resolving any provider role?
-NO — unless a later reviewed evidence record explicitly demonstrates sufficient PIT, licensing, coverage, cost and reproducibility evidence.
+NO — unless a later reviewed evidence record explicitly demonstrates sufficient PIT,\nlicensing, coverage, cost and reproducibility evidence.
 
 Remaining evidence required:
 UNKNOWN
