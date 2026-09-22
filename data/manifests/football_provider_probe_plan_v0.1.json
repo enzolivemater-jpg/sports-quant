@@ -1,0 +1,79 @@
+{
+  "schema_version": "1.0",
+  "project": "SPORTS_QUANT",
+  "purpose": "RESEARCH_ONLY_FOOTBALL_PROVIDER_PROBES",
+  "canonical_known_at_assignment": false,
+  "od24_resolved": false,
+  "providers": [
+    {
+      "provider": "api-football",
+      "role_hypothesis": [
+        "FIXTURE_RESULTS",
+        "PROSPECTIVE_CONTEXT"
+      ],
+      "auth": {
+        "type": "header_env",
+        "name": "x-apisports-key",
+        "env": "API_FOOTBALL_KEY"
+      },
+      "probes": [
+        {
+          "probe_name": "countries-auth-schema",
+          "url": "https://v3.football.api-sports.io/countries",
+          "purpose": "authentication and base response schema"
+        },
+        {
+          "probe_name": "england-leagues-2024",
+          "url": "https://v3.football.api-sports.io/leagues?country=England&season=2024",
+          "purpose": "resolve Premier League provider competition and season coverage"
+        }
+      ]
+    },
+    {
+      "provider": "sportmonks",
+      "role_hypothesis": [
+        "FIXTURE_RESULTS",
+        "PROSPECTIVE_CONTEXT",
+        "PROSPECTIVE_MARKET"
+      ],
+      "auth": {
+        "type": "header_env",
+        "name": "Authorization",
+        "env": "SPORTMONKS_API_TOKEN"
+      },
+      "probes": [
+        {
+          "probe_name": "fixtures-auth-schema",
+          "url": "https://api.sportmonks.com/v3/football/fixtures",
+          "purpose": "authentication and fixture response schema"
+        }
+      ]
+    },
+    {
+      "provider": "sportradar",
+      "role_hypothesis": [
+        "FIXTURE_RESULTS",
+        "PROSPECTIVE_CONTEXT",
+        "PREMIUM_PRODUCTION_DATA"
+      ],
+      "auth": {
+        "type": "header_env",
+        "name": "x-api-key",
+        "env": "SPORTRADAR_API_KEY"
+      },
+      "probes": [
+        {
+          "probe_name": "soccer-v4-competitions",
+          "url": "https://api.sportradar.com/soccer/trial/v4/en/competitions.json",
+          "purpose": "competition discovery and schema probe"
+        }
+      ]
+    }
+  ],
+  "excluded_from_this_manifest": [
+    {
+      "provider": "the-odds-api",
+      "reason": "paid historical Stage A has its own manifest and guarded runner"
+    }
+  ]
+}
