@@ -2,21 +2,31 @@
 
 Phase: `F1 — Repository Skeleton`
 
-Status: `BLOCKED_ON_ENVIRONMENT_VALIDATION`
+Status: `IMPLEMENTED_TECHNICALLY_GREEN__PROMOTION_BLOCKED_PENDING_INDEPENDENT_F0_REVIEW`
 
 Implemented scope:
 - repository tree;
-- packaging;
+- reproducible Python packaging with committed `uv.lock`;
 - CI;
 - secret handling;
 - PostgreSQL local/test plumbing;
 - migrations skeleton;
 - minimal structured observability.
 
-Validation blockers:
-- `uv.lock` cannot be generated because PyPI/DNS access is unavailable in the execution environment;
-- real PostgreSQL integration cannot be executed because Docker is unavailable;
-- Ruff/mypy and GitHub security workflow cannot be executed locally without the missing tooling/network.
+GitHub validation:
+- final reference commit before this documentation update: `079099ddeac1e96d4943530690136008769a5465`;
+- CI run `35728820181`: SUCCESS;
+- Security run `35728820172`: SUCCESS;
+- quality job: repository-scope validator, Ruff format, Ruff lint, mypy, unit/smoke tests, Alembic heads — all SUCCESS;
+- PostgreSQL integration smoke test — SUCCESS;
+- Gitleaks — SUCCESS;
+- pip-audit — SUCCESS.
+
+Resolved during F1 validation:
+- generated the previously missing `uv.lock` using a temporary GitHub Actions bootstrap workflow;
+- fixed Ruff import ordering;
+- upgraded pytest after `pip-audit` identified `PYSEC-2026-1845`; current lock resolves pytest 9.1.1;
+- temporary bootstrap workflow removed after lock generation.
 
 Explicitly NOT STARTED:
 - F2 contracts;
@@ -28,4 +38,8 @@ Explicitly NOT STARTED:
 - dependency/optimizer logic;
 - frontend implementation.
 
-Governance note: this repository does not claim that F0 received an independent critical review.
+Governance note:
+- this repository does NOT claim that F0 received an independent critical review;
+- F1 implementation occurred before that canonical gate was satisfied;
+- technical green status does not retroactively satisfy the governance gate;
+- do not promote to F2 until the independent-review requirement is resolved under project governance.

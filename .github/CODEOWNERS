@@ -1,3 +1,10 @@
-# Enzo is the final project authority.
-# A concrete GitHub username is intentionally not invented here.
-# Add enforceable CODEOWNERS entries only when the repository owner handle is known.
+# Enzo is the final project authority. GitHub handle verified from the connected repository.
+* @enzolivemater-jpg
+
+/.project/ @enzolivemater-jpg
+/.ai/ @enzolivemater-jpg
+/.github/ @enzolivemater-jpg
+/docs/adr/ @enzolivemater-jpg
+
+# CODEOWNERS establishes repository ownership only.
+# It does not satisfy the project's independent critical-review requirement by itself.
