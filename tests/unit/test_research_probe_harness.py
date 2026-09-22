@@ -24,7 +24,10 @@ def _load_module() -> ModuleType:
 def test_redact_url_hides_sensitive_query_values() -> None:
     module = _load_module()
 
-    url = "https://provider.example/v1/odds?api_key=super-secret&api_token=sportmonks-secret&token=another-secret&market=h2h"
+    url = (
+        "https://provider.example/v1/odds?"
+        "api_key=super-secret&api_token=sportmonks-secret&token=another-secret&market=h2h"
+    )
     redacted = module._redact_url(url)
 
     assert "super-secret" not in redacted
@@ -49,6 +52,42 @@ def test_header_env_reads_secret_without_transform(monkeypatch: pytest.MonkeyPat
     headers = module._parse_header_env(["X-Api-Key=SPORTS_QUANT_TEST_PROVIDER_KEY"])
 
     assert headers == {"X-Api-Key": "secret-value"}
+
+
+def test_query_env_injects_secret_without_putting_it_in_base_url(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    module = _load_module()
+    monkeypatch.setenv("SPORTS_QUANT_TEST_PROVIDER_KEY", "query-secret")
+
+    request_url, injected = module._build_request_url(
+        "https://provider.example/v1/fixtures?league=39",
+        ["api_key=SPORTS_QUANT_TEST_PROVIDER_KEY"],
+    )
+
+    assert "api_key=query-secret" in request_url
+    assert injected == {"api_key"}
+    assert "query-secret" not in module._redact_url(request_url, injected)
+
+
+def test_sensitive_query_value_in_url_is_rejected() -> None:
+    module = _load_module()
+
+    with pytest.raises(ValueError, match="must use --query-env"):
+        module._build_request_url(
+            "https://provider.example/v1/fixtures?api_key=plain-secret",
+            [],
+        )
+
+
+def test_credentials_embedded_in_url_are_rejected() -> None:
+    module = _load_module()
+
+    with pytest.raises(ValueError, match="Credentials embedded"):
+        module._build_request_url(
+            "https://user:password@provider.example/v1/fixtures",
+            [],
+        )
 
 
 def test_output_path_is_confined_to_research_probe_root(
@@ -120,8 +159,15 @@ def test_successful_capture_is_research_only_and_does_not_assign_known_at(
     module = _load_module()
     root = (tmp_path / "research-probes").resolve()
     monkeypatch.setattr(module, "OUTPUT_ROOT", root)
-    monkeypatch.setenv("SPORTS_QUANT_TEST_PROVIDER_KEY", "secret-value")
-    monkeypatch.setattr(module.urllib.request, "urlopen", lambda *_args, **_kwargs: _FakeResponse())
+    monkeypatch.setenv("SPORTS_QUANT_TEST_PROVIDER_KEY", "query-secret")
+
+    requested_urls: list[str] = []
+
+    def fake_urlopen(request: Any, **_kwargs: Any) -> _FakeResponse:
+        requested_urls.append(request.full_url)
+        return _FakeResponse()
+
+    monkeypatch.setattr(module.urllib.request, "urlopen", fake_urlopen)
     monkeypatch.setattr(
         sys,
         "argv",
@@ -133,15 +179,17 @@ def test_successful_capture_is_research_only_and_does_not_assign_known_at(
             "--probe-name",
             "fixtures",
             "--url",
-            "https://provider.example/v1/fixtures?api_key=query-secret&league=39",
-            "--header-env",
-            "X-Api-Key=SPORTS_QUANT_TEST_PROVIDER_KEY",
+            "https://provider.example/v1/fixtures?league=39",
+            "--query-env",
+            "api_key=SPORTS_QUANT_TEST_PROVIDER_KEY",
         ],
     )
 
     exit_code = module.main()
 
     assert exit_code == 0
+    assert len(requested_urls) == 1
+    assert "api_key=query-secret" in requested_urls[0]
 
     metadata_files = list(root.rglob("*.metadata.json"))
     assert len(metadata_files) == 1
@@ -154,7 +202,6 @@ def test_successful_capture_is_research_only_and_does_not_assign_known_at(
     assert "known_at" not in metadata
     assert "received_at" in metadata
     assert "query-secret" not in metadata_text
-    assert "secret-value" not in metadata_text
     assert "Set-Cookie" not in metadata["selected_response_headers"]
     assert metadata["selected_response_headers"]["X-RateLimit-Remaining"] == "99"
     assert metadata["payload_sha256"]

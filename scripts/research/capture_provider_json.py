@@ -43,11 +43,15 @@ def _utc_now() -> str:
     return datetime.now(UTC).isoformat()
 
 
-def _redact_url(url: str) -> str:
+def _redact_url(url: str, extra_sensitive_keys: set[str] | None = None) -> str:
     parts = urllib.parse.urlsplit(url)
+    sensitive_keys = set(SENSITIVE_QUERY_KEYS)
+    if extra_sensitive_keys:
+        sensitive_keys.update(key.lower() for key in extra_sensitive_keys)
+
     query = urllib.parse.parse_qsl(parts.query, keep_blank_values=True)
     redacted = [
-        (key, "***REDACTED***" if key.lower() in SENSITIVE_QUERY_KEYS else value)
+        (key, "***REDACTED***" if key.lower() in sensitive_keys else value)
         for key, value in query
     ]
     return urllib.parse.urlunsplit(
@@ -55,21 +59,58 @@ def _redact_url(url: str) -> str:
     )
 
 
-def _parse_header_env(items: list[str]) -> dict[str, str]:
-    headers: dict[str, str] = {}
+def _parse_env_assignments(items: list[str], option_name: str) -> list[tuple[str, str]]:
+    values: list[tuple[str, str]] = []
     for item in items:
         if "=" not in item:
-            raise ValueError(f"Invalid --header-env value {item!r}; expected Header=ENV_VAR")
-        header, env_name = item.split("=", 1)
-        header = header.strip()
+            raise ValueError(f"Invalid {option_name} value {item!r}; expected NAME=ENV_VAR")
+        name, env_name = item.split("=", 1)
+        name = name.strip()
         env_name = env_name.strip()
-        if not header or not env_name:
-            raise ValueError(f"Invalid --header-env value {item!r}")
+        if not name or not env_name:
+            raise ValueError(f"Invalid {option_name} value {item!r}")
         value = os.environ.get(env_name)
         if not value:
             raise ValueError(f"Missing required environment variable: {env_name}")
-        headers[header] = value
-    return headers
+        values.append((name, value))
+    return values
+
+
+def _parse_header_env(items: list[str]) -> dict[str, str]:
+    return dict(_parse_env_assignments(items, "--header-env"))
+
+
+def _build_request_url(url: str, query_env: list[str]) -> tuple[str, set[str]]:
+    parts = urllib.parse.urlsplit(url)
+    if parts.scheme != "https":
+        raise ValueError("Only HTTPS provider URLs are allowed.")
+    if parts.username is not None or parts.password is not None:
+        raise ValueError("Credentials embedded in provider URLs are prohibited.")
+
+    existing_query = urllib.parse.parse_qsl(parts.query, keep_blank_values=True)
+    direct_sensitive = sorted(
+        {key for key, _value in existing_query if key.lower() in SENSITIVE_QUERY_KEYS}
+    )
+    if direct_sensitive:
+        joined = ", ".join(direct_sensitive)
+        raise ValueError(
+            "Sensitive query parameter(s) must use --query-env instead of --url: " + joined
+        )
+
+    injected = _parse_env_assignments(query_env, "--query-env")
+    existing_names = {key for key, _value in existing_query}
+    duplicates = sorted({key for key, _value in injected if key in existing_names})
+    if duplicates:
+        raise ValueError(
+            "Query parameter provided both in --url and --query-env: " + ", ".join(duplicates)
+        )
+
+    request_query = urllib.parse.urlencode(existing_query + injected)
+    request_url = urllib.parse.urlunsplit(
+        (parts.scheme, parts.netloc, parts.path, request_query, parts.fragment)
+    )
+    injected_names = {key for key, _value in injected}
+    return request_url, injected_names
 
 
 def _safe_output_dir(provider: str, probe_name: str) -> Path:
@@ -96,13 +137,24 @@ def main() -> int:
     parser.add_argument("--research-only", action="store_true", required=True)
     parser.add_argument("--provider", required=True)
     parser.add_argument("--probe-name", required=True)
-    parser.add_argument("--url", required=True)
+    parser.add_argument(
+        "--url",
+        required=True,
+        help="HTTPS provider URL without credentials or sensitive query values.",
+    )
     parser.add_argument(
         "--header-env",
         action="append",
         default=[],
         metavar="HEADER=ENV_VAR",
         help="Read a secret/non-secret header value from an environment variable.",
+    )
+    parser.add_argument(
+        "--query-env",
+        action="append",
+        default=[],
+        metavar="PARAM=ENV_VAR",
+        help="Inject a query parameter from an environment variable without exposing its value.",
     )
     parser.add_argument("--timeout", type=float, default=30.0)
     args = parser.parse_args()
@@ -111,13 +163,9 @@ def main() -> int:
         print("This harness may only run in research-only mode.", file=sys.stderr)
         return 2
 
-    parsed = urllib.parse.urlsplit(args.url)
-    if parsed.scheme != "https":
-        print("Only HTTPS provider URLs are allowed.", file=sys.stderr)
-        return 2
-
     try:
         headers = _parse_header_env(args.header_env)
+        request_url, injected_query_keys = _build_request_url(args.url, args.query_env)
         output_dir = _safe_output_dir(args.provider, args.probe_name)
     except ValueError as exc:
         print(f"Configuration error: {exc}", file=sys.stderr)
@@ -126,7 +174,7 @@ def main() -> int:
     output_dir.mkdir(parents=True, exist_ok=True)
 
     requested_at = _utc_now()
-    request = urllib.request.Request(args.url, headers=headers, method="GET")
+    request = urllib.request.Request(request_url, headers=headers, method="GET")
 
     status: int | None = None
     response_headers: dict[str, str] = {}
@@ -195,7 +243,7 @@ def main() -> int:
         "probe_name": args.probe_name,
         "requested_at": requested_at,
         "received_at": received_at,
-        "request_url_redacted": _redact_url(args.url),
+        "request_url_redacted": _redact_url(request_url, injected_query_keys),
         "http_status": status,
         "selected_response_headers": response_headers,
         "payload_sha256": digest,

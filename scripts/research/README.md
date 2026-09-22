@@ -43,19 +43,25 @@ It does not:
 
 ## Secret handling
 
-Secrets are read from environment variables via:
+Preferred mechanisms:
 
-`--header-env 'Header-Name=ENV_VAR_NAME'`
+- header secret: `--header-env 'Header-Name=ENV_VAR_NAME'`
+- query secret: `--query-env 'parameter_name=ENV_VAR_NAME'`
 
-The value is never intentionally written to metadata.
+The secret value comes from the environment and is never intentionally written to metadata.
 
-If an API uses a secret query parameter, place it in the runtime URL only and ensure its key is one of the script's redacted query-key names. Prefer header authentication when the provider supports it.
+The harness rejects:
+- plain HTTP;
+- username/password credentials embedded in the URL;
+- known sensitive query parameters supplied directly in `--url`.
+
+This avoids putting provider key values directly into command-line URLs and reduces shell-history/process-list exposure.
 
 Never paste provider keys into:
 - GitHub issues;
 - committed docs;
-- shell history when avoidable;
-- screenshots.
+- screenshots;
+- command-line URLs.
 
 ## Example shape
 
@@ -66,8 +72,8 @@ python scripts/research/capture_provider_json.py \
   --research-only \
   --provider example-provider \
   --probe-name fixtures-schema \
-  --url 'https://provider.example/v1/fixtures?...' \
-  --header-env 'X-Api-Key=PROVIDER_API_KEY'
+  --url 'https://provider.example/v1/fixtures?league=39' \
+  --query-env 'api_key=PROVIDER_API_KEY'
 ```
 
 The example uses a placeholder provider intentionally. Use exact authenticated endpoint syntax from the provider's official documentation during the actual bake-off.
