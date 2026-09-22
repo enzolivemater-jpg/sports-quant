@@ -1,91 +1,65 @@
 # CURRENT TASK
 
 Phase:
-`PRE_F2_GATE`
+`F2_DOMAIN_CONTRACTS`
 
 Status:
-`PREPARATION_SATURATED__F2_BLOCKED_PENDING_INDEPENDENT_F0_REVIEW`
+`READY_TO_IMPLEMENT__F0_GATE_PASSED`
 
 Date:
 2026-09-22
 
-## Current repository state
+## Governance gate
 
-Authoritative source:
-GitHub `enzolivemater-jpg/sports-quant`
+Independent F0 review is complete and accepted.
 
-Pre-audit reviewed HEAD:
-`04d6526514b53c91a4463fec3e083971ccdbfc7c`
+Reviewed HEAD:
+`d4d6c0ce4d26f42183312b6386b7d0e00ab46f88`
 
-At that HEAD:
-- CI: SUCCESS
-- Security: SUCCESS
-
-## Foundation / F1
-
-F1 repository foundation is technically green.
-
-F0 independent review is NOT yet recorded.
+Review result:
+- P0 open: 0
+- P1 open: 0
+- blocking_findings_cleared: true
+- final status: GO
+- explicit authorization: F2 MAY BEGIN
 
 Machine state:
-- foundation_review.status = PENDING
-- f2.authorized = false
+- foundation_review.status = PASS
+- f2.authorized = true
 
-Issue #1 remains the blocking governance gate.
+Accepted machine-readable review record:
+`.project/reviews/F0_REVIEW_RECORD_2026-09-22_d4d6c0ce.md`
 
-## Football
+Verbatim final reviewer report:
+`.project/reviews/F0_FINAL_REREVIEW_RAW_2026-09-22_d4d6c0ce.md`
 
-Football is the first end-to-end pilot.
+## Current implementation task
 
-Prepared but not production-authorized:
-- provider research
-- PIT/data specifications
-- feature governance
-- model benchmark/math
-- temporal evaluation
-- market/no-vig research
-- calibration/uncertainty/P_safe research
-- S-Tier design
-- backtest design
-- dependency/parlay design
-- paper betting design
-- PWA design
+Implement F2 domain contracts only.
 
-## Implementation queue
+Primary handoff:
+`.ai/handoffs/CLAUDE_F2_IMPLEMENTATION_HANDOFF.md`
 
-Claude handoffs exist for F2 through F12.
+Primary spec:
+`docs/contracts/F2_READY_TO_IMPLEMENT_SPEC.md`
 
-Do not start F2 until the F0 gate is legitimately opened.
+Do not start F3 in the same change.
 
-## External/admin work
+## Required completion discipline
+
+F2 must:
+- stay within the contract layer;
+- preserve all OPEN_DECISIONS;
+- pass formatter/Ruff/mypy/pytest/Alembic/PostgreSQL/CI/Security;
+- receive critical review;
+- have no unresolved P0/P1 before F3.
+
+## Parallel work
 
 Issue #17:
-repository is still public and main is unprotected.
+repository hardening remains an admin action.
 
 Issue #18:
-provider credentials/trials are still required for authenticated Football bake-off.
+provider trial credentials remain relevant for later Football provider bake-off/F4.
 
-These do not authorize bypassing F0.
-
-## Current priority
-
-1. independent F0 review;
-2. record accepted review;
-3. machine-authorize F2;
-4. CI/Security green;
-5. Claude F2;
-6. repository hardening/provider probes in parallel.
-
-## Stop-work rule
-
-Further speculative architecture documentation is now lower value.
-
-Until new evidence arrives, do only:
-- review/gate work;
-- CI/security fixes;
-- repo hardening;
-- provider probes;
-- verified defect corrections.
-
-Reference:
-`docs/runbooks/PRE_F2_READINESS_AUDIT.md`
+These no longer block starting F2.
