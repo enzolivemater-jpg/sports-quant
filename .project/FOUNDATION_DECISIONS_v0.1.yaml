@@ -10,8 +10,21 @@ record:
   external_research_audit: Gemini_Pro
   criticality: C2_DECISION_SUPPORT
   sports_scope:
-  - TENNIS
-  - FOOTBALL
+    mandatory_sports:
+    - BASKETBALL
+    - FOOTBALL
+    - MMA
+    mandatory_competition_scope:
+      MMA:
+      - UFC
+    optional_sports_admission: EMPIRICAL_SPORT_PREDICTABILITY_ONLY
+  scope_amendment:
+    adr: ADR-0002
+    authority: Enzo
+    approved_at: 2026-09-22
+    supersedes:
+    - TENNIS_AS_MANDATORY_V1_SPORT
+    - BASKETBALL_AND_MMA_AS_FUTURE_ONLY
   foundation_status: READY_TO_IMPLEMENT
 priority_order:
 - accuracy
@@ -196,20 +209,11 @@ market_catalog:
   - market_instance
   - MR_base
   rule: MR_class_is_not_a_model_family
-  tennis:
-    phase_1:
-    - market_family: TENNIS_MATCH_WINNER
-      MR_base: MR1
-    phase_2:
-    - market_family: TENNIS_TOTAL_GAMES
-      MR_base: MR2
-    - market_family: TENNIS_GAME_HANDICAP
-      MR_base: MR2
-    deferred:
-    - SET_MARKETS
-    - PLAYER_PROPS
-    - EXACT_SCORE_TIEBREAK_MARKETS
-    - MICRO_MARKETS
+  basketball:
+    scope_status: MANDATORY
+    competition_scope: NOT_DEFINED_DO_NOT_IMPLEMENT
+    phase_1_market_families: NOT_DEFINED_DO_NOT_IMPLEMENT
+    phase_2_market_families: NOT_DEFINED_DO_NOT_IMPLEMENT
   football:
     phase_1:
     - market_family: FOOTBALL_1X2
@@ -229,6 +233,21 @@ market_catalog:
     - EXACT_SCORES
     - PRECISE_TIMING_MARKETS
     - MICRO_SAME_GAME_COMPOUND_MARKETS
+  mma:
+    scope_status: MANDATORY
+    competition_scope:
+    - UFC
+    phase_1_market_families: NOT_DEFINED_DO_NOT_IMPLEMENT
+    phase_2_market_families: NOT_DEFINED_DO_NOT_IMPLEMENT
+  optional_sports:
+    admission_basis: EMPIRICAL_SPORT_PREDICTABILITY
+    admission_scope: SPORT_X_MARKET_FAMILY
+    automatic_admission: false
+    candidate_list_preapproved: false
+    empirical_thresholds: NOT_DEFINED_DO_NOT_IMPLEMENT
+    rule: >-
+      Additional sports may enter the active roadmap only after PIT-valid out-of-sample evidence
+      demonstrates sufficiently strong and stable predictability for the relevant market families.
 sport_predictability:
   status: APPROVED_AMENDMENT
   classes:
@@ -306,7 +325,7 @@ technology_disposition:
   - Prometheus_Grafana
   - Supabase_selection
   - C2_PLUS
-  - NBA_MMA
+  - sport_specific_model_implementation_until_authorized_phases
   reject_for_foundation:
   - microservices
   - dedicated_feature_store
@@ -327,7 +346,8 @@ superseded_for_foundation:
 - weighted_average_mr
 - composite_dynamic_market_risk_score
 - C2_PLUS_as_active_foundation_criticality
-- NBA_MMA_packages
+- TENNIS_AS_MANDATORY_V1_SPORT
+- BASKETBALL_AND_MMA_AS_FUTURE_ONLY
 - legacy_source_taxonomy_names
 - ambiguous_generic_edge_field
 - P_model_or_safe_minus_P_market_no_vig
@@ -343,5 +363,6 @@ f0_scope:
   - mark_weighted_MR_and_dynamic_composite_MR_DEFERRED
   - freeze_phase_1_phase_2_market_catalog
   - incorporate_approved_Sport_Predictability_amendment
+  - incorporate_approved_mandatory_sports_scope_amendment_ADR_0002
   business_code_allowed: false
   next_phase: F1_REPOSITORY_SKELETON

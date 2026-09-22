@@ -1,3 +1,3 @@
-# Reserved package boundary: `modeling/tennis`
+# Optional candidate package boundary: `modeling/tennis`
 
-This directory is created by F1 as repository structure only. Its domain/business implementation belongs to F2 or a later authorized phase.
+Tennis is **not** a mandatory SPORTS QUANT V1 sport after ADR-0002. This placeholder carries no admission decision. Tennis may be activated only if future PIT-valid empirical Sport Predictability evidence qualifies relevant market families under the optional-sport admission policy.

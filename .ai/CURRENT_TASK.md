@@ -32,7 +32,7 @@ Explicitly NOT STARTED:
 - F2 contracts;
 - point-in-time kernel;
 - data ingestion business logic;
-- Tennis/Football models;
+- Basketball/Football/MMA-UFC models;
 - market/no-vig engine;
 - calibration or production P_safe logic;
 - dependency/optimizer logic;
@@ -43,3 +43,11 @@ Governance note:
 - F1 implementation occurred before that canonical gate was satisfied;
 - technical green status does not retroactively satisfy the governance gate;
 - do not promote to F2 until the independent-review requirement is resolved under project governance.
+
+
+Scope amendment recorded 2026-09-22:
+- mandatory sports are Basketball, Football and MMA;
+- UFC is the mandatory initial MMA competition scope;
+- additional sports are evidence-gated by empirical Sport Predictability;
+- Tennis is no longer a mandatory V1 sport;
+- Basketball and MMA/UFC market-family catalogs remain intentionally undefined until their authorized decision phase.

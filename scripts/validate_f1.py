@@ -32,8 +32,10 @@ FORBIDDEN_F1_IMPLEMENTATIONS = [
     "src/sports_quant/contracts/time.py",
     "src/sports_quant/contracts/prediction.py",
     "src/sports_quant/data/point_in_time/kernel.py",
-    "src/sports_quant/modeling/tennis/model.py",
+    "src/sports_quant/modeling/basketball/model.py",
     "src/sports_quant/modeling/football/model.py",
+    "src/sports_quant/modeling/mma/model.py",
+    "src/sports_quant/modeling/tennis/model.py",
     "src/sports_quant/optimizer/optimizer.py",
 ]
 

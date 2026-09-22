@@ -1,5 +1,7 @@
 # ADR-0001 — SPORTS QUANT Foundation v0.1 Governance Canonicalization
 
+> **Partially superseded by ADR-0002 (2026-09-22)** for the active sport scope. Tennis is no longer a mandatory V1 sport; Basketball, Football and MMA are mandatory, with UFC as the mandatory initial MMA competition scope.
+
 - **Status:** APPROVED
 - **Authority:** Enzo
 - **Scope:** F0 — Governance Canonicalization only

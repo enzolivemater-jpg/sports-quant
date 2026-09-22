@@ -3,9 +3,15 @@ project: SPORTS_QUANT
 authority: Enzo
 architecture: MODULAR_MONOLITH
 criticality: C2_DECISION_SUPPORT
-v1_sports:
-  - TENNIS
+mandatory_sports:
+  - BASKETBALL
   - FOOTBALL
+  - MMA
+mandatory_competition_scope:
+  MMA:
+    - UFC
+optional_sports_admission: EMPIRICAL_SPORT_PREDICTABILITY_ONLY
+optional_sports_are_preapproved: false
 native_no_bet: true
 automated_real_money_wagering: PROHIBITED
 current_repository_phase: F1_REPOSITORY_SKELETON

@@ -34,8 +34,8 @@ decisions:
     decision: "seuils data/concept/calibration drift"
     due_phase: "Monitoring"
   - id: OD-10
-    decision: "modèles champions Tennis par famille"
-    due_phase: "Tennis"
+    decision: "modèles champions Tennis par famille uniquement si Tennis est ultérieurement admis comme sport optionnel via Sport Predictability"
+    due_phase: "Conditional optional-sport admission"
   - id: OD-11
     decision: "modèles champions Football par famille"
     due_phase: "Football"
@@ -91,8 +91,8 @@ decisions:
     decision: "passage C2 → C2+"
     due_phase: "Future"
   - id: OD-29
-    decision: "NBA/MMA"
-    due_phase: "Future expansion"
+    decision: "catalogue exact Phase 1/Phase 2 et scope compétition Basketball; familles de marchés Phase 1/Phase 2 MMA/UFC"
+    due_phase: "Before Basketball or MMA/UFC model implementation"
 
 sport_predictability_amendment:
   numbered_open_decisions_added: []
@@ -100,3 +100,19 @@ sport_predictability_amendment:
     L'amendement Sport Predictability approuvé ajoute des invariants de gouvernance et un contrat
     d'évaluation PIT/versionné, mais aucune nouvelle OPEN DECISION numérotée n'a été identifiée dans
     le record approuvé. Ne pas en inventer pendant F0.
+
+
+mandatory_sports_scope_amendment:
+  adr: ADR-0002
+  approved_by: Enzo
+  approved_at: 2026-09-22
+  mandatory_sports:
+    - BASKETBALL
+    - FOOTBALL
+    - MMA
+  mma_initial_competition_scope:
+    - UFC
+  optional_sports_rule: EMPIRICAL_SPORT_PREDICTABILITY_ONLY
+  note: >-
+    OD-29 no longer asks whether Basketball/MMA belong in scope; that inclusion is resolved.
+    OD-29 now tracks only the still-undefined competition/market-family details needed before implementation.
