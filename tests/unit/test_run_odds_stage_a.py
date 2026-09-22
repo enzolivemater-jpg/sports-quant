@@ -8,9 +8,7 @@ from typing import Any
 
 import pytest
 
-SCRIPT = (
-    Path(__file__).resolve().parents[2] / "scripts" / "research" / "run_odds_stage_a.py"
-)
+SCRIPT = Path(__file__).resolve().parents[2] / "scripts" / "research" / "run_odds_stage_a.py"
 
 
 def _load_module() -> ModuleType:

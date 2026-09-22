@@ -78,8 +78,7 @@ def _print_plan(selected: list[dict[str, str]], total: int) -> None:
     print(f"Selected probes: {len(selected)}")
     for index, spec in enumerate(selected, start=1):
         print(
-            f"{index:02d}. {spec['group_id']} {spec['cutoff']} "
-            f"{spec['requested_snapshot_at_utc']}"
+            f"{index:02d}. {spec['group_id']} {spec['cutoff']} {spec['requested_snapshot_at_utc']}"
         )
         print(f"    {spec['url']}")
     print("No API request was sent.")
@@ -99,8 +98,7 @@ def _validate_execution_ack(
         raise ValueError("--execute requires --ack-paid-provider-access")
     if all_stage_a and confirm_request_count != selected_count:
         raise ValueError(
-            "Full Stage A execution requires "
-            f"--confirm-request-count {selected_count}"
+            f"Full Stage A execution requires --confirm-request-count {selected_count}"
         )
     if not os.environ.get(KEY_ENV):
         raise ValueError(f"Missing required environment variable: {KEY_ENV}")
@@ -108,10 +106,7 @@ def _validate_execution_ack(
 
 def _execute(selected: list[dict[str, str]]) -> int:
     for index, spec in enumerate(selected, start=1):
-        print(
-            f"Executing {index}/{len(selected)}: "
-            f"{spec['group_id']} {spec['cutoff']}"
-        )
+        print(f"Executing {index}/{len(selected)}: {spec['group_id']} {spec['cutoff']}")
         command = [
             sys.executable,
             str(HARNESS),
@@ -128,8 +123,7 @@ def _execute(selected: list[dict[str, str]]) -> int:
         result = subprocess.run(command, check=False)
         if result.returncode != 0:
             print(
-                f"Stopping after failed probe {spec['probe_name']} "
-                f"(exit={result.returncode}).",
+                f"Stopping after failed probe {spec['probe_name']} (exit={result.returncode}).",
                 file=sys.stderr,
             )
             return result.returncode
