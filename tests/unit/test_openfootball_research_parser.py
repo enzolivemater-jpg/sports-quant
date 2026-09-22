@@ -6,7 +6,9 @@ from types import ModuleType
 
 import pytest
 
-SCRIPT = Path(__file__).resolve().parents[2] / "scripts" / "research" / "parse_openfootball_results.py"
+SCRIPT = (
+    Path(__file__).resolve().parents[2] / "scripts" / "research" / "parse_openfootball_results.py"
+)
 
 
 def _load_module() -> ModuleType:

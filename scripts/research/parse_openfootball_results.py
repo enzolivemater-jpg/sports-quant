@@ -181,7 +181,9 @@ def main() -> int:
         print(f"Parse error: {exc}", file=sys.stderr)
         return 1
 
-    teams = sorted({str(row["home_team"]) for row in rows} | {str(row["away_team"]) for row in rows})
+    teams = sorted(
+        {str(row["home_team"]) for row in rows} | {str(row["away_team"]) for row in rows}
+    )
     output = {
         "research_only": True,
         "source": {
