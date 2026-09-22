@@ -24,11 +24,12 @@ def _load_module() -> ModuleType:
 def test_redact_url_hides_sensitive_query_values() -> None:
     module = _load_module()
 
-    url = "https://provider.example/v1/odds?api_key=super-secret&token=another-secret&market=h2h"
+    url = "https://provider.example/v1/odds?api_key=super-secret&api_token=sportmonks-secret&token=another-secret&market=h2h"
     redacted = module._redact_url(url)
 
     assert "super-secret" not in redacted
     assert "another-secret" not in redacted
+    assert "sportmonks-secret" not in redacted
     assert "%2A%2A%2AREDACTED%2A%2A%2A" in redacted
     assert "market=h2h" in redacted
 

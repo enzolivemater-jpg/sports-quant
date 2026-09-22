@@ -27,9 +27,13 @@ SENSITIVE_QUERY_KEYS = {
     "api_key",
     "apikey",
     "api-key",
+    "api_token",
     "key",
     "token",
     "access_token",
+    "access-token",
+    "x-api-key",
+    "x-apisports-key",
     "auth",
     "authorization",
 }
