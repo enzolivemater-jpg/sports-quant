@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0",
+  "project": "SPORTS_QUANT",
+  "status": "RESEARCH_ALIAS_MAP__NOT_CANONICAL_ENTITY_IDS",
+  "source": "OpenFootball openfootball/england 2024-25/1-premierleague.txt",
+  "source_blob_sha": "ca0fe4923f0164d0f879f796ab0759253e13bc06",
+  "target": "Stage A official-source identity keys",
+  "aliases": {
+    "Manchester United FC": "Man Utd",
+    "Fulham FC": "Fulham",
+    "Ipswich Town FC": "Ipswich Town",
+    "Liverpool FC": "Liverpool",
+    "Arsenal FC": "Arsenal",
+    "Wolverhampton Wanderers FC": "Wolves",
+    "Everton FC": "Everton",
+    "Brighton & Hove Albion FC": "Brighton",
+    "Newcastle United FC": "Newcastle United",
+    "Southampton FC": "Southampton",
+    "Nottingham Forest FC": "Nottingham Forest",
+    "AFC Bournemouth": "AFC Bournemouth",
+    "West Ham United FC": "West Ham",
+    "Aston Villa FC": "Aston Villa",
+    "Brentford FC": "Brentford",
+    "Crystal Palace FC": "Crystal Palace",
+    "Chelsea FC": "Chelsea",
+    "Manchester City FC": "Man City",
+    "Leicester City FC": "Leicester City",
+    "Tottenham Hotspur FC": "Spurs"
+  },
+  "rules": [
+    "Research reconciliation only.",
+    "These values are not canonical SPORTS QUANT team IDs.",
+    "Exact source labels are preserved as keys.",
+    "A future provider must have its own explicit alias evidence rather than inheriting this map."
+  ]
+}
