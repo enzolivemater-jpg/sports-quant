@@ -6,15 +6,10 @@ from pathlib import Path
 from types import ModuleType
 
 SCRIPT = (
-    Path(__file__).resolve().parents[2]
-    / "scripts"
-    / "research"
-    / "validate_stage_a_fixtures.py"
+    Path(__file__).resolve().parents[2] / "scripts" / "research" / "validate_stage_a_fixtures.py"
 )
 ROOT = Path(__file__).resolve().parents[2]
-FIXTURES = (
-    ROOT / "data" / "manifests" / "football_odds_stage_a_epl_2024_25_fixtures.json"
-)
+FIXTURES = ROOT / "data" / "manifests" / "football_odds_stage_a_epl_2024_25_fixtures.json"
 CUTOFFS = ROOT / "data" / "manifests" / "football_odds_stage_a_epl_2024_25.json"
 
 
@@ -54,9 +49,7 @@ def test_source_alias_does_not_become_canonical_identity() -> None:
     data = json.loads(FIXTURES.read_text(encoding="utf-8"))
 
     newcastle_fixture = next(
-        fixture
-        for fixture in data["fixtures"]
-        if fixture["official_home_name"] == "Newcastle"
+        fixture for fixture in data["fixtures"] if fixture["official_home_name"] == "Newcastle"
     )
     assert newcastle_fixture["source_identity_home_key"] == "Newcastle United"
     assert newcastle_fixture["canonical_event_id"] is None

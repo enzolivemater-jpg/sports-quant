@@ -11,9 +11,7 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
-FIXTURE_MANIFEST = (
-    ROOT / "data" / "manifests" / "football_odds_stage_a_epl_2024_25_fixtures.json"
-)
+FIXTURE_MANIFEST = ROOT / "data" / "manifests" / "football_odds_stage_a_epl_2024_25_fixtures.json"
 CUTOFF_MANIFEST = ROOT / "data" / "manifests" / "football_odds_stage_a_epl_2024_25.json"
 
 EXPECTED_FIXTURES = 40
@@ -106,9 +104,7 @@ def validate_fixture_manifest(
             )
 
     duplicates = [
-        f"{matchweek}/{team}"
-        for (matchweek, team), count in team_week_counts.items()
-        if count != 1
+        f"{matchweek}/{team}" for (matchweek, team), count in team_week_counts.items() if count != 1
     ]
     if duplicates:
         errors.append(
