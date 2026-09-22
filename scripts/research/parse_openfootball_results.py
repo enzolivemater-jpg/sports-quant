@@ -16,16 +16,31 @@ from pathlib import Path
 from typing import Any
 from zoneinfo import ZoneInfo
 
+DATE_RANGE_RE = re.compile(
+    r"^# Date\s+"
+    r"(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)\s+[A-Z][a-z]{2}\s+\d{1,2}\s+(?P<start_year>\d{4})"
+    r"\s+-\s+"
+    r"(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)\s+[A-Z][a-z]{2}\s+\d{1,2}\s+(?P<end_year>\d{4})"
+)
 DATE_RE = re.compile(
-    r"^\s{2}(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)\s+"
+    r"^\s*(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)\s+"
     r"(?P<month>[A-Z][a-z]{2})\s+(?P<day>\d{1,2})(?:\s+(?P<year>\d{4}))?\s*$"
 )
 MATCHDAY_RE = re.compile(r"^▪\s+Matchday\s+(?P<matchday>\d+)\s*$")
-MATCH_RE = re.compile(
-    r"^\s{4}(?:(?P<time>\d{1,2}:\d{2})\s+)?"
+
+MODERN_MATCH_RE = re.compile(
+    r"^\s+(?:(?P<time>\d{1,2}:\d{2})\s+)?"
     r"(?P<home>.+?)\s+v\s+(?P<away>.+?)\s+"
     r"(?P<hg>\d+)-(?P<ag>\d+)"
     r"(?:\s+\((?P<hhg>\d+)-(?P<hag>\d+)\))?\s*$"
+)
+
+LEGACY_MATCH_RE = re.compile(
+    r"^\s+(?:(?P<time>\d{1,2}:\d{2})\s+)?"
+    r"(?P<home>.+?)\s+"
+    r"(?P<hg>\d+)-(?P<ag>\d+)"
+    r"(?:\s+\((?P<hhg>\d+)-(?P<hag>\d+)\))?\s+"
+    r"(?P<away>.+?)\s*$"
 )
 
 MONTHS = {
@@ -51,6 +66,18 @@ def _event_time_utc(date_text: str, kickoff: str, timezone_name: str) -> str:
     return local_dt.astimezone(ZoneInfo("UTC")).isoformat().replace("+00:00", "Z")
 
 
+def _parse_match_line(line: str) -> tuple[re.Match[str], str] | None:
+    modern = MODERN_MATCH_RE.match(line)
+    if modern:
+        return modern, "HOME_V_AWAY_SCORE"
+
+    legacy = LEGACY_MATCH_RE.match(line)
+    if legacy:
+        return legacy, "HOME_SCORE_AWAY"
+
+    return None
+
+
 def parse_openfootball(
     text: str,
     *,
@@ -63,9 +90,16 @@ def parse_openfootball(
     current_date: str | None = None
     current_year: int | None = None
     current_time: str | None = None
+    previous_month: int | None = None
 
     for line_number, raw_line in enumerate(text.splitlines(), start=1):
         line = raw_line.rstrip()
+
+        date_range_match = DATE_RANGE_RE.match(line)
+        if date_range_match:
+            current_year = int(date_range_match.group("start_year"))
+            previous_month = None
+            continue
 
         matchday_match = MATCHDAY_RE.match(line)
         if matchday_match:
@@ -74,27 +108,32 @@ def parse_openfootball(
 
         date_match = DATE_RE.match(line)
         if date_match:
-            explicit_year = date_match.group("year")
-            if explicit_year is not None:
-                current_year = int(explicit_year)
-            if current_year is None:
-                raise ValueError(
-                    f"Line {line_number}: date has no year before any explicit year was observed"
-                )
-
             month_name = date_match.group("month")
             month = MONTHS.get(month_name)
             if month is None:
                 raise ValueError(f"Line {line_number}: unsupported month {month_name!r}")
 
+            explicit_year = date_match.group("year")
+            if explicit_year is not None:
+                current_year = int(explicit_year)
+            elif current_year is None:
+                raise ValueError(
+                    f"Line {line_number}: date has no year before a season/header year was observed"
+                )
+            elif previous_month is not None and month < previous_month:
+                current_year += 1
+
             day = int(date_match.group("day"))
             current_date = f"{current_year:04d}-{month:02d}-{day:02d}"
+            previous_month = month
             current_time = None
             continue
 
-        match = MATCH_RE.match(line)
-        if not match:
+        parsed_match = _parse_match_line(line)
+        if parsed_match is None:
             continue
+
+        match, source_line_format = parsed_match
 
         if current_matchday is None:
             raise ValueError(f"Line {line_number}: match appears before a Matchday")
@@ -131,6 +170,7 @@ def parse_openfootball(
                 "home_ht_goals": int(half_home) if half_home is not None else None,
                 "away_ht_goals": int(half_away) if half_away is not None else None,
                 "source_line_number": line_number,
+                "source_line_format": source_line_format,
             }
         )
 
@@ -184,6 +224,11 @@ def main() -> int:
     teams = sorted(
         {str(row["home_team"]) for row in rows} | {str(row["away_team"]) for row in rows}
     )
+    format_counts: dict[str, int] = {}
+    for row in rows:
+        line_format = str(row["source_line_format"])
+        format_counts[line_format] = format_counts.get(line_format, 0) + 1
+
     output = {
         "research_only": True,
         "source": {
@@ -197,6 +242,7 @@ def main() -> int:
         "canonical_entity_ids_assigned": False,
         "match_count": len(rows),
         "team_count": len(teams),
+        "source_line_format_counts": format_counts,
         "teams": teams,
         "matches": rows,
     }
