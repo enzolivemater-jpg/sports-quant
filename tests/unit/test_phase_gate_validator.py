@@ -7,15 +7,10 @@ from types import ModuleType
 
 SCRIPT = Path(__file__).resolve().parents[2] / "scripts" / "validate_phase_gates.py"
 
-DEFAULT_ALLOWED = (
-    "src/sports_quant/__init__.py",
-    "src/sports_quant/config/__init__.py",
-    "src/sports_quant/config/settings.py",
-    "src/sports_quant/db/__init__.py",
-    "src/sports_quant/db/engine.py",
-    "src/sports_quant/observability/__init__.py",
-    "src/sports_quant/observability/logging.py",
-)
+TEST_F1_FILES = {
+    "src/sports_quant/config/settings.py": "SETTING = 1\n",
+    "src/sports_quant/db/engine.py": "ENGINE = 1\n",
+}
 
 
 def _load_module() -> ModuleType:
@@ -27,11 +22,15 @@ def _load_module() -> ModuleType:
     return module
 
 
-def _write_allowlist(root: Path, allowed: tuple[str, ...] = DEFAULT_ALLOWED) -> None:
+def _write_allowlist(
+    root: Path,
+    allowed: tuple[str, ...],
+    scaffold_filename: str = "README.md",
+) -> None:
     project = root / ".project"
     project.mkdir(parents=True, exist_ok=True)
     lines = [
-        'schema_version = "1.0"',
+        'schema_version = "1.1"',
         'project = "SPORTS_QUANT"',
         'purpose = "test allowlist"',
         "",
@@ -43,11 +42,26 @@ def _write_allowlist(root: Path, allowed: tuple[str, ...] = DEFAULT_ALLOWED) -> 
             "]",
             "",
             "[scaffold]",
-            'allowed_filename = "README.md"',
+            f'allowed_filename = "{scaffold_filename}"',
             "",
         ]
     )
     (project / "F1_SOURCE_ALLOWLIST.toml").write_text("\n".join(lines), encoding="utf-8")
+
+
+def _write_pyproject(
+    root: Path,
+    *,
+    where: str = '["src"]',
+    include: str = '["sports_quant*"]',
+) -> None:
+    (root / "pyproject.toml").write_text(
+        f"""[tool.setuptools.packages.find]
+where = {where}
+include = {include}
+""",
+        encoding="utf-8",
+    )
 
 
 def _write_gate(
@@ -64,7 +78,6 @@ def _write_gate(
 ) -> None:
     project = root / ".project"
     project.mkdir(parents=True, exist_ok=True)
-    _write_allowlist(root)
     (project / "PHASE_GATES.toml").write_text(
         f"""schema_version = "1.0"
 project = "SPORTS_QUANT"
@@ -89,18 +102,29 @@ spec = "docs/contracts/F2_READY_TO_IMPLEMENT_SPEC.md"
     )
 
 
+def _write_source(root: Path, relative: str, content: str = "VALUE = 1\n") -> None:
+    path = root / relative
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(content, encoding="utf-8")
+
+
 def _configure_module(module: ModuleType, root: Path) -> None:
     module.ROOT = root
     module.GATE_FILE = root / ".project" / "PHASE_GATES.toml"
     module.REVIEW_DIR = root / ".project" / "reviews"
     module.F1_SOURCE_ALLOWLIST_FILE = root / ".project" / "F1_SOURCE_ALLOWLIST.toml"
-    module.SOURCE_ROOT = root / "src" / "sports_quant"
+    module.PYPROJECT_FILE = root / "pyproject.toml"
+    module.SOURCE_ROOT = root / "src"
 
+    for path, content in TEST_F1_FILES.items():
+        _write_source(root, path, content)
 
-def _write_source(root: Path, relative: str, content: str = "VALUE = 1\n") -> None:
-    path = root / relative
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(content, encoding="utf-8")
+    module.CANONICAL_F1_SOURCE_BLOBS = {
+        path: module._git_blob_sha(root / path) for path in TEST_F1_FILES
+    }
+
+    _write_allowlist(root, tuple(TEST_F1_FILES))
+    _write_pyproject(root)
 
 
 def _valid_review_text() -> str:
@@ -137,15 +161,48 @@ F2 MAY BEGIN. No unresolved P0/P1 remains.
 """
 
 
-def test_closed_pending_gate_passes_with_f1_allowlisted_sources(tmp_path: Path) -> None:
+def test_closed_pending_gate_passes_with_frozen_f1_sources_and_readme(
+    tmp_path: Path,
+) -> None:
     module = _load_module()
     _configure_module(module, tmp_path)
     _write_gate(tmp_path)
-    _write_source(tmp_path, "src/sports_quant/config/settings.py")
-    _write_source(tmp_path, "src/sports_quant/db/engine.py")
     _write_source(tmp_path, "src/sports_quant/modeling/football/README.md", "# scaffold\n")
 
     assert module.main() == 0
+
+
+def test_closed_gate_rejects_allowlist_extension(tmp_path: Path) -> None:
+    module = _load_module()
+    _configure_module(module, tmp_path)
+    _write_gate(tmp_path)
+    extra = "src/sports_quant/modeling/football/model.py"
+    _write_allowlist(tmp_path, (*TEST_F1_FILES, extra))
+    _write_source(tmp_path, extra)
+
+    assert module.main() == 1
+
+
+def test_closed_gate_rejects_scaffold_filename_change(tmp_path: Path) -> None:
+    module = _load_module()
+    _configure_module(module, tmp_path)
+    _write_gate(tmp_path)
+    _write_allowlist(tmp_path, tuple(TEST_F1_FILES), scaffold_filename="model.py")
+
+    assert module.main() == 1
+
+
+def test_closed_gate_rejects_changed_content_in_allowlisted_f1_file(tmp_path: Path) -> None:
+    module = _load_module()
+    _configure_module(module, tmp_path)
+    _write_gate(tmp_path)
+    _write_source(
+        tmp_path,
+        "src/sports_quant/config/settings.py",
+        "def p_safe_override() -> float:\n    return 0.99\n",
+    )
+
+    assert module.main() == 1
 
 
 def test_closed_gate_rejects_f2_contract_implementation(tmp_path: Path) -> None:
@@ -180,6 +237,35 @@ def test_closed_gate_rejects_market_business_logic_outside_contracts(tmp_path: P
     _configure_module(module, tmp_path)
     _write_gate(tmp_path)
     _write_source(tmp_path, "src/sports_quant/market/no_vig/proportional.py")
+
+    assert module.main() == 1
+
+
+def test_closed_gate_rejects_probability_business_logic_outside_contracts(
+    tmp_path: Path,
+) -> None:
+    module = _load_module()
+    _configure_module(module, tmp_path)
+    _write_gate(tmp_path)
+    _write_source(tmp_path, "src/sports_quant/probability/model.py")
+
+    assert module.main() == 1
+
+
+def test_closed_gate_rejects_second_package_under_src(tmp_path: Path) -> None:
+    module = _load_module()
+    _configure_module(module, tmp_path)
+    _write_gate(tmp_path)
+    _write_source(tmp_path, "src/sports_quant_f2/__init__.py")
+
+    assert module.main() == 1
+
+
+def test_closed_gate_rejects_packaging_scope_broadening(tmp_path: Path) -> None:
+    module = _load_module()
+    _configure_module(module, tmp_path)
+    _write_gate(tmp_path)
+    _write_pyproject(tmp_path, include='["*"]')
 
     assert module.main() == 1
 

@@ -2,106 +2,75 @@
 
 Date recorded: 2026-09-22
 
-Status: REMEDIATION_IN_PROGRESS__P1_01_CORRECTED_PENDING_REREVIEW
+Status: REMEDIATION_IN_PROGRESS__P1_01_HARDENED_PENDING_REREVIEW
 
-## What happened
+## Historical deviation
 
-Foundation governance states:
+Foundation governance required independent F0 review before F1, but the F1 repository skeleton was implemented first. This remains a recorded historical process deviation.
 
-`f1_may_start_before_independent_review_of_f0: false`
+No F2 domain contracts, model, production P_safe, market engine, optimizer or automated wagering logic were implemented before the gate.
 
-However, the F1 repository skeleton was implemented and technically validated before the required independent F0 review was completed.
+## Review history
 
-This is a historical process deviation.
+Initial review:
+- reviewed HEAD: `f7be5354f0cb50cd82617571485c2d2fab6d7fa4`
+- P0: 0
+- P1: 1
+- status: NO_GO
 
-## What this record does NOT do
+First targeted re-review:
+- reviewed HEAD: `3cd2bba8bd29d7795d998d12f7f84b756bb6ee4f`
+- P0: 0
+- P1: 1
+- P1-01 remains OPEN
+- status: NO_GO
 
-This record does not:
-- retroactively claim the F0 review occurred;
-- waive the independent-review requirement;
-- authorize F2;
-- change the canonical Foundation decision;
-- erase the deviation;
-- turn same-chat/self-review into independent review.
+Both negative review artifacts are preserved under `.project/reviews/`.
 
-## Impact assessment
+## Current P1-01 remediation
 
-The premature work was limited to F1 repository-foundation scope:
-- repository structure;
-- Python packaging/lock;
-- CI/Security;
-- PostgreSQL local/test plumbing;
-- migration skeleton;
-- minimal observability;
-- governance/research documentation.
+While `f2.authorized=false`, the machine gate now enforces all of the following:
 
-No F2 domain-contract implementation was started.
+1. The exact F1 source path set is hard-coded in `scripts/validate_phase_gates.py`.
+2. `.project/F1_SOURCE_ALLOWLIST.toml` must exactly mirror that canonical set; it cannot add or remove paths.
+3. The scaffold exception is hard-coded to exactly `README.md`.
+4. Each of the seven approved F1 Python files is frozen by its exact Git blob SHA.
+5. Any content change to one of those files fails the closed F2 gate.
+6. The scanner covers all files under `src/`, not only `src/sports_quant/`.
+7. Every file under `src/` while F2 is closed must be either:
+   - one exact frozen F1 source blob; or
+   - a `README.md` scaffold.
+8. `pyproject.toml` explicitly restricts setuptools discovery to `sports_quant*`, and the validator verifies that exact packaging scope.
+9. A second package under `src/` fails independently of packaging configuration.
+10. Tests cover:
+   - allowlist extension;
+   - scaffold filename change;
+   - content mutation of an already allowlisted F1 file;
+   - contracts;
+   - Football modeling;
+   - calibration;
+   - market;
+   - probability outside contracts;
+   - second package under src;
+   - packaging-scope broadening.
 
-No model, production P_safe, market engine, optimizer or automated wagering logic was implemented.
+## Scope of guarantee
 
-## Independent F0 review result
+This is intentionally strict because F2 is closed.
 
-The independent review of HEAD `f7be5354f0cb50cd82617571485c2d2fab6d7fa4` reported:
-- P0 open: 0
-- P1 open: 1
-- blocking finding: P1-01
-- final status: NO_GO
+Legitimate changes to frozen F1 source files before F2 authorization require updating the baseline and another independent review; they cannot silently pass.
 
-P1-01 identified that the previous machine gate inspected only `src/sports_quant/contracts/`, so it did not exhaustively contain premature F2/F3+ source logic elsewhere.
+Research scripts outside `src/` are not production package implementation and remain governed separately.
 
-The original review is preserved under `.project/reviews/`.
-
-## Forward remediation
-
-The project now applies a stricter forward gate:
-
-1. F2 remains unauthorized.
-2. GitHub issue #1 remains open until the corrected gate is independently re-reviewed.
-3. `.project/PHASE_GATES.toml` is the machine-readable gate.
-4. `.project/F1_SOURCE_ALLOWLIST.toml` enumerates the exact non-README source files allowed while F2 is closed.
-5. `scripts/validate_phase_gates.py` scans all tracked/runtime files under `src/sports_quant/` and fails when any non-README source file is outside that explicit F1 allowlist.
-6. Regression tests prove that premature code in:
-   - `contracts/`
-   - `modeling/football/`
-   - `calibration/`
-   - `market/`
-   is blocked while legitimate F1 source/scaffold files pass.
-7. F2 authorization still requires:
-   - accepted independent review artifact;
-   - p0_open = 0;
-   - p1_open = 0;
-   - blocking_findings_cleared = true;
-   - f2.authorized = true.
-8. Claude F2 handoff independently checks the same gate before writing code.
-
-## Scope of the guarantee
-
-The machine containment guarantee is now intentionally precise:
-
-While `f2.authorized=false`, no new production/package source file may appear under `src/sports_quant/` unless it is explicitly present in the F1 source allowlist or is a README scaffold reservation.
-
-Research tooling outside the production package remains governed separately and does not become F2 implementation merely by existing.
-
-Repository-admin protection of `main` remains a separate issue (#17).
-
-## Reviewer instruction
-
-The targeted re-review should verify:
-- the explicit allowlist is complete and no broader than F1;
-- unauthorized code in contracts/football/calibration/market is blocked;
-- valid F1 source and README scaffold pass;
-- protected gate files cannot drift after an accepted review without requiring re-review;
-- P2-01 and P2-02 were corrected without changing canonical scope.
-
-The reviewer must not treat this document as evidence that F0 passed.
+Repository administrator controls remain separately tracked in issue #17.
 
 ## Resolution condition
 
-The process deviation is considered remediated for forward execution only when:
-- P1-01 correction is independently re-reviewed;
-- any remaining P0/P1 findings are cleared;
-- the accepted review artifact is committed;
-- the F2 machine gate is opened;
-- CI/Security are green.
+P1-01 remains governance-open until an independent reviewer verifies the hardened gate and reports:
+- P0 open = 0;
+- P1 open = 0;
+- blocking_findings_cleared = true;
+- explicit F2 authorization statement.
 
-The historical fact that F1 started early remains in the project record.
+Until then:
+F2 MUST REMAIN BLOCKED.

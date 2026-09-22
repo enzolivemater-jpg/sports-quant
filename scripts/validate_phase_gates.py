@@ -1,11 +1,12 @@
 """Machine-checkable SPORTS QUANT phase gate.
 
-This script enforces the current governance boundary between F1 and F2.
+This script enforces the governance boundary between F1 and F2.
 It does not replace an independent critical review.
 """
 
 from __future__ import annotations
 
+import hashlib
 import re
 import subprocess
 import sys
@@ -17,12 +18,28 @@ ROOT = Path(__file__).resolve().parents[1]
 GATE_FILE = ROOT / ".project" / "PHASE_GATES.toml"
 REVIEW_DIR = ROOT / ".project" / "reviews"
 F1_SOURCE_ALLOWLIST_FILE = ROOT / ".project" / "F1_SOURCE_ALLOWLIST.toml"
-SOURCE_ROOT = ROOT / "src" / "sports_quant"
+PYPROJECT_FILE = ROOT / "pyproject.toml"
+SOURCE_ROOT = ROOT / "src"
 
 PASS_REVIEW_STATES = {"PASS", "PASS_WITH_P2"}
 ALLOWED_REVIEW_STATES = PASS_REVIEW_STATES | {"PENDING", "BLOCKED", "NEEDS_DECISION"}
 REVIEW_FINAL_STATUSES = {"GO", "GO_WITH_CONDITIONS"}
 FULL_SHA_RE = re.compile(r"^[0-9a-f]{40}$")
+
+# Frozen F1 source baseline reviewed as infrastructure only.
+# Values are Git blob SHA-1s: sha1(b"blob " + len(content) + b"\0" + content).
+CANONICAL_F1_SOURCE_BLOBS: dict[str, str] = {
+    "src/sports_quant/__init__.py": "26b8d1f10a7ddf588663e2b9f49824eb31626dd6",
+    "src/sports_quant/config/__init__.py": "528d002102b858ac759ad6b821593920ef6dca77",
+    "src/sports_quant/config/settings.py": "6948ddc8d3ea16f1eba4517454a3639373c6dd75",
+    "src/sports_quant/db/__init__.py": "0ef790fc5cc0b20c6411c4bd084ec3119c8093e8",
+    "src/sports_quant/db/engine.py": "b338bf8089156f4a0890930257e4172186fc27bc",
+    "src/sports_quant/observability/__init__.py": "066aa77fc36bda374b6327eec68dc8a76702b261",
+    "src/sports_quant/observability/logging.py": "561e212a138349d52407ccc8c3f37c51631418b7",
+}
+CANONICAL_SCAFFOLD_FILENAME = "README.md"
+CANONICAL_PACKAGE_FIND_WHERE = ["src"]
+CANONICAL_PACKAGE_FIND_INCLUDE = ["sports_quant*"]
 
 REVIEW_PROTECTED_PATHS = (
     ".project/FOUNDATION_DECISIONS_v0.1.yaml",
@@ -30,6 +47,7 @@ REVIEW_PROTECTED_PATHS = (
     ".project/SPORT_PREDICTABILITY_POLICY.yaml",
     ".project/PROJECT_PROFILE.yaml",
     ".project/F1_SOURCE_ALLOWLIST.toml",
+    "pyproject.toml",
     "docs/adr/ADR-0001-foundation-v0.1.md",
     "docs/adr/ADR-0002-mandatory-sports-scope.md",
     "docs/adr/ADR-0003-additional-sports-allowlist.md",
@@ -38,6 +56,7 @@ REVIEW_PROTECTED_PATHS = (
     ".ai/AI_DECISIONS.md",
     ".ai/handoffs/F0_INDEPENDENT_REVIEW.md",
     "scripts/validate_phase_gates.py",
+    "tests/unit/test_phase_gate_validator.py",
     "docs/runbooks/GOVERNANCE_DEVIATION_F1_BEFORE_F0_REVIEW.md",
     ".github/workflows/ci.yml",
 )
@@ -50,7 +69,13 @@ def _load_gates() -> dict[str, Any]:
         return tomllib.load(handle)
 
 
-def _load_f1_source_allowlist() -> tuple[set[str], str]:
+def _git_blob_sha(path: Path) -> str:
+    content = path.read_bytes()
+    header = f"blob {len(content)}\0".encode()
+    return hashlib.sha1(header + content, usedforsecurity=False).hexdigest()
+
+
+def _load_f1_source_allowlist() -> set[str]:
     if not F1_SOURCE_ALLOWLIST_FILE.exists():
         raise RuntimeError(
             f"Missing F1 source allowlist: {F1_SOURCE_ALLOWLIST_FILE.relative_to(ROOT)}"
@@ -60,7 +85,7 @@ def _load_f1_source_allowlist() -> tuple[set[str], str]:
         data = tomllib.load(handle)
 
     raw_allowed = data.get("allowed_source_files")
-    if not isinstance(raw_allowed, list) or not raw_allowed:
+    if not isinstance(raw_allowed, list):
         raise RuntimeError("F1 source allowlist must contain allowed_source_files")
 
     allowed: set[str] = set()
@@ -70,23 +95,72 @@ def _load_f1_source_allowlist() -> tuple[set[str], str]:
         path = Path(item)
         if path.is_absolute() or ".." in path.parts:
             raise RuntimeError(f"Unsafe F1 source allowlist entry: {item!r}")
-        normalized = path.as_posix()
-        if not normalized.startswith("src/sports_quant/"):
-            raise RuntimeError(
-                f"F1 source allowlist entries must live under src/sports_quant/: {item!r}"
-            )
-        allowed.add(normalized)
+        allowed.add(path.as_posix())
+
+    canonical = set(CANONICAL_F1_SOURCE_BLOBS)
+    if allowed != canonical:
+        added = sorted(allowed - canonical)
+        missing = sorted(canonical - allowed)
+        raise RuntimeError(
+            "F1 source allowlist must exactly equal the frozen canonical F1 set; "
+            f"extra={added}, missing={missing}"
+        )
 
     scaffold = data.get("scaffold", {})
     allowed_filename = scaffold.get("allowed_filename")
-    if not isinstance(allowed_filename, str) or not allowed_filename.strip():
-        raise RuntimeError("F1 source allowlist requires scaffold.allowed_filename")
+    if allowed_filename != CANONICAL_SCAFFOLD_FILENAME:
+        raise RuntimeError(
+            "F1 scaffold filename must be exactly "
+            f"{CANONICAL_SCAFFOLD_FILENAME!r}, got {allowed_filename!r}"
+        )
 
-    return allowed, allowed_filename
+    return allowed
+
+
+def _validate_packaging_scope() -> None:
+    if not PYPROJECT_FILE.exists():
+        raise RuntimeError("Missing pyproject.toml")
+
+    with PYPROJECT_FILE.open("rb") as handle:
+        data = tomllib.load(handle)
+
+    try:
+        find = data["tool"]["setuptools"]["packages"]["find"]
+    except (KeyError, TypeError) as exc:
+        raise RuntimeError("Missing [tool.setuptools.packages.find] configuration") from exc
+
+    where = find.get("where")
+    include = find.get("include")
+    if where != CANONICAL_PACKAGE_FIND_WHERE:
+        raise RuntimeError(
+            "setuptools package discovery 'where' must remain exactly "
+            f"{CANONICAL_PACKAGE_FIND_WHERE!r}, got {where!r}"
+        )
+    if include != CANONICAL_PACKAGE_FIND_INCLUDE:
+        raise RuntimeError(
+            "setuptools package discovery 'include' must remain exactly "
+            f"{CANONICAL_PACKAGE_FIND_INCLUDE!r}, got {include!r}"
+        )
+
+
+def _validate_frozen_f1_source_blobs() -> None:
+    for relative, expected_sha in CANONICAL_F1_SOURCE_BLOBS.items():
+        path = ROOT / relative
+        if not path.is_file():
+            raise RuntimeError(f"Frozen F1 source file is missing: {relative}")
+        actual_sha = _git_blob_sha(path)
+        if actual_sha != expected_sha:
+            raise RuntimeError(
+                "Frozen F1 source content changed while F2 is closed: "
+                f"{relative} expected_blob={expected_sha} actual_blob={actual_sha}"
+            )
 
 
 def _unauthorized_pre_f2_source_files() -> list[Path]:
-    allowed, scaffold_filename = _load_f1_source_allowlist()
+    allowed = _load_f1_source_allowlist()
+    _validate_packaging_scope()
+    _validate_frozen_f1_source_blobs()
+
     if not SOURCE_ROOT.exists():
         return []
 
@@ -95,7 +169,7 @@ def _unauthorized_pre_f2_source_files() -> list[Path]:
         if not path.is_file():
             continue
         relative = path.relative_to(ROOT).as_posix()
-        if path.name == scaffold_filename:
+        if path.name == CANONICAL_SCAFFOLD_FILENAME:
             continue
         if relative not in allowed:
             unauthorized.append(path)

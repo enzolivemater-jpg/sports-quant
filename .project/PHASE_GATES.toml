@@ -5,7 +5,7 @@ current_phase = "F1_REPOSITORY_SKELETON"
 [foundation_review]
 status = "BLOCKED"
 independent_reviewer = ""
-review_artifact = ".project/reviews/F0_INDEPENDENT_REVIEW_2026-09-22_f7be5354.md"
+review_artifact = ".project/reviews/F0_TARGETED_REREVIEW_2026-09-22_3cd2bba8.md"
 p0_open = 0
 p1_open = 1
 blocking_findings_cleared = false
@@ -13,7 +13,7 @@ issue = 1
 
 [f2]
 authorized = false
-authorization_basis = "BLOCKED_BY_F0_REVIEW_P1_01"
+authorization_basis = "BLOCKED_BY_F0_REREVIEW_P1_01"
 implementation_issue = 2
 spec = "docs/contracts/F2_READY_TO_IMPLEMENT_SPEC.md"
 

@@ -28,6 +28,7 @@ dev = [
 
 [tool.setuptools.packages.find]
 where = ["src"]
+include = ["sports_quant*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

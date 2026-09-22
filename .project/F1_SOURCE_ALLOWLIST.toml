@@ -1,6 +1,6 @@
-schema_version = "1.0"
+schema_version = "1.1"
 project = "SPORTS_QUANT"
-purpose = "Explicit source allowlist while F2 is unauthorized"
+purpose = "Auditable mirror of the immutable F1 source baseline enforced by validate_phase_gates.py"
 
 allowed_source_files = [
   "src/sports_quant/__init__.py",
@@ -16,4 +16,4 @@ allowed_source_files = [
 allowed_filename = "README.md"
 
 [rule]
-description = "While f2.authorized=false, every tracked file under src/sports_quant must either be this exact F1 allowlist or a README.md scaffold reservation."
+description = "While f2.authorized=false, files under src must be an exact frozen F1 source blob or a README.md scaffold. This TOML cannot broaden the canonical set; the validator enforces the exact paths and blob SHAs."
