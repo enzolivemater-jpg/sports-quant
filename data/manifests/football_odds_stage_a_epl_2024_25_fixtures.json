@@ -26,7 +26,9 @@
     ]
   },
   "identity_rules": [
-    "Official names are preserved as source labels; they are not canonical SPORTS QUANT entity IDs.",
+    "Official names are preserved exactly as source labels; they are not canonical SPORTS QUANT entity IDs.",
+    "The official page itself uses Newcastle and Newcastle United for the same club across MW1-MW4; source_label_aliases records this source-internal alias explicitly.",
+    "source_identity_*_key is only a research reconciliation key for this manifest, not a canonical SPORTS QUANT team ID.",
     "canonical_event_id remains null until F4 entity resolution.",
     "provider_event_ids remain empty until each provider is reconciled.",
     "Provider commence_time must be checked against this fixture identity before an event ID is accepted.",
@@ -65,7 +67,9 @@
       "kickoff_utc": "2024-08-16T19:00:00Z",
       "kickoff_group_id": "MW1_G01",
       "canonical_event_id": null,
-      "provider_event_ids": {}
+      "provider_event_ids": {},
+      "source_identity_home_key": "Man Utd",
+      "source_identity_away_key": "Fulham"
     },
     {
       "fixture_index": 2,
@@ -76,7 +80,9 @@
       "kickoff_utc": "2024-08-17T11:30:00Z",
       "kickoff_group_id": "MW1_G02",
       "canonical_event_id": null,
-      "provider_event_ids": {}
+      "provider_event_ids": {},
+      "source_identity_home_key": "Ipswich Town",
+      "source_identity_away_key": "Liverpool"
     },
     {
       "fixture_index": 3,
@@ -87,7 +93,9 @@
       "kickoff_utc": "2024-08-17T14:00:00Z",
       "kickoff_group_id": "MW1_G03",
       "canonical_event_id": null,
-      "provider_event_ids": {}
+      "provider_event_ids": {},
+      "source_identity_home_key": "Arsenal",
+      "source_identity_away_key": "Wolves"
     },
     {
       "fixture_index": 4,
@@ -98,7 +106,9 @@
       "kickoff_utc": "2024-08-17T14:00:00Z",
       "kickoff_group_id": "MW1_G03",
       "canonical_event_id": null,
-      "provider_event_ids": {}
+      "provider_event_ids": {},
+      "source_identity_home_key": "Everton",
+      "source_identity_away_key": "Brighton"
     },
     {
       "fixture_index": 5,
@@ -109,7 +119,9 @@
       "kickoff_utc": "2024-08-17T14:00:00Z",
       "kickoff_group_id": "MW1_G03",
       "canonical_event_id": null,
-      "provider_event_ids": {}
+      "provider_event_ids": {},
+      "source_identity_home_key": "Newcastle United",
+      "source_identity_away_key": "Southampton"
     },
     {
       "fixture_index": 6,
@@ -120,7 +132,9 @@
       "kickoff_utc": "2024-08-17T14:00:00Z",
       "kickoff_group_id": "MW1_G03",
       "canonical_event_id": null,
-      "provider_event_ids": {}
+      "provider_event_ids": {},
+      "source_identity_home_key": "Nottingham Forest",
+      "source_identity_away_key": "AFC Bournemouth"
     },
     {
       "fixture_index": 7,
@@ -131,7 +145,9 @@
       "kickoff_utc": "2024-08-17T16:30:00Z",
       "kickoff_group_id": "MW1_G04",
       "canonical_event_id": null,
-      "provider_event_ids": {}
+      "provider_event_ids": {},
+      "source_identity_home_key": "West Ham",
+      "source_identity_away_key": "Aston Villa"
     },
     {
       "fixture_index": 8,
@@ -142,7 +158,9 @@
       "kickoff_utc": "2024-08-18T13:00:00Z",
       "kickoff_group_id": "MW1_G05",
       "canonical_event_id": null,
-      "provider_event_ids": {}
+      "provider_event_ids": {},
+      "source_identity_home_key": "Brentford",
+      "source_identity_away_key": "Crystal Palace"
     },
     {
       "fixture_index": 9,
@@ -153,7 +171,9 @@
       "kickoff_utc": "2024-08-18T15:30:00Z",
       "kickoff_group_id": "MW1_G06",
       "canonical_event_id": null,
-      "provider_event_ids": {}
+      "provider_event_ids": {},
+      "source_identity_home_key": "Chelsea",
+      "source_identity_away_key": "Man City"
     },
     {
       "fixture_index": 10,
@@ -164,7 +184,9 @@
       "kickoff_utc": "2024-08-19T19:00:00Z",
       "kickoff_group_id": "MW1_G07",
       "canonical_event_id": null,
-      "provider_event_ids": {}
+      "provider_event_ids": {},
+      "source_identity_home_key": "Leicester City",
+      "source_identity_away_key": "Spurs"
     },
     {
       "fixture_index": 11,
@@ -175,7 +197,9 @@
       "kickoff_utc": "2024-08-24T11:30:00Z",
       "kickoff_group_id": "MW2_G08",
       "canonical_event_id": null,
-      "provider_event_ids": {}
+      "provider_event_ids": {},
+      "source_identity_home_key": "Brighton",
+      "source_identity_away_key": "Man Utd"
     },
     {
       "fixture_index": 12,
@@ -186,7 +210,9 @@
       "kickoff_utc": "2024-08-24T14:00:00Z",
       "kickoff_group_id": "MW2_G09",
       "canonical_event_id": null,
-      "provider_event_ids": {}
+      "provider_event_ids": {},
+      "source_identity_home_key": "Crystal Palace",
+      "source_identity_away_key": "West Ham"
     },
     {
       "fixture_index": 13,
@@ -197,7 +223,9 @@
       "kickoff_utc": "2024-08-24T14:00:00Z",
       "kickoff_group_id": "MW2_G09",
       "canonical_event_id": null,
-      "provider_event_ids": {}
+      "provider_event_ids": {},
+      "source_identity_home_key": "Fulham",
+      "source_identity_away_key": "Leicester City"
     },
     {
       "fixture_index": 14,
@@ -208,7 +236,9 @@
       "kickoff_utc": "2024-08-24T14:00:00Z",
       "kickoff_group_id": "MW2_G09",
       "canonical_event_id": null,
-      "provider_event_ids": {}
+      "provider_event_ids": {},
+      "source_identity_home_key": "Man City",
+      "source_identity_away_key": "Ipswich Town"
     },
     {
       "fixture_index": 15,
@@ -219,7 +249,9 @@
       "kickoff_utc": "2024-08-24T14:00:00Z",
       "kickoff_group_id": "MW2_G09",
       "canonical_event_id": null,
-      "provider_event_ids": {}
+      "provider_event_ids": {},
+      "source_identity_home_key": "Southampton",
+      "source_identity_away_key": "Nottingham Forest"
     },
     {
       "fixture_index": 16,
@@ -230,7 +262,9 @@
       "kickoff_utc": "2024-08-24T14:00:00Z",
       "kickoff_group_id": "MW2_G09",
       "canonical_event_id": null,
-      "provider_event_ids": {}
+      "provider_event_ids": {},
+      "source_identity_home_key": "Spurs",
+      "source_identity_away_key": "Everton"
     },
     {
       "fixture_index": 17,
@@ -241,7 +275,9 @@
       "kickoff_utc": "2024-08-24T16:30:00Z",
       "kickoff_group_id": "MW2_G10",
       "canonical_event_id": null,
-      "provider_event_ids": {}
+      "provider_event_ids": {},
+      "source_identity_home_key": "Aston Villa",
+      "source_identity_away_key": "Arsenal"
     },
     {
       "fixture_index": 18,
@@ -252,7 +288,9 @@
       "kickoff_utc": "2024-08-25T13:00:00Z",
       "kickoff_group_id": "MW2_G11",
       "canonical_event_id": null,
-      "provider_event_ids": {}
+      "provider_event_ids": {},
+      "source_identity_home_key": "AFC Bournemouth",
+      "source_identity_away_key": "Newcastle United"
     },
     {
       "fixture_index": 19,
@@ -263,7 +301,9 @@
       "kickoff_utc": "2024-08-25T13:00:00Z",
       "kickoff_group_id": "MW2_G11",
       "canonical_event_id": null,
-      "provider_event_ids": {}
+      "provider_event_ids": {},
+      "source_identity_home_key": "Wolves",
+      "source_identity_away_key": "Chelsea"
     },
     {
       "fixture_index": 20,
@@ -274,7 +314,9 @@
       "kickoff_utc": "2024-08-25T15:30:00Z",
       "kickoff_group_id": "MW2_G12",
       "canonical_event_id": null,
-      "provider_event_ids": {}
+      "provider_event_ids": {},
+      "source_identity_home_key": "Liverpool",
+      "source_identity_away_key": "Brentford"
     },
     {
       "fixture_index": 21,
@@ -285,7 +327,9 @@
       "kickoff_utc": "2024-08-31T11:30:00Z",
       "kickoff_group_id": "MW3_G13",
       "canonical_event_id": null,
-      "provider_event_ids": {}
+      "provider_event_ids": {},
+      "source_identity_home_key": "Arsenal",
+      "source_identity_away_key": "Brighton"
     },
     {
       "fixture_index": 22,
@@ -296,7 +340,9 @@
       "kickoff_utc": "2024-08-31T14:00:00Z",
       "kickoff_group_id": "MW3_G14",
       "canonical_event_id": null,
-      "provider_event_ids": {}
+      "provider_event_ids": {},
+      "source_identity_home_key": "Brentford",
+      "source_identity_away_key": "Southampton"
     },
     {
       "fixture_index": 23,
@@ -307,7 +353,9 @@
       "kickoff_utc": "2024-08-31T14:00:00Z",
       "kickoff_group_id": "MW3_G14",
       "canonical_event_id": null,
-      "provider_event_ids": {}
+      "provider_event_ids": {},
+      "source_identity_home_key": "Everton",
+      "source_identity_away_key": "AFC Bournemouth"
     },
     {
       "fixture_index": 24,
@@ -318,7 +366,9 @@
       "kickoff_utc": "2024-08-31T14:00:00Z",
       "kickoff_group_id": "MW3_G14",
       "canonical_event_id": null,
-      "provider_event_ids": {}
+      "provider_event_ids": {},
+      "source_identity_home_key": "Ipswich Town",
+      "source_identity_away_key": "Fulham"
     },
     {
       "fixture_index": 25,
@@ -329,7 +379,9 @@
       "kickoff_utc": "2024-08-31T14:00:00Z",
       "kickoff_group_id": "MW3_G14",
       "canonical_event_id": null,
-      "provider_event_ids": {}
+      "provider_event_ids": {},
+      "source_identity_home_key": "Leicester City",
+      "source_identity_away_key": "Aston Villa"
     },
     {
       "fixture_index": 26,
@@ -340,7 +392,9 @@
       "kickoff_utc": "2024-08-31T14:00:00Z",
       "kickoff_group_id": "MW3_G14",
       "canonical_event_id": null,
-      "provider_event_ids": {}
+      "provider_event_ids": {},
+      "source_identity_home_key": "Nottingham Forest",
+      "source_identity_away_key": "Wolves"
     },
     {
       "fixture_index": 27,
@@ -351,7 +405,9 @@
       "kickoff_utc": "2024-08-31T16:30:00Z",
       "kickoff_group_id": "MW3_G15",
       "canonical_event_id": null,
-      "provider_event_ids": {}
+      "provider_event_ids": {},
+      "source_identity_home_key": "West Ham",
+      "source_identity_away_key": "Man City"
     },
     {
       "fixture_index": 28,
@@ -362,7 +418,9 @@
       "kickoff_utc": "2024-09-01T12:30:00Z",
       "kickoff_group_id": "MW3_G16",
       "canonical_event_id": null,
-      "provider_event_ids": {}
+      "provider_event_ids": {},
+      "source_identity_home_key": "Chelsea",
+      "source_identity_away_key": "Crystal Palace"
     },
     {
       "fixture_index": 29,
@@ -373,7 +431,9 @@
       "kickoff_utc": "2024-09-01T12:30:00Z",
       "kickoff_group_id": "MW3_G16",
       "canonical_event_id": null,
-      "provider_event_ids": {}
+      "provider_event_ids": {},
+      "source_identity_home_key": "Newcastle United",
+      "source_identity_away_key": "Spurs"
     },
     {
       "fixture_index": 30,
@@ -384,7 +444,9 @@
       "kickoff_utc": "2024-09-01T15:00:00Z",
       "kickoff_group_id": "MW3_G17",
       "canonical_event_id": null,
-      "provider_event_ids": {}
+      "provider_event_ids": {},
+      "source_identity_home_key": "Man Utd",
+      "source_identity_away_key": "Liverpool"
     },
     {
       "fixture_index": 31,
@@ -395,7 +457,9 @@
       "kickoff_utc": "2024-09-14T11:30:00Z",
       "kickoff_group_id": "MW4_G18",
       "canonical_event_id": null,
-      "provider_event_ids": {}
+      "provider_event_ids": {},
+      "source_identity_home_key": "Southampton",
+      "source_identity_away_key": "Man Utd"
     },
     {
       "fixture_index": 32,
@@ -406,7 +470,9 @@
       "kickoff_utc": "2024-09-14T14:00:00Z",
       "kickoff_group_id": "MW4_G19",
       "canonical_event_id": null,
-      "provider_event_ids": {}
+      "provider_event_ids": {},
+      "source_identity_home_key": "Brighton",
+      "source_identity_away_key": "Ipswich Town"
     },
     {
       "fixture_index": 33,
@@ -417,7 +483,9 @@
       "kickoff_utc": "2024-09-14T14:00:00Z",
       "kickoff_group_id": "MW4_G19",
       "canonical_event_id": null,
-      "provider_event_ids": {}
+      "provider_event_ids": {},
+      "source_identity_home_key": "Crystal Palace",
+      "source_identity_away_key": "Leicester City"
     },
     {
       "fixture_index": 34,
@@ -428,7 +496,9 @@
       "kickoff_utc": "2024-09-14T14:00:00Z",
       "kickoff_group_id": "MW4_G19",
       "canonical_event_id": null,
-      "provider_event_ids": {}
+      "provider_event_ids": {},
+      "source_identity_home_key": "Fulham",
+      "source_identity_away_key": "West Ham"
     },
     {
       "fixture_index": 35,
@@ -439,7 +509,9 @@
       "kickoff_utc": "2024-09-14T14:00:00Z",
       "kickoff_group_id": "MW4_G19",
       "canonical_event_id": null,
-      "provider_event_ids": {}
+      "provider_event_ids": {},
+      "source_identity_home_key": "Liverpool",
+      "source_identity_away_key": "Nottingham Forest"
     },
     {
       "fixture_index": 36,
@@ -450,7 +522,9 @@
       "kickoff_utc": "2024-09-14T14:00:00Z",
       "kickoff_group_id": "MW4_G19",
       "canonical_event_id": null,
-      "provider_event_ids": {}
+      "provider_event_ids": {},
+      "source_identity_home_key": "Man City",
+      "source_identity_away_key": "Brentford"
     },
     {
       "fixture_index": 37,
@@ -461,7 +535,9 @@
       "kickoff_utc": "2024-09-14T16:30:00Z",
       "kickoff_group_id": "MW4_G20",
       "canonical_event_id": null,
-      "provider_event_ids": {}
+      "provider_event_ids": {},
+      "source_identity_home_key": "Aston Villa",
+      "source_identity_away_key": "Everton"
     },
     {
       "fixture_index": 38,
@@ -472,7 +548,9 @@
       "kickoff_utc": "2024-09-14T19:00:00Z",
       "kickoff_group_id": "MW4_G21",
       "canonical_event_id": null,
-      "provider_event_ids": {}
+      "provider_event_ids": {},
+      "source_identity_home_key": "AFC Bournemouth",
+      "source_identity_away_key": "Chelsea"
     },
     {
       "fixture_index": 39,
@@ -483,7 +561,9 @@
       "kickoff_utc": "2024-09-15T13:00:00Z",
       "kickoff_group_id": "MW4_G22",
       "canonical_event_id": null,
-      "provider_event_ids": {}
+      "provider_event_ids": {},
+      "source_identity_home_key": "Spurs",
+      "source_identity_away_key": "Arsenal"
     },
     {
       "fixture_index": 40,
@@ -494,7 +574,34 @@
       "kickoff_utc": "2024-09-15T15:30:00Z",
       "kickoff_group_id": "MW4_G23",
       "canonical_event_id": null,
-      "provider_event_ids": {}
+      "provider_event_ids": {},
+      "source_identity_home_key": "Wolves",
+      "source_identity_away_key": "Newcastle United"
     }
+  ],
+  "source_label_aliases": {
+    "Newcastle": "Newcastle United"
+  },
+  "source_identity_team_keys": [
+    "AFC Bournemouth",
+    "Arsenal",
+    "Aston Villa",
+    "Brentford",
+    "Brighton",
+    "Chelsea",
+    "Crystal Palace",
+    "Everton",
+    "Fulham",
+    "Ipswich Town",
+    "Leicester City",
+    "Liverpool",
+    "Man City",
+    "Man Utd",
+    "Newcastle United",
+    "Nottingham Forest",
+    "Southampton",
+    "Spurs",
+    "West Ham",
+    "Wolves"
   ]
 }

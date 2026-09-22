@@ -22,7 +22,9 @@ The official page states that weekend and Bank Holiday fixtures without another 
 This is a source-identity reconciliation manifest, not F4 canonical entity resolution.
 
 Therefore:
-- official source labels are preserved;
+- official source labels are preserved exactly;
+- the source's own `Newcastle` / `Newcastle United` variation is recorded in an explicit source-internal alias map;
+- `source_identity_*_key` is only a research reconciliation key, not a canonical team ID;
 - `canonical_event_id` is null;
 - `provider_event_ids` starts empty;
 - no canonical team ID is invented;

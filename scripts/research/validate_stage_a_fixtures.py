@@ -56,6 +56,8 @@ def validate_fixture_manifest(
         matchweek = fixture.get("matchweek")
         home = fixture.get("official_home_name")
         away = fixture.get("official_away_name")
+        home_key = fixture.get("source_identity_home_key")
+        away_key = fixture.get("source_identity_away_key")
         kickoff_utc = fixture.get("kickoff_utc")
         group_id = fixture.get("kickoff_group_id")
 
@@ -63,6 +65,8 @@ def validate_fixture_manifest(
             not isinstance(matchweek, str)
             or not isinstance(home, str)
             or not isinstance(away, str)
+            or not isinstance(home_key, str)
+            or not isinstance(away_key, str)
             or not isinstance(kickoff_utc, str)
             or not isinstance(group_id, str)
         ):
@@ -80,8 +84,8 @@ def validate_fixture_manifest(
 
         _parse_utc(kickoff_utc)
         matchweek_counts[matchweek] += 1
-        team_week_counts[(matchweek, home)] += 1
-        team_week_counts[(matchweek, away)] += 1
+        team_week_counts[(matchweek, home_key)] += 1
+        team_week_counts[(matchweek, away_key)] += 1
 
         key = (home, away, kickoff_utc)
         if key in fixture_keys:
@@ -113,7 +117,15 @@ def validate_fixture_manifest(
         )
 
     if len(team_week_counts) != 80:
-        errors.append("Expected 20 team appearances across each of 4 matchweeks")
+        errors.append("Expected 20 source-identity teams across each of 4 matchweeks")
+
+    source_identity_team_keys = fixture_data.get("source_identity_team_keys")
+    if not isinstance(source_identity_team_keys, list) or len(source_identity_team_keys) != 20:
+        errors.append("Expected 20 source_identity_team_keys")
+
+    aliases = fixture_data.get("source_label_aliases")
+    if aliases != {"Newcastle": "Newcastle United"}:
+        errors.append("Unexpected source label alias map")
 
     if fixture_data.get("fixture_count") != EXPECTED_FIXTURES:
         errors.append("fixture_count metadata mismatch")

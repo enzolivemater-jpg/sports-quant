@@ -34,7 +34,9 @@ def test_fixture_manifest_is_complete_and_matches_cutoff_groups() -> None:
 
     assert module.validate_fixture_manifest(fixture_data, cutoff_data) == []
     assert fixture_data["fixture_count"] == 40
-    assert len(fixture_data["official_team_labels"]) == 20
+    assert len(fixture_data["official_team_labels"]) == 21
+    assert len(fixture_data["source_identity_team_keys"]) == 20
+    assert fixture_data["source_label_aliases"] == {"Newcastle": "Newcastle United"}
 
 
 def test_ten_fixtures_per_matchweek() -> None:
@@ -46,6 +48,18 @@ def test_ten_fixtures_per_matchweek() -> None:
         counts[matchweek] = counts.get(matchweek, 0) + 1
 
     assert counts == {"MW1": 10, "MW2": 10, "MW3": 10, "MW4": 10}
+
+
+def test_source_alias_does_not_become_canonical_identity() -> None:
+    data = json.loads(FIXTURES.read_text(encoding="utf-8"))
+
+    newcastle_fixture = next(
+        fixture
+        for fixture in data["fixtures"]
+        if fixture["official_home_name"] == "Newcastle"
+    )
+    assert newcastle_fixture["source_identity_home_key"] == "Newcastle United"
+    assert newcastle_fixture["canonical_event_id"] is None
 
 
 def test_fixture_identity_starts_unresolved() -> None:
