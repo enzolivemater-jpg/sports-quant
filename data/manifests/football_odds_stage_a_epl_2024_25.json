@@ -1,0 +1,705 @@
+{
+  "schema_version": "1.0",
+  "project": "SPORTS_QUANT",
+  "sport": "FOOTBALL",
+  "competition": "English Premier League",
+  "season": "2024/25",
+  "purpose": "THE_ODDS_API_HISTORICAL_STAGE_A_RESEARCH",
+  "status": "RESEARCH_MANIFEST__NO_PURCHASE_AUTHORIZED",
+  "local_timezone": "Europe/London",
+  "local_timezone_note": "All listed MW1-MW4 dates occur during British Summer Time (UTC+01:00).",
+  "sport_key": "soccer_epl",
+  "markets": [
+    "h2h",
+    "totals"
+  ],
+  "regions": [
+    "eu"
+  ],
+  "odds_format": "decimal",
+  "kickoff_group_count": 23,
+  "cutoffs_per_group": [
+    "T-24h",
+    "T-1h",
+    "T-15m"
+  ],
+  "planned_query_count": 69,
+  "source_schedule_reference": "docs/research/FOOTBALL_ODDS_BAKEOFF_STAGE_A_SAMPLE_v0.1.md",
+  "warnings": [
+    "Research request manifest only; not production decision cutoffs.",
+    "Provider returned snapshot time must be recorded separately from requested time.",
+    "Provider event commence_time must be reconciled to the official fixture identity.",
+    "Re-check provider pricing, quota, endpoint semantics and licensing before paid execution."
+  ],
+  "kickoff_groups": [
+    {
+      "group_id": "MW1_G01",
+      "matchweek": "MW1",
+      "kickoff_local_europe_london": "2024-08-16T20:00:00+01:00",
+      "kickoff_utc": "2024-08-16T19:00:00Z",
+      "cutoffs": {
+        "T-24h": "2024-08-15T19:00:00Z",
+        "T-1h": "2024-08-16T18:00:00Z",
+        "T-15m": "2024-08-16T18:45:00Z"
+      }
+    },
+    {
+      "group_id": "MW1_G02",
+      "matchweek": "MW1",
+      "kickoff_local_europe_london": "2024-08-17T12:30:00+01:00",
+      "kickoff_utc": "2024-08-17T11:30:00Z",
+      "cutoffs": {
+        "T-24h": "2024-08-16T11:30:00Z",
+        "T-1h": "2024-08-17T10:30:00Z",
+        "T-15m": "2024-08-17T11:15:00Z"
+      }
+    },
+    {
+      "group_id": "MW1_G03",
+      "matchweek": "MW1",
+      "kickoff_local_europe_london": "2024-08-17T15:00:00+01:00",
+      "kickoff_utc": "2024-08-17T14:00:00Z",
+      "cutoffs": {
+        "T-24h": "2024-08-16T14:00:00Z",
+        "T-1h": "2024-08-17T13:00:00Z",
+        "T-15m": "2024-08-17T13:45:00Z"
+      }
+    },
+    {
+      "group_id": "MW1_G04",
+      "matchweek": "MW1",
+      "kickoff_local_europe_london": "2024-08-17T17:30:00+01:00",
+      "kickoff_utc": "2024-08-17T16:30:00Z",
+      "cutoffs": {
+        "T-24h": "2024-08-16T16:30:00Z",
+        "T-1h": "2024-08-17T15:30:00Z",
+        "T-15m": "2024-08-17T16:15:00Z"
+      }
+    },
+    {
+      "group_id": "MW1_G05",
+      "matchweek": "MW1",
+      "kickoff_local_europe_london": "2024-08-18T14:00:00+01:00",
+      "kickoff_utc": "2024-08-18T13:00:00Z",
+      "cutoffs": {
+        "T-24h": "2024-08-17T13:00:00Z",
+        "T-1h": "2024-08-18T12:00:00Z",
+        "T-15m": "2024-08-18T12:45:00Z"
+      }
+    },
+    {
+      "group_id": "MW1_G06",
+      "matchweek": "MW1",
+      "kickoff_local_europe_london": "2024-08-18T16:30:00+01:00",
+      "kickoff_utc": "2024-08-18T15:30:00Z",
+      "cutoffs": {
+        "T-24h": "2024-08-17T15:30:00Z",
+        "T-1h": "2024-08-18T14:30:00Z",
+        "T-15m": "2024-08-18T15:15:00Z"
+      }
+    },
+    {
+      "group_id": "MW1_G07",
+      "matchweek": "MW1",
+      "kickoff_local_europe_london": "2024-08-19T20:00:00+01:00",
+      "kickoff_utc": "2024-08-19T19:00:00Z",
+      "cutoffs": {
+        "T-24h": "2024-08-18T19:00:00Z",
+        "T-1h": "2024-08-19T18:00:00Z",
+        "T-15m": "2024-08-19T18:45:00Z"
+      }
+    },
+    {
+      "group_id": "MW2_G08",
+      "matchweek": "MW2",
+      "kickoff_local_europe_london": "2024-08-24T12:30:00+01:00",
+      "kickoff_utc": "2024-08-24T11:30:00Z",
+      "cutoffs": {
+        "T-24h": "2024-08-23T11:30:00Z",
+        "T-1h": "2024-08-24T10:30:00Z",
+        "T-15m": "2024-08-24T11:15:00Z"
+      }
+    },
+    {
+      "group_id": "MW2_G09",
+      "matchweek": "MW2",
+      "kickoff_local_europe_london": "2024-08-24T15:00:00+01:00",
+      "kickoff_utc": "2024-08-24T14:00:00Z",
+      "cutoffs": {
+        "T-24h": "2024-08-23T14:00:00Z",
+        "T-1h": "2024-08-24T13:00:00Z",
+        "T-15m": "2024-08-24T13:45:00Z"
+      }
+    },
+    {
+      "group_id": "MW2_G10",
+      "matchweek": "MW2",
+      "kickoff_local_europe_london": "2024-08-24T17:30:00+01:00",
+      "kickoff_utc": "2024-08-24T16:30:00Z",
+      "cutoffs": {
+        "T-24h": "2024-08-23T16:30:00Z",
+        "T-1h": "2024-08-24T15:30:00Z",
+        "T-15m": "2024-08-24T16:15:00Z"
+      }
+    },
+    {
+      "group_id": "MW2_G11",
+      "matchweek": "MW2",
+      "kickoff_local_europe_london": "2024-08-25T14:00:00+01:00",
+      "kickoff_utc": "2024-08-25T13:00:00Z",
+      "cutoffs": {
+        "T-24h": "2024-08-24T13:00:00Z",
+        "T-1h": "2024-08-25T12:00:00Z",
+        "T-15m": "2024-08-25T12:45:00Z"
+      }
+    },
+    {
+      "group_id": "MW2_G12",
+      "matchweek": "MW2",
+      "kickoff_local_europe_london": "2024-08-25T16:30:00+01:00",
+      "kickoff_utc": "2024-08-25T15:30:00Z",
+      "cutoffs": {
+        "T-24h": "2024-08-24T15:30:00Z",
+        "T-1h": "2024-08-25T14:30:00Z",
+        "T-15m": "2024-08-25T15:15:00Z"
+      }
+    },
+    {
+      "group_id": "MW3_G13",
+      "matchweek": "MW3",
+      "kickoff_local_europe_london": "2024-08-31T12:30:00+01:00",
+      "kickoff_utc": "2024-08-31T11:30:00Z",
+      "cutoffs": {
+        "T-24h": "2024-08-30T11:30:00Z",
+        "T-1h": "2024-08-31T10:30:00Z",
+        "T-15m": "2024-08-31T11:15:00Z"
+      }
+    },
+    {
+      "group_id": "MW3_G14",
+      "matchweek": "MW3",
+      "kickoff_local_europe_london": "2024-08-31T15:00:00+01:00",
+      "kickoff_utc": "2024-08-31T14:00:00Z",
+      "cutoffs": {
+        "T-24h": "2024-08-30T14:00:00Z",
+        "T-1h": "2024-08-31T13:00:00Z",
+        "T-15m": "2024-08-31T13:45:00Z"
+      }
+    },
+    {
+      "group_id": "MW3_G15",
+      "matchweek": "MW3",
+      "kickoff_local_europe_london": "2024-08-31T17:30:00+01:00",
+      "kickoff_utc": "2024-08-31T16:30:00Z",
+      "cutoffs": {
+        "T-24h": "2024-08-30T16:30:00Z",
+        "T-1h": "2024-08-31T15:30:00Z",
+        "T-15m": "2024-08-31T16:15:00Z"
+      }
+    },
+    {
+      "group_id": "MW3_G16",
+      "matchweek": "MW3",
+      "kickoff_local_europe_london": "2024-09-01T13:30:00+01:00",
+      "kickoff_utc": "2024-09-01T12:30:00Z",
+      "cutoffs": {
+        "T-24h": "2024-08-31T12:30:00Z",
+        "T-1h": "2024-09-01T11:30:00Z",
+        "T-15m": "2024-09-01T12:15:00Z"
+      }
+    },
+    {
+      "group_id": "MW3_G17",
+      "matchweek": "MW3",
+      "kickoff_local_europe_london": "2024-09-01T16:00:00+01:00",
+      "kickoff_utc": "2024-09-01T15:00:00Z",
+      "cutoffs": {
+        "T-24h": "2024-08-31T15:00:00Z",
+        "T-1h": "2024-09-01T14:00:00Z",
+        "T-15m": "2024-09-01T14:45:00Z"
+      }
+    },
+    {
+      "group_id": "MW4_G18",
+      "matchweek": "MW4",
+      "kickoff_local_europe_london": "2024-09-14T12:30:00+01:00",
+      "kickoff_utc": "2024-09-14T11:30:00Z",
+      "cutoffs": {
+        "T-24h": "2024-09-13T11:30:00Z",
+        "T-1h": "2024-09-14T10:30:00Z",
+        "T-15m": "2024-09-14T11:15:00Z"
+      }
+    },
+    {
+      "group_id": "MW4_G19",
+      "matchweek": "MW4",
+      "kickoff_local_europe_london": "2024-09-14T15:00:00+01:00",
+      "kickoff_utc": "2024-09-14T14:00:00Z",
+      "cutoffs": {
+        "T-24h": "2024-09-13T14:00:00Z",
+        "T-1h": "2024-09-14T13:00:00Z",
+        "T-15m": "2024-09-14T13:45:00Z"
+      }
+    },
+    {
+      "group_id": "MW4_G20",
+      "matchweek": "MW4",
+      "kickoff_local_europe_london": "2024-09-14T17:30:00+01:00",
+      "kickoff_utc": "2024-09-14T16:30:00Z",
+      "cutoffs": {
+        "T-24h": "2024-09-13T16:30:00Z",
+        "T-1h": "2024-09-14T15:30:00Z",
+        "T-15m": "2024-09-14T16:15:00Z"
+      }
+    },
+    {
+      "group_id": "MW4_G21",
+      "matchweek": "MW4",
+      "kickoff_local_europe_london": "2024-09-14T20:00:00+01:00",
+      "kickoff_utc": "2024-09-14T19:00:00Z",
+      "cutoffs": {
+        "T-24h": "2024-09-13T19:00:00Z",
+        "T-1h": "2024-09-14T18:00:00Z",
+        "T-15m": "2024-09-14T18:45:00Z"
+      }
+    },
+    {
+      "group_id": "MW4_G22",
+      "matchweek": "MW4",
+      "kickoff_local_europe_london": "2024-09-15T14:00:00+01:00",
+      "kickoff_utc": "2024-09-15T13:00:00Z",
+      "cutoffs": {
+        "T-24h": "2024-09-14T13:00:00Z",
+        "T-1h": "2024-09-15T12:00:00Z",
+        "T-15m": "2024-09-15T12:45:00Z"
+      }
+    },
+    {
+      "group_id": "MW4_G23",
+      "matchweek": "MW4",
+      "kickoff_local_europe_london": "2024-09-15T16:30:00+01:00",
+      "kickoff_utc": "2024-09-15T15:30:00Z",
+      "cutoffs": {
+        "T-24h": "2024-09-14T15:30:00Z",
+        "T-1h": "2024-09-15T14:30:00Z",
+        "T-15m": "2024-09-15T15:15:00Z"
+      }
+    }
+  ],
+  "query_plan": [
+    {
+      "group_id": "MW1_G01",
+      "matchweek": "MW1",
+      "cutoff": "T-24h",
+      "requested_snapshot_at_utc": "2024-08-15T19:00:00Z"
+    },
+    {
+      "group_id": "MW1_G01",
+      "matchweek": "MW1",
+      "cutoff": "T-1h",
+      "requested_snapshot_at_utc": "2024-08-16T18:00:00Z"
+    },
+    {
+      "group_id": "MW1_G01",
+      "matchweek": "MW1",
+      "cutoff": "T-15m",
+      "requested_snapshot_at_utc": "2024-08-16T18:45:00Z"
+    },
+    {
+      "group_id": "MW1_G02",
+      "matchweek": "MW1",
+      "cutoff": "T-24h",
+      "requested_snapshot_at_utc": "2024-08-16T11:30:00Z"
+    },
+    {
+      "group_id": "MW1_G02",
+      "matchweek": "MW1",
+      "cutoff": "T-1h",
+      "requested_snapshot_at_utc": "2024-08-17T10:30:00Z"
+    },
+    {
+      "group_id": "MW1_G02",
+      "matchweek": "MW1",
+      "cutoff": "T-15m",
+      "requested_snapshot_at_utc": "2024-08-17T11:15:00Z"
+    },
+    {
+      "group_id": "MW1_G03",
+      "matchweek": "MW1",
+      "cutoff": "T-24h",
+      "requested_snapshot_at_utc": "2024-08-16T14:00:00Z"
+    },
+    {
+      "group_id": "MW1_G03",
+      "matchweek": "MW1",
+      "cutoff": "T-1h",
+      "requested_snapshot_at_utc": "2024-08-17T13:00:00Z"
+    },
+    {
+      "group_id": "MW1_G03",
+      "matchweek": "MW1",
+      "cutoff": "T-15m",
+      "requested_snapshot_at_utc": "2024-08-17T13:45:00Z"
+    },
+    {
+      "group_id": "MW1_G04",
+      "matchweek": "MW1",
+      "cutoff": "T-24h",
+      "requested_snapshot_at_utc": "2024-08-16T16:30:00Z"
+    },
+    {
+      "group_id": "MW1_G04",
+      "matchweek": "MW1",
+      "cutoff": "T-1h",
+      "requested_snapshot_at_utc": "2024-08-17T15:30:00Z"
+    },
+    {
+      "group_id": "MW1_G04",
+      "matchweek": "MW1",
+      "cutoff": "T-15m",
+      "requested_snapshot_at_utc": "2024-08-17T16:15:00Z"
+    },
+    {
+      "group_id": "MW1_G05",
+      "matchweek": "MW1",
+      "cutoff": "T-24h",
+      "requested_snapshot_at_utc": "2024-08-17T13:00:00Z"
+    },
+    {
+      "group_id": "MW1_G05",
+      "matchweek": "MW1",
+      "cutoff": "T-1h",
+      "requested_snapshot_at_utc": "2024-08-18T12:00:00Z"
+    },
+    {
+      "group_id": "MW1_G05",
+      "matchweek": "MW1",
+      "cutoff": "T-15m",
+      "requested_snapshot_at_utc": "2024-08-18T12:45:00Z"
+    },
+    {
+      "group_id": "MW1_G06",
+      "matchweek": "MW1",
+      "cutoff": "T-24h",
+      "requested_snapshot_at_utc": "2024-08-17T15:30:00Z"
+    },
+    {
+      "group_id": "MW1_G06",
+      "matchweek": "MW1",
+      "cutoff": "T-1h",
+      "requested_snapshot_at_utc": "2024-08-18T14:30:00Z"
+    },
+    {
+      "group_id": "MW1_G06",
+      "matchweek": "MW1",
+      "cutoff": "T-15m",
+      "requested_snapshot_at_utc": "2024-08-18T15:15:00Z"
+    },
+    {
+      "group_id": "MW1_G07",
+      "matchweek": "MW1",
+      "cutoff": "T-24h",
+      "requested_snapshot_at_utc": "2024-08-18T19:00:00Z"
+    },
+    {
+      "group_id": "MW1_G07",
+      "matchweek": "MW1",
+      "cutoff": "T-1h",
+      "requested_snapshot_at_utc": "2024-08-19T18:00:00Z"
+    },
+    {
+      "group_id": "MW1_G07",
+      "matchweek": "MW1",
+      "cutoff": "T-15m",
+      "requested_snapshot_at_utc": "2024-08-19T18:45:00Z"
+    },
+    {
+      "group_id": "MW2_G08",
+      "matchweek": "MW2",
+      "cutoff": "T-24h",
+      "requested_snapshot_at_utc": "2024-08-23T11:30:00Z"
+    },
+    {
+      "group_id": "MW2_G08",
+      "matchweek": "MW2",
+      "cutoff": "T-1h",
+      "requested_snapshot_at_utc": "2024-08-24T10:30:00Z"
+    },
+    {
+      "group_id": "MW2_G08",
+      "matchweek": "MW2",
+      "cutoff": "T-15m",
+      "requested_snapshot_at_utc": "2024-08-24T11:15:00Z"
+    },
+    {
+      "group_id": "MW2_G09",
+      "matchweek": "MW2",
+      "cutoff": "T-24h",
+      "requested_snapshot_at_utc": "2024-08-23T14:00:00Z"
+    },
+    {
+      "group_id": "MW2_G09",
+      "matchweek": "MW2",
+      "cutoff": "T-1h",
+      "requested_snapshot_at_utc": "2024-08-24T13:00:00Z"
+    },
+    {
+      "group_id": "MW2_G09",
+      "matchweek": "MW2",
+      "cutoff": "T-15m",
+      "requested_snapshot_at_utc": "2024-08-24T13:45:00Z"
+    },
+    {
+      "group_id": "MW2_G10",
+      "matchweek": "MW2",
+      "cutoff": "T-24h",
+      "requested_snapshot_at_utc": "2024-08-23T16:30:00Z"
+    },
+    {
+      "group_id": "MW2_G10",
+      "matchweek": "MW2",
+      "cutoff": "T-1h",
+      "requested_snapshot_at_utc": "2024-08-24T15:30:00Z"
+    },
+    {
+      "group_id": "MW2_G10",
+      "matchweek": "MW2",
+      "cutoff": "T-15m",
+      "requested_snapshot_at_utc": "2024-08-24T16:15:00Z"
+    },
+    {
+      "group_id": "MW2_G11",
+      "matchweek": "MW2",
+      "cutoff": "T-24h",
+      "requested_snapshot_at_utc": "2024-08-24T13:00:00Z"
+    },
+    {
+      "group_id": "MW2_G11",
+      "matchweek": "MW2",
+      "cutoff": "T-1h",
+      "requested_snapshot_at_utc": "2024-08-25T12:00:00Z"
+    },
+    {
+      "group_id": "MW2_G11",
+      "matchweek": "MW2",
+      "cutoff": "T-15m",
+      "requested_snapshot_at_utc": "2024-08-25T12:45:00Z"
+    },
+    {
+      "group_id": "MW2_G12",
+      "matchweek": "MW2",
+      "cutoff": "T-24h",
+      "requested_snapshot_at_utc": "2024-08-24T15:30:00Z"
+    },
+    {
+      "group_id": "MW2_G12",
+      "matchweek": "MW2",
+      "cutoff": "T-1h",
+      "requested_snapshot_at_utc": "2024-08-25T14:30:00Z"
+    },
+    {
+      "group_id": "MW2_G12",
+      "matchweek": "MW2",
+      "cutoff": "T-15m",
+      "requested_snapshot_at_utc": "2024-08-25T15:15:00Z"
+    },
+    {
+      "group_id": "MW3_G13",
+      "matchweek": "MW3",
+      "cutoff": "T-24h",
+      "requested_snapshot_at_utc": "2024-08-30T11:30:00Z"
+    },
+    {
+      "group_id": "MW3_G13",
+      "matchweek": "MW3",
+      "cutoff": "T-1h",
+      "requested_snapshot_at_utc": "2024-08-31T10:30:00Z"
+    },
+    {
+      "group_id": "MW3_G13",
+      "matchweek": "MW3",
+      "cutoff": "T-15m",
+      "requested_snapshot_at_utc": "2024-08-31T11:15:00Z"
+    },
+    {
+      "group_id": "MW3_G14",
+      "matchweek": "MW3",
+      "cutoff": "T-24h",
+      "requested_snapshot_at_utc": "2024-08-30T14:00:00Z"
+    },
+    {
+      "group_id": "MW3_G14",
+      "matchweek": "MW3",
+      "cutoff": "T-1h",
+      "requested_snapshot_at_utc": "2024-08-31T13:00:00Z"
+    },
+    {
+      "group_id": "MW3_G14",
+      "matchweek": "MW3",
+      "cutoff": "T-15m",
+      "requested_snapshot_at_utc": "2024-08-31T13:45:00Z"
+    },
+    {
+      "group_id": "MW3_G15",
+      "matchweek": "MW3",
+      "cutoff": "T-24h",
+      "requested_snapshot_at_utc": "2024-08-30T16:30:00Z"
+    },
+    {
+      "group_id": "MW3_G15",
+      "matchweek": "MW3",
+      "cutoff": "T-1h",
+      "requested_snapshot_at_utc": "2024-08-31T15:30:00Z"
+    },
+    {
+      "group_id": "MW3_G15",
+      "matchweek": "MW3",
+      "cutoff": "T-15m",
+      "requested_snapshot_at_utc": "2024-08-31T16:15:00Z"
+    },
+    {
+      "group_id": "MW3_G16",
+      "matchweek": "MW3",
+      "cutoff": "T-24h",
+      "requested_snapshot_at_utc": "2024-08-31T12:30:00Z"
+    },
+    {
+      "group_id": "MW3_G16",
+      "matchweek": "MW3",
+      "cutoff": "T-1h",
+      "requested_snapshot_at_utc": "2024-09-01T11:30:00Z"
+    },
+    {
+      "group_id": "MW3_G16",
+      "matchweek": "MW3",
+      "cutoff": "T-15m",
+      "requested_snapshot_at_utc": "2024-09-01T12:15:00Z"
+    },
+    {
+      "group_id": "MW3_G17",
+      "matchweek": "MW3",
+      "cutoff": "T-24h",
+      "requested_snapshot_at_utc": "2024-08-31T15:00:00Z"
+    },
+    {
+      "group_id": "MW3_G17",
+      "matchweek": "MW3",
+      "cutoff": "T-1h",
+      "requested_snapshot_at_utc": "2024-09-01T14:00:00Z"
+    },
+    {
+      "group_id": "MW3_G17",
+      "matchweek": "MW3",
+      "cutoff": "T-15m",
+      "requested_snapshot_at_utc": "2024-09-01T14:45:00Z"
+    },
+    {
+      "group_id": "MW4_G18",
+      "matchweek": "MW4",
+      "cutoff": "T-24h",
+      "requested_snapshot_at_utc": "2024-09-13T11:30:00Z"
+    },
+    {
+      "group_id": "MW4_G18",
+      "matchweek": "MW4",
+      "cutoff": "T-1h",
+      "requested_snapshot_at_utc": "2024-09-14T10:30:00Z"
+    },
+    {
+      "group_id": "MW4_G18",
+      "matchweek": "MW4",
+      "cutoff": "T-15m",
+      "requested_snapshot_at_utc": "2024-09-14T11:15:00Z"
+    },
+    {
+      "group_id": "MW4_G19",
+      "matchweek": "MW4",
+      "cutoff": "T-24h",
+      "requested_snapshot_at_utc": "2024-09-13T14:00:00Z"
+    },
+    {
+      "group_id": "MW4_G19",
+      "matchweek": "MW4",
+      "cutoff": "T-1h",
+      "requested_snapshot_at_utc": "2024-09-14T13:00:00Z"
+    },
+    {
+      "group_id": "MW4_G19",
+      "matchweek": "MW4",
+      "cutoff": "T-15m",
+      "requested_snapshot_at_utc": "2024-09-14T13:45:00Z"
+    },
+    {
+      "group_id": "MW4_G20",
+      "matchweek": "MW4",
+      "cutoff": "T-24h",
+      "requested_snapshot_at_utc": "2024-09-13T16:30:00Z"
+    },
+    {
+      "group_id": "MW4_G20",
+      "matchweek": "MW4",
+      "cutoff": "T-1h",
+      "requested_snapshot_at_utc": "2024-09-14T15:30:00Z"
+    },
+    {
+      "group_id": "MW4_G20",
+      "matchweek": "MW4",
+      "cutoff": "T-15m",
+      "requested_snapshot_at_utc": "2024-09-14T16:15:00Z"
+    },
+    {
+      "group_id": "MW4_G21",
+      "matchweek": "MW4",
+      "cutoff": "T-24h",
+      "requested_snapshot_at_utc": "2024-09-13T19:00:00Z"
+    },
+    {
+      "group_id": "MW4_G21",
+      "matchweek": "MW4",
+      "cutoff": "T-1h",
+      "requested_snapshot_at_utc": "2024-09-14T18:00:00Z"
+    },
+    {
+      "group_id": "MW4_G21",
+      "matchweek": "MW4",
+      "cutoff": "T-15m",
+      "requested_snapshot_at_utc": "2024-09-14T18:45:00Z"
+    },
+    {
+      "group_id": "MW4_G22",
+      "matchweek": "MW4",
+      "cutoff": "T-24h",
+      "requested_snapshot_at_utc": "2024-09-14T13:00:00Z"
+    },
+    {
+      "group_id": "MW4_G22",
+      "matchweek": "MW4",
+      "cutoff": "T-1h",
+      "requested_snapshot_at_utc": "2024-09-15T12:00:00Z"
+    },
+    {
+      "group_id": "MW4_G22",
+      "matchweek": "MW4",
+      "cutoff": "T-15m",
+      "requested_snapshot_at_utc": "2024-09-15T12:45:00Z"
+    },
+    {
+      "group_id": "MW4_G23",
+      "matchweek": "MW4",
+      "cutoff": "T-24h",
+      "requested_snapshot_at_utc": "2024-09-14T15:30:00Z"
+    },
+    {
+      "group_id": "MW4_G23",
+      "matchweek": "MW4",
+      "cutoff": "T-1h",
+      "requested_snapshot_at_utc": "2024-09-15T14:30:00Z"
+    },
+    {
+      "group_id": "MW4_G23",
+      "matchweek": "MW4",
+      "cutoff": "T-15m",
+      "requested_snapshot_at_utc": "2024-09-15T15:15:00Z"
+    }
+  ]
+}
