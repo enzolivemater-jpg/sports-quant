@@ -153,3 +153,28 @@ A mixed-source architecture is acceptable only if provenance, entity resolution 
 OD-24: OPEN.
 
 No provider or provider combination is approved by this document.
+
+
+### API-Football
+
+Observed capabilities from current official documentation:
+- fixtures, results, events, lineups, player/match statistics;
+- injuries and suspensions;
+- predictions;
+- pre-match and live odds;
+- competition/season coverage flags;
+- lineups typically appear shortly before kickoff;
+- injury feed is periodically updated;
+- pre-match odds endpoint retains only the last seven days of odds history.
+
+Strength:
+- broad, inexpensive integration candidate for prospective/live Football capture;
+- useful coverage flags allow the ingestion layer to detect unsupported data categories instead of silently treating missing data as zero.
+
+Critical limitation for SPORTS QUANT:
+- the seven-day pre-match odds retention window makes it unsuitable as the sole source for long-horizon historical market reconstruction;
+- live/injury/lineup data still require SPORTS QUANT-owned raw snapshots to establish defensible `received_at` and `known_at`.
+
+Potential pilot role:
+- prospective live/context ingestion candidate;
+- not a substitute for a dedicated historical-odds source.
