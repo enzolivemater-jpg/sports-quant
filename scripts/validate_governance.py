@@ -31,11 +31,17 @@ def _yaml_list_after_key(text: str, key: str) -> list[str]:
             if not following.strip():
                 continue
             indent = len(following) - len(following.lstrip())
+            item = re.match(r"^\s*-\s+([^#]+?)\s*$", following)
+
+            # PyYAML commonly emits "indentless sequences": the list item may
+            # have the same indentation as its mapping key.
+            if item and indent >= base_indent:
+                values.append(item.group(1).strip())
+                continue
+
             if indent <= base_indent:
                 break
-            item = re.match(r"^\s*-\s+([^#]+?)\s*$", following)
-            if item:
-                values.append(item.group(1).strip())
+
         return values
     raise ValueError(f"Missing YAML list key: {key}")
 
