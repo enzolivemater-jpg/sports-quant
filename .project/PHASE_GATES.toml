@@ -1,19 +1,19 @@
 schema_version = "1.0"
 project = "SPORTS_QUANT"
-current_phase = "F1_REPOSITORY_SKELETON"
+current_phase = "F2_DOMAIN_CONTRACTS"
 
 [foundation_review]
-status = "BLOCKED"
+status = "PASS"
 independent_reviewer = "separate-gpt-codex-independent-review"
-review_artifact = ".project/reviews/F0_REVIEW_RECORD_2026-09-22_d4d6c0ce.md"
+review_artifact = ".project/reviews/F0_REVIEW_RECORD_2026-09-22_e5220707.md"
 p0_open = 0
 p1_open = 0
 blocking_findings_cleared = true
 issue = 1
 
 [f2]
-authorized = false
-authorization_basis = "POST_REVIEW_CI_HISTORY_INTEGRATION_FIX_REQUIRES_TARGETED_REREVIEW"
+authorized = true
+authorization_basis = "F0 micro re-review GO at e5220707b018dee501a2a9757c3e31d5bb41683a; P0=0; P1=0; blocking_findings_cleared=true"
 implementation_issue = 2
 spec = "docs/contracts/F2_READY_TO_IMPLEMENT_SPEC.md"
 

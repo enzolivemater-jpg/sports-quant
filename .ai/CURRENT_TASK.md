@@ -1,54 +1,72 @@
 # CURRENT TASK
 
 Phase:
-`PRE_F2_GATE_INTEGRATION`
+`F2_DOMAIN_CONTRACTS`
 
 Status:
-`F0_REVIEW_GO__F2_TEMPORARILY_CLOSED_FOR_CI_HISTORY_FIX`
+`AUTHORIZED_PENDING_GREEN_AUTHORIZATION_HEAD`
 
 Date:
 2026-09-22
 
-## Review state
+## F0 governance
 
-Independent F0 review has cleared all findings:
+Independent F0 review cycle is complete.
+
+Final reviewed HEAD:
+`e5220707b018dee501a2a9757c3e31d5bb41683a`
+
+Final review result:
 - P0 open: 0
 - P1 open: 0
 - blocking_findings_cleared: true
-- reviewer verdict: GO
-- explicit statement: F2 MAY BEGIN
+- final status: GO
+- explicit authorization: F2 MAY BEGIN
 
-Reviewed HEAD:
-`d4d6c0ce4d26f42183312b6386b7d0e00ab46f88`
+Canonical review record:
+`.project/reviews/F0_REVIEW_RECORD_2026-09-22_e5220707.md`
 
-## Why F2 is temporarily closed again
+Verbatim micro-review:
+`.project/reviews/F0_CI_HISTORY_MICRO_REREVIEW_RAW_2026-09-22_e5220707.md`
 
-The first authorization commit exposed a CI integration defect:
-GitHub Actions used shallow checkout history, so the phase-gate validator could not load the reviewed HEAD to verify protected-file drift.
+## Machine state
 
-This is not a reopened F0 finding.
-It is a gate-integration defect.
+- foundation_review.status = PASS
+- f2.authorized = true
 
-## Remediation
+Before implementation begins, the authorization commit itself must pass:
+- CI
+- Security
+- phase-gate validation
 
-CI checkout now uses full history:
-`fetch-depth: 0`
+If it fails, F2 implementation must not start until corrected.
 
-F2 remains:
-`authorized = false`
+## F2 implementation
 
-until this CI workflow change is independently re-reviewed because `.github/workflows/ci.yml` is itself a protected F0 path.
+Primary handoff:
+`.ai/handoffs/CLAUDE_F2_IMPLEMENTATION_HANDOFF.md`
 
-## Next action
+Primary spec:
+`docs/contracts/F2_READY_TO_IMPLEMENT_SPEC.md`
 
-1. Obtain green CI/Security on this closed-gate remediation HEAD.
-2. Run a targeted independent re-review of the CI history change only.
-3. If P0=0/P1=0 and reviewer re-authorizes F2:
-   - record the new review artifact;
-   - set foundation_review.status=PASS;
-   - set f2.authorized=true;
-   - rerun CI/Security;
-   - close issue #1;
-   - start Claude F2.
+Scope:
+domain-contract layer only.
 
-Do not implement F2 before this final gate cycle is complete.
+Do not start F3 in the same change.
+
+## Completion discipline
+
+F2 must:
+- preserve all OPEN_DECISIONS;
+- implement only approved contracts;
+- pass formatter/Ruff/mypy/pytest/Alembic/PostgreSQL/CI/Security;
+- receive independent critical review;
+- have no unresolved P0/P1 before F3.
+
+## Parallel work
+
+Issue #17:
+repository privacy / main protection remains admin work.
+
+Issue #18:
+provider trials/credentials remain relevant for later F4 work.
