@@ -69,8 +69,7 @@ def main() -> int:
         mandatory = _yaml_list_after_key(foundation, "mandatory_sports")
         if mandatory != ["BASKETBALL", "FOOTBALL", "MMA"]:
             errors.append(
-                "mandatory_sports must be exactly BASKETBALL, FOOTBALL, MMA; "
-                f"got {mandatory}"
+                f"mandatory_sports must be exactly BASKETBALL, FOOTBALL, MMA; got {mandatory}"
             )
     except ValueError as exc:
         errors.append(str(exc))
