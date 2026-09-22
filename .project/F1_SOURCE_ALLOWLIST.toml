@@ -1,0 +1,19 @@
+schema_version = "1.0"
+project = "SPORTS_QUANT"
+purpose = "Explicit source allowlist while F2 is unauthorized"
+
+allowed_source_files = [
+  "src/sports_quant/__init__.py",
+  "src/sports_quant/config/__init__.py",
+  "src/sports_quant/config/settings.py",
+  "src/sports_quant/db/__init__.py",
+  "src/sports_quant/db/engine.py",
+  "src/sports_quant/observability/__init__.py",
+  "src/sports_quant/observability/logging.py",
+]
+
+[scaffold]
+allowed_filename = "README.md"
+
+[rule]
+description = "While f2.authorized=false, every tracked file under src/sports_quant must either be this exact F1 allowlist or a README.md scaffold reservation."

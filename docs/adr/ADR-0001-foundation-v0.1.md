@@ -6,7 +6,7 @@
 - **Authority:** Enzo
 - **Scope:** F0 — Governance Canonicalization only
 - **Criticality:** C2 — Decision Support
-- **V1 sports:** Tennis + Football
+- **V1 sports (HISTORICAL / SUPERSEDED by ADR-0002/ADR-0003):** Tennis + Football
 - **Architecture:** Modular Monolith
 - **Promotion constraint:** independent REVIEW required before F1
 
@@ -20,7 +20,13 @@ The canonical governance needed normalization before implementation because earl
 
 ### 1. Architecture and scope
 
-Foundation v0.1 uses a **Modular Monolith**. Microservices, Kubernetes, Kafka and a dedicated feature store are not part of Foundation. V1 scope is Tennis + Football only. Active criticality is **C2 Decision Support**. C2+ and automated wagering are deferred/prohibited for the active Foundation scope.
+Foundation v0.1 uses a **Modular Monolith**. Microservices, Kubernetes, Kafka and a dedicated feature store are not part of Foundation.
+
+**HISTORICAL / SUPERSEDED scope statement:** when ADR-0001 was originally approved, V1 scope was Tennis + Football only. That statement is no longer active implementation authority.
+
+**Current authority:** ADR-0002/ADR-0003 make Basketball, Football and MMA mandatory; UFC is the initial mandatory MMA competition scope; Handball, Volleyball and Tennis are the only additional validation sports. ADR-0004 selects Football as the first end-to-end pilot.
+
+Active criticality is **C2 Decision Support**. C2+ and automated wagering are deferred/prohibited for the active Foundation scope.
 
 ### 2. Point-in-time semantics
 
@@ -101,7 +107,9 @@ SP never directly changes `P_safe`, edge, uncertainty or Market Risk and never b
 
 ## Superseded Foundation interpretations
 
-For Foundation v0.1, do not implement: active C2+, NBA/MMA packages, ambiguous generic `edge`, combined quality/freshness/conflict state, legacy source names, `weighted_average_mr`, or a composite Dynamic Market Risk Score.
+**HISTORICAL / SUPERSEDED scope item:** ADR-0001 originally said not to implement `NBA/MMA packages`. That scope statement is no longer active after ADR-0002. Basketball and MMA are mandatory; UFC is the initial mandatory MMA competition scope. Basketball's exact competition/catalog details and MMA/UFC market-family details remain unresolved under OD-29 and therefore must not be invented.
+
+The remaining semantic constraints from the original interpretation remain active unless explicitly superseded elsewhere: C2+ stays deferred, generic ambiguous `edge` is not canonical, combined quality/freshness/conflict state is prohibited, legacy source names are normalized, and `weighted_average_mr` plus composite Dynamic Market Risk remain deferred.
 
 ## Review requirement
 

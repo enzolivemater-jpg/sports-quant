@@ -7,6 +7,16 @@ from types import ModuleType
 
 SCRIPT = Path(__file__).resolve().parents[2] / "scripts" / "validate_phase_gates.py"
 
+DEFAULT_ALLOWED = (
+    "src/sports_quant/__init__.py",
+    "src/sports_quant/config/__init__.py",
+    "src/sports_quant/config/settings.py",
+    "src/sports_quant/db/__init__.py",
+    "src/sports_quant/db/engine.py",
+    "src/sports_quant/observability/__init__.py",
+    "src/sports_quant/observability/logging.py",
+)
+
 
 def _load_module() -> ModuleType:
     spec = importlib.util.spec_from_file_location("validate_phase_gates", SCRIPT)
@@ -15,6 +25,29 @@ def _load_module() -> ModuleType:
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
+
+
+def _write_allowlist(root: Path, allowed: tuple[str, ...] = DEFAULT_ALLOWED) -> None:
+    project = root / ".project"
+    project.mkdir(parents=True, exist_ok=True)
+    lines = [
+        'schema_version = "1.0"',
+        'project = "SPORTS_QUANT"',
+        'purpose = "test allowlist"',
+        "",
+        "allowed_source_files = [",
+    ]
+    lines.extend(f'  "{path}",' for path in allowed)
+    lines.extend(
+        [
+            "]",
+            "",
+            "[scaffold]",
+            'allowed_filename = "README.md"',
+            "",
+        ]
+    )
+    (project / "F1_SOURCE_ALLOWLIST.toml").write_text("\n".join(lines), encoding="utf-8")
 
 
 def _write_gate(
@@ -31,6 +64,7 @@ def _write_gate(
 ) -> None:
     project = root / ".project"
     project.mkdir(parents=True, exist_ok=True)
+    _write_allowlist(root)
     (project / "PHASE_GATES.toml").write_text(
         f"""schema_version = "1.0"
 project = "SPORTS_QUANT"
@@ -59,6 +93,14 @@ def _configure_module(module: ModuleType, root: Path) -> None:
     module.ROOT = root
     module.GATE_FILE = root / ".project" / "PHASE_GATES.toml"
     module.REVIEW_DIR = root / ".project" / "reviews"
+    module.F1_SOURCE_ALLOWLIST_FILE = root / ".project" / "F1_SOURCE_ALLOWLIST.toml"
+    module.SOURCE_ROOT = root / "src" / "sports_quant"
+
+
+def _write_source(root: Path, relative: str, content: str = "VALUE = 1\n") -> None:
+    path = root / relative
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(content, encoding="utf-8")
 
 
 def _valid_review_text() -> str:
@@ -95,21 +137,49 @@ F2 MAY BEGIN. No unresolved P0/P1 remains.
 """
 
 
-def test_closed_pending_gate_passes_without_f2_files(tmp_path: Path) -> None:
+def test_closed_pending_gate_passes_with_f1_allowlisted_sources(tmp_path: Path) -> None:
     module = _load_module()
     _configure_module(module, tmp_path)
     _write_gate(tmp_path)
+    _write_source(tmp_path, "src/sports_quant/config/settings.py")
+    _write_source(tmp_path, "src/sports_quant/db/engine.py")
+    _write_source(tmp_path, "src/sports_quant/modeling/football/README.md", "# scaffold\n")
 
     assert module.main() == 0
 
 
-def test_closed_gate_rejects_f2_implementation_files(tmp_path: Path) -> None:
+def test_closed_gate_rejects_f2_contract_implementation(tmp_path: Path) -> None:
     module = _load_module()
     _configure_module(module, tmp_path)
     _write_gate(tmp_path)
-    contracts = tmp_path / "src" / "sports_quant" / "contracts"
-    contracts.mkdir(parents=True)
-    (contracts / "probability.py").write_text("P_SAFE = None\n", encoding="utf-8")
+    _write_source(tmp_path, "src/sports_quant/contracts/probability.py", "P_SAFE = None\n")
+
+    assert module.main() == 1
+
+
+def test_closed_gate_rejects_football_business_logic_outside_contracts(tmp_path: Path) -> None:
+    module = _load_module()
+    _configure_module(module, tmp_path)
+    _write_gate(tmp_path)
+    _write_source(tmp_path, "src/sports_quant/modeling/football/model.py")
+
+    assert module.main() == 1
+
+
+def test_closed_gate_rejects_calibration_business_logic_outside_contracts(tmp_path: Path) -> None:
+    module = _load_module()
+    _configure_module(module, tmp_path)
+    _write_gate(tmp_path)
+    _write_source(tmp_path, "src/sports_quant/calibration/platt.py")
+
+    assert module.main() == 1
+
+
+def test_closed_gate_rejects_market_business_logic_outside_contracts(tmp_path: Path) -> None:
+    module = _load_module()
+    _configure_module(module, tmp_path)
+    _write_gate(tmp_path)
+    _write_source(tmp_path, "src/sports_quant/market/no_vig/proportional.py")
 
     assert module.main() == 1
 
@@ -166,7 +236,10 @@ def test_authorized_gate_rejects_unresolved_template_placeholders(tmp_path: Path
     reviews = tmp_path / ".project" / "reviews"
     reviews.mkdir(parents=True, exist_ok=True)
     review = reviews / "F0_INDEPENDENT_REVIEW_2026-09-22.md"
-    review.write_text(_valid_review_text() + "\nReviewer notes: <free text>\n", encoding="utf-8")
+    review.write_text(
+        _valid_review_text() + "\nReviewer notes: <free text>\n",
+        encoding="utf-8",
+    )
     _write_gate(
         tmp_path,
         status="PASS",

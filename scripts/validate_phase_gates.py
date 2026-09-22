@@ -16,6 +16,8 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 GATE_FILE = ROOT / ".project" / "PHASE_GATES.toml"
 REVIEW_DIR = ROOT / ".project" / "reviews"
+F1_SOURCE_ALLOWLIST_FILE = ROOT / ".project" / "F1_SOURCE_ALLOWLIST.toml"
+SOURCE_ROOT = ROOT / "src" / "sports_quant"
 
 PASS_REVIEW_STATES = {"PASS", "PASS_WITH_P2"}
 ALLOWED_REVIEW_STATES = PASS_REVIEW_STATES | {"PENDING", "BLOCKED", "NEEDS_DECISION"}
@@ -27,6 +29,7 @@ REVIEW_PROTECTED_PATHS = (
     ".project/OPEN_DECISIONS.yaml",
     ".project/SPORT_PREDICTABILITY_POLICY.yaml",
     ".project/PROJECT_PROFILE.yaml",
+    ".project/F1_SOURCE_ALLOWLIST.toml",
     "docs/adr/ADR-0001-foundation-v0.1.md",
     "docs/adr/ADR-0002-mandatory-sports-scope.md",
     "docs/adr/ADR-0003-additional-sports-allowlist.md",
@@ -36,6 +39,7 @@ REVIEW_PROTECTED_PATHS = (
     ".ai/handoffs/F0_INDEPENDENT_REVIEW.md",
     "scripts/validate_phase_gates.py",
     "docs/runbooks/GOVERNANCE_DEVIATION_F1_BEFORE_F0_REVIEW.md",
+    ".github/workflows/ci.yml",
 )
 
 
@@ -46,17 +50,59 @@ def _load_gates() -> dict[str, Any]:
         return tomllib.load(handle)
 
 
-def _f2_implementation_files() -> list[Path]:
-    contracts = ROOT / "src" / "sports_quant" / "contracts"
-    if not contracts.exists():
+def _load_f1_source_allowlist() -> tuple[set[str], str]:
+    if not F1_SOURCE_ALLOWLIST_FILE.exists():
+        raise RuntimeError(
+            "Missing F1 source allowlist: "
+            f"{F1_SOURCE_ALLOWLIST_FILE.relative_to(ROOT)}"
+        )
+
+    with F1_SOURCE_ALLOWLIST_FILE.open("rb") as handle:
+        data = tomllib.load(handle)
+
+    raw_allowed = data.get("allowed_source_files")
+    if not isinstance(raw_allowed, list) or not raw_allowed:
+        raise RuntimeError("F1 source allowlist must contain allowed_source_files")
+
+    allowed: set[str] = set()
+    for item in raw_allowed:
+        if not isinstance(item, str) or not item.strip():
+            raise RuntimeError("F1 source allowlist entries must be non-empty strings")
+        path = Path(item)
+        if path.is_absolute() or ".." in path.parts:
+            raise RuntimeError(f"Unsafe F1 source allowlist entry: {item!r}")
+        normalized = path.as_posix()
+        if not normalized.startswith("src/sports_quant/"):
+            raise RuntimeError(
+                "F1 source allowlist entries must live under src/sports_quant/: "
+                f"{item!r}"
+            )
+        allowed.add(normalized)
+
+    scaffold = data.get("scaffold", {})
+    allowed_filename = scaffold.get("allowed_filename")
+    if not isinstance(allowed_filename, str) or not allowed_filename.strip():
+        raise RuntimeError("F1 source allowlist requires scaffold.allowed_filename")
+
+    return allowed, allowed_filename
+
+
+def _unauthorized_pre_f2_source_files() -> list[Path]:
+    allowed, scaffold_filename = _load_f1_source_allowlist()
+    if not SOURCE_ROOT.exists():
         return []
 
-    allowed_scaffold_names = {"README.md", "__init__.py"}
-    return sorted(
-        path
-        for path in contracts.rglob("*")
-        if path.is_file() and path.name not in allowed_scaffold_names
-    )
+    unauthorized: list[Path] = []
+    for path in SOURCE_ROOT.rglob("*"):
+        if not path.is_file():
+            continue
+        relative = path.relative_to(ROOT).as_posix()
+        if path.name == scaffold_filename:
+            continue
+        if relative not in allowed:
+            unauthorized.append(path)
+
+    return sorted(unauthorized)
 
 
 def _extract_value(text: str, label: str) -> str | None:
@@ -213,8 +259,6 @@ def main() -> int:
         print("f2.authorized must be a boolean")
         return 1
 
-    f2_files = _f2_implementation_files()
-
     if not authorized:
         if status in PASS_REVIEW_STATES:
             print(
@@ -223,9 +267,15 @@ def main() -> int:
             )
             return 1
 
-        if f2_files:
-            print("F2 implementation exists while the F2 gate is closed:")
-            for path in f2_files:
+        try:
+            unauthorized = _unauthorized_pre_f2_source_files()
+        except (OSError, RuntimeError, tomllib.TOMLDecodeError) as exc:
+            print(f"Pre-F2 source containment configuration error: {exc}")
+            return 1
+
+        if unauthorized:
+            print("Unauthorized source implementation exists while the F2 gate is closed:")
+            for path in unauthorized:
                 print(f"  - {path.relative_to(ROOT)}")
             return 1
 

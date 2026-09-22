@@ -2,7 +2,7 @@
 
 Date recorded: 2026-09-22
 
-Status: REMEDIATED_FOR_FORWARD_PROGRESS__HISTORICAL_DEVIATION_REMAINS
+Status: REMEDIATION_IN_PROGRESS__P1_01_CORRECTED_PENDING_REREVIEW
 
 ## What happened
 
@@ -39,34 +39,68 @@ No F2 domain-contract implementation was started.
 
 No model, production P_safe, market engine, optimizer or automated wagering logic was implemented.
 
+## Independent F0 review result
+
+The independent review of HEAD `f7be5354f0cb50cd82617571485c2d2fab6d7fa4` reported:
+- P0 open: 0
+- P1 open: 1
+- blocking finding: P1-01
+- final status: NO_GO
+
+P1-01 identified that the previous machine gate inspected only `src/sports_quant/contracts/`, so it did not exhaustively contain premature F2/F3+ source logic elsewhere.
+
+The original review is preserved under `.project/reviews/`.
+
 ## Forward remediation
 
 The project now applies a stricter forward gate:
 
 1. F2 remains unauthorized.
-2. GitHub issue #1 remains open until independent F0 review is recorded.
+2. GitHub issue #1 remains open until the corrected gate is independently re-reviewed.
 3. `.project/PHASE_GATES.toml` is the machine-readable gate.
-4. `scripts/validate_phase_gates.py` makes CI fail if F2 implementation appears while unauthorized.
-5. F2 authorization requires:
+4. `.project/F1_SOURCE_ALLOWLIST.toml` enumerates the exact non-README source files allowed while F2 is closed.
+5. `scripts/validate_phase_gates.py` scans all tracked/runtime files under `src/sports_quant/` and fails when any non-README source file is outside that explicit F1 allowlist.
+6. Regression tests prove that premature code in:
+   - `contracts/`
+   - `modeling/football/`
+   - `calibration/`
+   - `market/`
+   is blocked while legitimate F1 source/scaffold files pass.
+7. F2 authorization still requires:
    - accepted independent review artifact;
    - p0_open = 0;
    - p1_open = 0;
    - blocking_findings_cleared = true;
    - f2.authorized = true.
-6. Claude F2 handoff independently checks the same gate before writing code.
+8. Claude F2 handoff independently checks the same gate before writing code.
+
+## Scope of the guarantee
+
+The machine containment guarantee is now intentionally precise:
+
+While `f2.authorized=false`, no new production/package source file may appear under `src/sports_quant/` unless it is explicitly present in the F1 source allowlist or is a README scaffold reservation.
+
+Research tooling outside the production package remains governed separately and does not become F2 implementation merely by existing.
+
+Repository-admin protection of `main` remains a separate issue (#17).
 
 ## Reviewer instruction
 
-The independent reviewer should assess whether the historical deviation creates any remaining P0/P1 correctness risk.
+The targeted re-review should verify:
+- the explicit allowlist is complete and no broader than F1;
+- unauthorized code in contracts/football/calibration/market is blocked;
+- valid F1 source and README scaffold pass;
+- protected gate files cannot drift after an accepted review without requiring re-review;
+- P2-01 and P2-02 were corrected without changing canonical scope.
 
 The reviewer must not treat this document as evidence that F0 passed.
 
 ## Resolution condition
 
 The process deviation is considered remediated for forward execution only when:
-- independent F0 review is completed;
-- any P0/P1 findings are corrected and re-reviewed;
-- the review artifact is committed;
+- P1-01 correction is independently re-reviewed;
+- any remaining P0/P1 findings are cleared;
+- the accepted review artifact is committed;
 - the F2 machine gate is opened;
 - CI/Security are green.
 

@@ -1,4 +1,4 @@
-.PHONY: sync format lint typecheck test test-unit test-integration check db-up db-down db-test-up db-test-down migrate migration-status validate-f1
+.PHONY: sync format lint typecheck test test-unit test-integration check db-up db-down db-test-up db-test-down migrate migration-status validate-phase-gates validate-governance validate-f1
 
 sync:
 	uv sync --all-groups
@@ -21,10 +21,16 @@ test-unit:
 test-integration:
 	uv run pytest -m integration
 
+validate-phase-gates:
+	uv run python scripts/validate_phase_gates.py
+
+validate-governance:
+	uv run python scripts/validate_governance.py
+
 validate-f1:
 	uv run python scripts/validate_f1.py
 
-check: validate-f1 lint typecheck test-unit
+check: validate-phase-gates validate-governance validate-f1 lint typecheck test-unit
 
 db-up:
 	docker compose up -d postgres
