@@ -53,7 +53,7 @@ def _write_pyproject(
     root: Path,
     *,
     where: str = '["src"]',
-    include: str = '["sports_quant*"]',
+    include: str = '["sports_quant", "sports_quant.*"]',
 ) -> None:
     (root / "pyproject.toml").write_text(
         f"""[tool.setuptools.packages.find]

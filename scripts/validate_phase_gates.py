@@ -39,7 +39,7 @@ CANONICAL_F1_SOURCE_BLOBS: dict[str, str] = {
 }
 CANONICAL_SCAFFOLD_FILENAME = "README.md"
 CANONICAL_PACKAGE_FIND_WHERE = ["src"]
-CANONICAL_PACKAGE_FIND_INCLUDE = ["sports_quant*"]
+CANONICAL_PACKAGE_FIND_INCLUDE = ["sports_quant", "sports_quant.*"]
 
 REVIEW_PROTECTED_PATHS = (
     ".project/FOUNDATION_DECISIONS_v0.1.yaml",
@@ -156,18 +156,25 @@ def _validate_frozen_f1_source_blobs() -> None:
             )
 
 
+def _tracked_source_files() -> list[Path]:
+    if (ROOT / ".git").exists():
+        result = _git(["ls-files", "--", "src"])
+        if result.returncode != 0:
+            raise RuntimeError("Unable to list tracked files under src/")
+        return [ROOT / line.strip() for line in result.stdout.splitlines() if line.strip()]
+
+    if not SOURCE_ROOT.exists():
+        return []
+    return [path for path in SOURCE_ROOT.rglob("*") if path.is_file()]
+
+
 def _unauthorized_pre_f2_source_files() -> list[Path]:
     allowed = _load_f1_source_allowlist()
     _validate_packaging_scope()
     _validate_frozen_f1_source_blobs()
 
-    if not SOURCE_ROOT.exists():
-        return []
-
     unauthorized: list[Path] = []
-    for path in SOURCE_ROOT.rglob("*"):
-        if not path.is_file():
-            continue
+    for path in _tracked_source_files():
         relative = path.relative_to(ROOT).as_posix()
         if path.name == CANONICAL_SCAFFOLD_FILENAME:
             continue
