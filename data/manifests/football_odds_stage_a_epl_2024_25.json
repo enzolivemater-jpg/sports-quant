@@ -701,5 +701,11 @@
       "cutoff": "T-15m",
       "requested_snapshot_at_utc": "2024-09-15T15:15:00Z"
     }
-  ]
+  ],
+  "historical_credit_assumption": {
+    "credits_per_request": 20,
+    "basis": "Current research assumption: 10 credits per region per market × 1 region × 2 markets.",
+    "status": "RECHECK_PROVIDER_DOCS_BEFORE_EXECUTION",
+    "documented_at": "2026-09-22"
+  }
 }

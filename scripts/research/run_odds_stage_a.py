@@ -73,9 +73,25 @@ def select_specs(
     return specs[offset : offset + limit]
 
 
-def _print_plan(selected: list[dict[str, str]], total: int) -> None:
+def estimate_credits(data: dict[str, Any], request_count: int) -> int:
+    assumption = data.get("historical_credit_assumption")
+    if not isinstance(assumption, dict):
+        raise ValueError("Manifest is missing historical_credit_assumption")
+    credits_per_request = assumption.get("credits_per_request")
+    if not isinstance(credits_per_request, int) or credits_per_request < 1:
+        raise ValueError("historical_credit_assumption.credits_per_request must be >= 1")
+    return credits_per_request * request_count
+
+
+def _print_plan(
+    selected: list[dict[str, str]],
+    total: int,
+    estimated_credits: int,
+) -> None:
     print(f"Stage A available probes: {total}")
     print(f"Selected probes: {len(selected)}")
+    print(f"Estimated credits under current manifest assumption: {estimated_credits}")
+    print("Credit assumption MUST be rechecked against provider docs before paid execution.")
     for index, spec in enumerate(selected, start=1):
         print(
             f"{index:02d}. {spec['group_id']} {spec['cutoff']} {spec['requested_snapshot_at_utc']}"
@@ -91,6 +107,8 @@ def _validate_execution_ack(
     all_stage_a: bool,
     confirm_request_count: int | None,
     selected_count: int,
+    estimated_credits: int,
+    max_credits: int | None,
 ) -> None:
     if not execute:
         return
@@ -99,6 +117,15 @@ def _validate_execution_ack(
     if all_stage_a and confirm_request_count != selected_count:
         raise ValueError(
             f"Full Stage A execution requires --confirm-request-count {selected_count}"
+        )
+    if max_credits is None:
+        raise ValueError("--execute requires --max-credits")
+    if max_credits < 1:
+        raise ValueError("--max-credits must be >= 1")
+    if estimated_credits > max_credits:
+        raise ValueError(
+            f"Estimated Stage A cost {estimated_credits} credits exceeds "
+            f"--max-credits {max_credits}"
         )
     if not os.environ.get(KEY_ENV):
         raise ValueError(f"Missing required environment variable: {KEY_ENV}")
@@ -153,6 +180,12 @@ def main() -> int:
         default=None,
         help="Required for full Stage A execution; must equal the selected count.",
     )
+    parser.add_argument(
+        "--max-credits",
+        type=int,
+        default=None,
+        help="Hard execution cap. Required with --execute and checked against manifest estimate.",
+    )
     parser.add_argument("--offset", type=int, default=0)
     parser.add_argument(
         "--limit",
@@ -173,19 +206,22 @@ def main() -> int:
         )
         if not selected:
             raise ValueError("Selection is empty; check --offset/--limit")
+        estimated_credits = estimate_credits(data, len(selected))
         _validate_execution_ack(
             execute=args.execute,
             ack_paid_provider_access=args.ack_paid_provider_access,
             all_stage_a=args.all_stage_a,
             confirm_request_count=args.confirm_request_count,
             selected_count=len(selected),
+            estimated_credits=estimated_credits,
+            max_credits=args.max_credits,
         )
     except (KeyError, OSError, ValueError, json.JSONDecodeError) as exc:
         print(f"Stage A configuration error: {exc}", file=sys.stderr)
         return 2
 
     if not args.execute:
-        _print_plan(selected, len(specs))
+        _print_plan(selected, len(specs), estimated_credits)
         return 0
 
     return _execute(selected)

@@ -34,6 +34,15 @@ def test_build_probe_specs_has_69_secret_free_requests() -> None:
     assert all("date=" in item["url"] for item in specs)
 
 
+def test_manifest_credit_estimate_matches_stage_a_plan() -> None:
+    module = _load_module()
+    data = module.load_manifest()
+
+    assert module.estimate_credits(data, 1) == 20
+    assert module.estimate_credits(data, 5) == 100
+    assert module.estimate_credits(data, 69) == 1380
+
+
 def test_default_selection_is_one_request() -> None:
     module = _load_module()
     specs = module.build_probe_specs(module.load_manifest())
@@ -66,6 +75,8 @@ def test_full_execution_requires_exact_request_count_confirmation(
             all_stage_a=True,
             confirm_request_count=None,
             selected_count=69,
+            estimated_credits=1380,
+            max_credits=1380,
         )
 
 
@@ -79,7 +90,58 @@ def test_execution_requires_paid_access_ack() -> None:
             all_stage_a=False,
             confirm_request_count=None,
             selected_count=1,
+            estimated_credits=20,
+            max_credits=20,
         )
+
+
+def test_execution_requires_max_credit_cap(monkeypatch: pytest.MonkeyPatch) -> None:
+    module = _load_module()
+    monkeypatch.setenv(module.KEY_ENV, "secret")
+
+    with pytest.raises(ValueError, match="--max-credits"):
+        module._validate_execution_ack(
+            execute=True,
+            ack_paid_provider_access=True,
+            all_stage_a=False,
+            confirm_request_count=None,
+            selected_count=1,
+            estimated_credits=20,
+            max_credits=None,
+        )
+
+
+def test_execution_rejects_estimate_above_credit_cap(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    module = _load_module()
+    monkeypatch.setenv(module.KEY_ENV, "secret")
+
+    with pytest.raises(ValueError, match="exceeds --max-credits"):
+        module._validate_execution_ack(
+            execute=True,
+            ack_paid_provider_access=True,
+            all_stage_a=False,
+            confirm_request_count=None,
+            selected_count=5,
+            estimated_credits=100,
+            max_credits=99,
+        )
+
+
+def test_execution_accepts_exact_credit_cap(monkeypatch: pytest.MonkeyPatch) -> None:
+    module = _load_module()
+    monkeypatch.setenv(module.KEY_ENV, "secret")
+
+    module._validate_execution_ack(
+        execute=True,
+        ack_paid_provider_access=True,
+        all_stage_a=False,
+        confirm_request_count=None,
+        selected_count=5,
+        estimated_credits=100,
+        max_credits=100,
+    )
 
 
 def test_dry_run_needs_no_api_key(
@@ -95,4 +157,5 @@ def test_dry_run_needs_no_api_key(
     assert exit_code == 0
     output = capsys.readouterr().out
     assert "Selected probes: 1" in output
+    assert "Estimated credits under current manifest assumption: 20" in output
     assert "No API request was sent." in output
