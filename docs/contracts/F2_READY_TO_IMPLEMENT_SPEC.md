@@ -24,10 +24,15 @@ Minimum modules:
 - `data_state.py`
 - `entity.py`
 - `provenance.py`
+- `sports_intelligence.py`
 - `market.py`
+- `market_risk.py`
 - `probability.py`
 - `edge.py`
+- `dependency.py`
+- `gates.py`
 - `decision.py`
+- `reproducibility.py`
 - `predictability.py`
 
 Names may be adjusted during implementation only if semantics remain identical and the change is documented.
@@ -85,6 +90,64 @@ Conflict:
 
 Precedence:
 BLOCKED > REVIEW > WAIT > NO_BET > QUALIFIED
+
+### Known-at basis
+- SYSTEM_RECEIPT
+- VERIFIED_SOURCE_AVAILABILITY
+
+No speculative third basis may be introduced in F2.
+
+### Sports Intelligence claim type
+- FACT
+- EXPERT_ASSESSMENT
+- OPINION
+- RUMOR
+- CONFLICT
+
+Invariants:
+- FACT does not imply VERIFIED;
+- structured Sports Intelligence may affect only approved channels;
+- no claim or LLM/human interpretation may directly assign final P_safe.
+
+Approved effect channels:
+- VALIDATED_MODEL_FEATURES
+- STRUCTURED_CONTEXT
+- UNCERTAINTY
+- REVIEW_STATE
+- RESTRICTIONS
+- GATES
+- NO_BET_REASONS
+
+### Market Risk
+Classes:
+- MR1
+- MR2
+- MR3
+- MR4
+- MR5
+- MR6
+
+Modes:
+- CONSERVATIVE
+- BALANCED
+- AGGRESSIVE
+- SPECULATIVE
+
+Invariants:
+- MR_base is ordinal/structural, not probability;
+- MR_base does not directly modify P_safe;
+- weighted_average_mr remains DEFERRED;
+- composite Dynamic Market Risk remains DEFERRED.
+
+### Dependency class
+- independent
+- weak
+- moderate
+- strong
+- redundant
+- contradictory
+
+F2 defines the qualitative contract only. Quantitative dependency estimation remains later (OD-19/OD-23).
 
 ### Sport Predictability
 - SP1
@@ -201,6 +264,35 @@ Validation invariant:
 
 A stricter positive minimum edge remains unresolved.
 
+## Gate contract
+
+F2 defines the contract surface needed by later qualification logic without implementing the S-Tier engine.
+
+Minimum concepts:
+- gate identifier;
+- gate evidence/reference payload;
+- evaluated_at / decision_cutoff_at where applicable;
+- deterministic reason code/string identifier;
+- resulting business decision state or non-final gate outcome representation that does not contradict the canonical business states.
+
+F2 must not:
+- implement S-Tier thresholds;
+- invent model-agreement thresholds;
+- invent drift thresholds;
+- invent Sport Predictability numeric gate thresholds;
+- allow a failed critical gate to be overridden by an aggregate score.
+
+## Reproducibility contract
+
+Minimum version/reference concepts:
+- code version / commit reference;
+- dataset or snapshot reference;
+- configuration version;
+- model/calibrator/version references when applicable later;
+- deterministic run/assessment identifier where applicable.
+
+F2 defines identifiers and serializable references only. Backtest/run-manifest implementation belongs to later phases.
+
 ## PredictabilityAssessment contract
 
 Required fields:
@@ -246,10 +338,15 @@ At minimum:
 10. edge-calculation contract tests;
 11. negative-edge cannot-QUALIFIED test;
 12. business-state precedence tests;
-13. PredictabilityAssessment required-field tests;
-14. immutable/versioned assessment behavior tests;
-15. serialization/reproducibility tests;
-16. regression tests for every corrected contract defect.
+13. Sports Intelligence claim-type/effect-channel contract tests;
+14. Market Risk class/mode and non-probability contract tests;
+15. dependency-class round-trip tests;
+16. gate-contract serialization/reason-code tests without S-Tier logic;
+17. reproducibility-reference serialization tests;
+18. PredictabilityAssessment required-field tests;
+19. immutable/versioned assessment behavior tests;
+20. serialization/reproducibility tests;
+21. regression tests for every corrected contract defect.
 
 ## Explicit non-goals
 

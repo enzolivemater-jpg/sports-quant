@@ -70,10 +70,15 @@ Create under `src/sports_quant/contracts/`:
 - `data_state.py`
 - `entity.py`
 - `provenance.py`
+- `sports_intelligence.py`
 - `market.py`
+- `market_risk.py`
 - `probability.py`
 - `edge.py`
+- `dependency.py`
+- `gates.py`
 - `decision.py`
+- `reproducibility.py`
 - `predictability.py`
 
 Module names may change only if semantics remain identical and the change is documented.
@@ -110,6 +115,40 @@ At domain boundaries:
 - known_at remains explicit
 - critical information without defensible known_at is not silently PIT-eligible
 - F2 defines validation semantics; F3 will implement as-of selection/replay
+
+### Sports Intelligence
+Canonical claim types:
+- FACT
+- EXPERT_ASSESSMENT
+- OPINION
+- RUMOR
+- CONFLICT
+
+FACT does not imply VERIFIED.
+Do not allow Sports Intelligence or an LLM/human to directly assign final P_safe.
+Keep approved effect channels explicit and typed.
+
+### Market Risk
+Canonical classes: MR1–MR6.
+Canonical modes: CONSERVATIVE, BALANCED, AGGRESSIVE, SPECULATIVE.
+
+MR is structural/ordinal, not probability.
+Do not implement weighted_average_mr or composite Dynamic Market Risk; both remain DEFERRED.
+
+### Dependency
+Canonical qualitative classes:
+- independent
+- weak
+- moderate
+- strong
+- redundant
+- contradictory
+
+F2 defines contracts only. Do not implement OD-19/OD-23 quantitative methods.
+
+### Gate / reproducibility contracts
+Define serializable contract surfaces/references only.
+Do not implement S-Tier thresholds, drift thresholds, model-agreement thresholds, backtest manifests or later-phase algorithms.
 
 ### Probability
 Keep separate:
@@ -202,10 +241,15 @@ At minimum:
 10. edge formulas
 11. negative edge cannot QUALIFIED
 12. decision precedence
-13. PredictabilityAssessment required fields
-14. assessment serialization/version behavior
-15. deterministic serialization/reproducibility
-16. regression tests for any defect fixed during implementation
+13. Sports Intelligence claim/effect-channel contracts
+14. Market Risk class/mode contracts
+15. dependency-class round trips
+16. gate-contract serialization/reason codes without S-Tier logic
+17. reproducibility-reference serialization
+18. PredictabilityAssessment required fields
+19. assessment serialization/version behavior
+20. deterministic serialization/reproducibility
+21. regression tests for any defect fixed during implementation
 
 ## Engineering quality
 
