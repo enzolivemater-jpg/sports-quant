@@ -12,9 +12,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
 PLAN_MANIFEST = ROOT / "data" / "manifests" / "football_odds_stage_a_epl_2024_25.json"
-FIXTURE_MANIFEST = (
-    ROOT / "data" / "manifests" / "football_odds_stage_a_epl_2024_25_fixtures.json"
-)
+FIXTURE_MANIFEST = ROOT / "data" / "manifests" / "football_odds_stage_a_epl_2024_25_fixtures.json"
 
 EXPECTED_GROUPS = 23
 EXPECTED_FIXTURES = 40
@@ -146,9 +144,7 @@ def validate_plan_manifest(data: dict[str, Any]) -> list[str]:
     return errors
 
 
-def validate_fixture_manifest(
-    data: dict[str, Any], plan_data: dict[str, Any]
-) -> list[str]:
+def validate_fixture_manifest(data: dict[str, Any], plan_data: dict[str, Any]) -> list[str]:
     errors: list[str] = []
     plan_errors: list[str] = []
     groups, _ = _plan_groups(plan_data, plan_errors)
@@ -203,7 +199,9 @@ def validate_fixture_manifest(
             _parse_utc(kickoff_utc)
 
         if fixture.get("canonical_event_id") is not None:
-            errors.append(f"Fixture {index}: canonical_event_id must remain null in research manifest")
+            errors.append(
+                f"Fixture {index}: canonical_event_id must remain null in research manifest"
+            )
         provider_ids = fixture.get("provider_event_ids")
         if not isinstance(provider_ids, dict) or provider_ids:
             errors.append(f"Fixture {index}: provider_event_ids must remain an empty object")
@@ -246,16 +244,16 @@ def validate_fixture_manifest(
             if not isinstance(source_label, str) or not isinstance(target, str):
                 errors.append("source_label_aliases entries must be string -> string")
             elif target not in identity_key_set:
-                errors.append(f"Alias target is not a declared identity key: {source_label} -> {target}")
+                errors.append(
+                    f"Alias target is not a declared identity key: {source_label} -> {target}"
+                )
 
     return errors
 
 
 def main() -> int:
     missing = [
-        path.relative_to(ROOT)
-        for path in (PLAN_MANIFEST, FIXTURE_MANIFEST)
-        if not path.is_file()
+        path.relative_to(ROOT) for path in (PLAN_MANIFEST, FIXTURE_MANIFEST) if not path.is_file()
     ]
     if missing:
         for path in missing:
