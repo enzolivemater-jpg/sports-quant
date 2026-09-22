@@ -225,9 +225,7 @@ def analyze_snapshot(
         "complete_h2h_coverage_expected_denominator": ratio(
             complete_h2h_count, expected_fixture_count
         ),
-        "totals_coverage_expected_denominator": ratio(
-            totals_present_count, expected_fixture_count
-        ),
+        "totals_coverage_expected_denominator": ratio(totals_present_count, expected_fixture_count),
         "bookmaker_count_distribution_resolved": _distribution(bookmaker_counts),
         "canonical_known_at_assigned": False,
         "no_vig_calculated": False,
