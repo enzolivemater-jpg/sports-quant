@@ -88,6 +88,9 @@ Severity:
 - P1 = material inconsistency likely to propagate into architecture/model decisions
 - P2 = non-blocking clarity/maintainability issue
 
+Required output should be directly usable with `.project/reviews/F0_REVIEW_RECORD_TEMPLATE.md`.
+Include the exact full Git HEAD you reviewed.
+
 Required output:
 - P0 findings
 - P1 findings
