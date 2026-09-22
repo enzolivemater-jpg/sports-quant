@@ -10,7 +10,9 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
-MANIFEST = ROOT / "data" / "manifests" / "football_odds_stage_a_epl_2024_25.json"
+MANIFEST = (
+    ROOT / "data" / "manifests" / "football_odds_stage_a_epl_2024_25.json"
+)
 
 EXPECTED_GROUPS = 23
 EXPECTED_CUTOFFS = ("T-24h", "T-1h", "T-15m")
