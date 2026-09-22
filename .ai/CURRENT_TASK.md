@@ -1,77 +1,91 @@
 # CURRENT TASK
 
-Phase: `F1 — Repository Skeleton`
+Phase:
+`PRE_F2_GATE`
 
-Status: `IMPLEMENTED_TECHNICALLY_GREEN__PROMOTION_BLOCKED_PENDING_INDEPENDENT_F0_REVIEW`
+Status:
+`PREPARATION_SATURATED__F2_BLOCKED_PENDING_INDEPENDENT_F0_REVIEW`
 
-Implemented scope:
-- repository tree;
-- reproducible Python packaging with committed `uv.lock`;
-- CI;
-- secret handling;
-- PostgreSQL local/test plumbing;
-- migrations skeleton;
-- minimal structured observability.
+Date:
+2026-09-22
 
-GitHub validation:
-- final reference commit before this documentation update: `079099ddeac1e96d4943530690136008769a5465`;
-- CI run `35728820181`: SUCCESS;
-- Security run `35728820172`: SUCCESS;
-- quality job: repository-scope validator, Ruff format, Ruff lint, mypy, unit/smoke tests, Alembic heads — all SUCCESS;
-- PostgreSQL integration smoke test — SUCCESS;
-- Gitleaks — SUCCESS;
-- pip-audit — SUCCESS.
+## Current repository state
 
-Resolved during F1 validation:
-- generated the previously missing `uv.lock` using a temporary GitHub Actions bootstrap workflow;
-- fixed Ruff import ordering;
-- upgraded pytest after `pip-audit` identified `PYSEC-2026-1845`; current lock resolves pytest 9.1.1;
-- temporary bootstrap workflow removed after lock generation.
+Authoritative source:
+GitHub `enzolivemater-jpg/sports-quant`
 
-Explicitly NOT STARTED:
-- F2 contracts;
-- point-in-time kernel;
-- data ingestion business logic;
-- Basketball/Football/MMA-UFC models;
-- market/no-vig engine;
-- calibration or production P_safe logic;
-- dependency/optimizer logic;
-- frontend implementation.
+Pre-audit reviewed HEAD:
+`04d6526514b53c91a4463fec3e083971ccdbfc7c`
 
-Governance note:
-- this repository does NOT claim that F0 received an independent critical review;
-- F1 implementation occurred before that canonical gate was satisfied;
-- technical green status does not retroactively satisfy the governance gate;
-- do not promote to F2 until the independent-review requirement is resolved under project governance.
+At that HEAD:
+- CI: SUCCESS
+- Security: SUCCESS
 
+## Foundation / F1
 
-Scope amendment recorded 2026-09-22:
-- mandatory sports are Basketball, Football and MMA;
-- UFC is the mandatory initial MMA competition scope;
-- additional sports are evidence-gated by empirical Sport Predictability;
-- Tennis is no longer a mandatory V1 sport;
-- Basketball and MMA/UFC market-family catalogs remain intentionally undefined until their authorized decision phase.
+F1 repository foundation is technically green.
 
+F0 independent review is NOT yet recorded.
 
-Additional-sports scope decision recorded 2026-09-22:
-- approved additional disciplines: Handball, Volleyball and Tennis only;
-- Rugby Union, Futsal, Lacrosse, Roller Hockey and every other non-core sport are excluded from the current roadmap;
-- approval means "allowed into empirical validation", not automatic SP validation or production promotion;
-- no SP class is assigned until PIT-valid OOS evidence exists.
+Machine state:
+- foundation_review.status = PENDING
+- f2.authorized = false
 
+Issue #1 remains the blocking governance gate.
 
-Pilot sport decision recorded 2026-09-22:
-- Football is the first end-to-end implementation and validation sport;
-- the pilot must exercise the full chain: data -> PIT -> features -> model -> calibration -> P_safe -> market -> gate -> backtest;
-- no Football model-family champion is selected by this decision;
-- no F2+ implementation starts until the independent F0 review gate is resolved.
+## Football
 
+Football is the first end-to-end pilot.
 
-Execution acceleration update 2026-09-22:
-- documentation/specification path is prepared through F12 PWA;
-- active master execution plan: `docs/runbooks/FAST_EXECUTION_PLAN.md`;
-- Football research artifacts now include provider bake-off, evidence matrix, pilot dataset manifest, feature governance, StatsBomb open-data probe and model benchmark protocol;
-- downstream draft specs prepared: F3 PIT, F4 Football Data Layer, F5 Modeling Harness, F6 Market Engine, F7 Calibration/Uncertainty/P_safe, F8 S-Tier, F9 Backtesting, F10 Dependency/Parlay, F11 Paper Betting/Monitoring, F12 PWA;
-- GitHub issue #16 tracks the fast execution path;
-- independent F0 review issue #1 is still OPEN and currently has no review comment/artifact;
-- therefore F2+ implementation remains blocked by governance, while research/specification work may continue.
+Prepared but not production-authorized:
+- provider research
+- PIT/data specifications
+- feature governance
+- model benchmark/math
+- temporal evaluation
+- market/no-vig research
+- calibration/uncertainty/P_safe research
+- S-Tier design
+- backtest design
+- dependency/parlay design
+- paper betting design
+- PWA design
+
+## Implementation queue
+
+Claude handoffs exist for F2 through F12.
+
+Do not start F2 until the F0 gate is legitimately opened.
+
+## External/admin work
+
+Issue #17:
+repository is still public and main is unprotected.
+
+Issue #18:
+provider credentials/trials are still required for authenticated Football bake-off.
+
+These do not authorize bypassing F0.
+
+## Current priority
+
+1. independent F0 review;
+2. record accepted review;
+3. machine-authorize F2;
+4. CI/Security green;
+5. Claude F2;
+6. repository hardening/provider probes in parallel.
+
+## Stop-work rule
+
+Further speculative architecture documentation is now lower value.
+
+Until new evidence arrives, do only:
+- review/gate work;
+- CI/security fixes;
+- repo hardening;
+- provider probes;
+- verified defect corrections.
+
+Reference:
+`docs/runbooks/PRE_F2_READINESS_AUDIT.md`

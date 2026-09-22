@@ -30,6 +30,34 @@ This file defines the handoff order. It does not override phase gates.
    - issue #8
    - only after F4 acceptance
 
+6. `.ai/handoffs/CLAUDE_F6_IMPLEMENTATION_HANDOFF.md`
+   - issue #9
+   - after F5 acceptance and stable PIT odds
+
+7. `.ai/handoffs/CLAUDE_F7_IMPLEMENTATION_HANDOFF.md`
+   - issue #10
+   - after F6/model evidence; unresolved OD-01..05 may block full completion
+
+8. `.ai/handoffs/CLAUDE_F8_IMPLEMENTATION_HANDOFF.md`
+   - issue #11
+   - after F7 acceptance
+
+9. `.ai/handoffs/CLAUDE_F9_IMPLEMENTATION_HANDOFF.md`
+   - issue #12
+   - after F8 acceptance
+
+10. `.ai/handoffs/CLAUDE_F10_IMPLEMENTATION_HANDOFF.md`
+    - issue #13
+    - after valid single-leg/backtest stack
+
+11. `.ai/handoffs/CLAUDE_F11_IMPLEMENTATION_HANDOFF.md`
+    - issue #14
+    - prospective Football paper betting
+
+12. `.ai/handoffs/CLAUDE_F12_IMPLEMENTATION_HANDOFF.md`
+    - issue #15
+    - only after backend decision contracts stabilize
+
 ## Parallel research queue
 
 - `.ai/handoffs/GEMINI_FOOTBALL_VENDOR_AUDIT.md`
@@ -48,31 +76,3 @@ Each phase must satisfy:
 - required critical review;
 - no unresolved P0/P1;
 - Enzo decision where NEEDS_DECISION is raised.
-
-5. `.ai/handoffs/CLAUDE_F6_IMPLEMENTATION_HANDOFF.md`
-   - issue #9
-   - after F5 acceptance and stable PIT odds
-
-6. `.ai/handoffs/CLAUDE_F7_IMPLEMENTATION_HANDOFF.md`
-   - issue #10
-   - after F6/model evidence; unresolved OD-01..05 may block full completion
-
-7. `.ai/handoffs/CLAUDE_F8_IMPLEMENTATION_HANDOFF.md`
-   - issue #11
-   - after F7 acceptance
-
-8. `.ai/handoffs/CLAUDE_F9_IMPLEMENTATION_HANDOFF.md`
-   - issue #12
-   - after F8 acceptance
-
-9. `.ai/handoffs/CLAUDE_F10_IMPLEMENTATION_HANDOFF.md`
-   - issue #13
-   - after valid single-leg/backtest stack
-
-10. `.ai/handoffs/CLAUDE_F11_IMPLEMENTATION_HANDOFF.md`
-    - issue #14
-    - prospective Football paper betting
-
-11. `.ai/handoffs/CLAUDE_F12_IMPLEMENTATION_HANDOFF.md`
-    - issue #15
-    - only after backend decision contracts stabilize
