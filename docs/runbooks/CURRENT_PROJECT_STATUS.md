@@ -1,6 +1,6 @@
 # SPORTS QUANT — Current Execution Status
 
-Date: 2026-09-22
+Date: 2026-09-23
 
 Status: ACTIVE
 
@@ -9,13 +9,26 @@ Pilot sport: FOOTBALL
 ## Governance gate
 
 F0 independent review:
-- issue #1: OPEN
-- accepted review artifact: NOT YET RECORDED
-- F2 machine authorization: CLOSED
+- issue #1: CLOSED
+- accepted review artifact: `.project/reviews/F0_REVIEW_RECORD_2026-09-22_e5220707.md`
+- F2 machine authorization: OPEN (`f2.authorized = true`)
+
+F2 Domain Contracts:
+- status: COMPLETE / MERGED / GREEN
+- PR #19, final reviewed head `40a604d9e5ec3e3f2fe0528373f0313874667e8c`
+- merge commit `d2cc02b5f5fbfbef2100eb07395e652a731bb31d`
+- independent review: GO (P0=0, P1=0)
+- CI + Security green on the merge commit
+- issue #2: CLOSED
+
+F3 Point-in-Time Kernel:
+- status: READY_TO_IMPLEMENT
+- machine authorization: OPEN (`f3.authorized = true`)
+- issue #6
 
 Therefore:
-- F2 production/domain implementation: BLOCKED
-- F3+ implementation: BLOCKED
+- F3 PIT kernel implementation: ALLOWED (issue #6)
+- F4+ implementation: BLOCKED until F3 acceptance
 - research/specification/provider probes: ALLOWED
 
 Machine enforcement:
@@ -29,8 +42,9 @@ F1:
 - CI/Security generally enforced on main
 - PostgreSQL integration smoke exists
 - secret scan and dependency audit exist
+- secret scan now also executes on pull requests (Gitleaks v3, PR #20)
 
-Repository admin state last verified:
+Repository admin state last verified (2026-09-23):
 - visibility: PUBLIC
 - main protected: false
 
@@ -129,8 +143,8 @@ No Champion model has been selected.
 
 ## Prepared implementation chain
 
-- F2 Contracts — issue #2
-- F3 PIT Kernel — #6
+- F2 Contracts — issue #2 — COMPLETE
+- F3 PIT Kernel — #6 — READY_TO_IMPLEMENT (current critical path)
 - F4 Football Data Layer — #7
 - F5 Modeling Harness — #8
 - F6 Market Engine — #9
@@ -148,11 +162,14 @@ Claude handoffs are prepared through F12.
 
 ## Immediate external blockers/actions
 
-### A. Independent F0 review
+### A. F3 PIT Kernel implementation
 Use:
-`.ai/handoffs/START_PROMPT_F0_INDEPENDENT_REVIEW.md`
+`.ai/handoffs/CLAUDE_F3_IMPLEMENTATION_HANDOFF.md`
 
-Required before F2.
+Spec:
+`docs/contracts/F3_POINT_IN_TIME_KERNEL_SPEC_DRAFT.md`
+
+Requires independent critical review before F4.
 
 ### B. Repository hardening
 Make repository private and protect main.
@@ -187,9 +204,7 @@ Allowed research:
 - handoff preparation
 - source/version manifests
 
-Not allowed before F0 gate:
-- actual F2 domain-contract implementation
-- PIT kernel implementation
+Not allowed before their phase gates:
 - production provider adapters
 - model implementation
 - production calibration/P_safe
@@ -199,10 +214,10 @@ Not allowed before F0 gate:
 
 ## Current project conclusion
 
-Engineering preparation is substantially ahead of the implementation gate.
+F0 and F2 gates are closed successfully; F3 is authorized.
 
-Primary critical-path blocker:
-**independent F0 review**
+Critical path:
+**F3 PIT Kernel -> F4 Football Data Layer -> F5 Modeling Harness -> ...**
 
 Primary data execution blocker:
 **provider credentials / later historical-odds spend**

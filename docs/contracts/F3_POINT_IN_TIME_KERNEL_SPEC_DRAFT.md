@@ -2,7 +2,7 @@
 
 Date: 2026-09-22
 
-Status: DRAFT_READY__BLOCKED_BY_F0_REVIEW_AND_F2
+Status: READY_TO_IMPLEMENT
 
 ## Objective
 
