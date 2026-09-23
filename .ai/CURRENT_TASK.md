@@ -72,9 +72,11 @@ CLOSED (completed)
 OD-01 through OD-29:
 UNCHANGED
 
-Machine state:
+Recorded F3 authorization (`.project/PHASE_GATES.toml`):
 - current_phase = F3_POINT_IN_TIME_KERNEL
-- f3.authorized = true
+- [f3] authorized = true
+
+Note: F3 authorization is recorded in `.project/PHASE_GATES.toml` but is not yet independently machine-enforced by `scripts/validate_phase_gates.py`.
 
 ## Active implementation task
 

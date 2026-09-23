@@ -97,10 +97,20 @@ At minimum:
 - EXPIRED_AT_CUTOFF
 - NOT_YET_VALID_AT_CUTOFF
 - SOURCE_VERSION_UNRESOLVED
-- CONFLICT_BLOCKING
-- QUALITY_BLOCKING
 
 Exact enum placement belongs to F2/F3 implementation review.
+
+### Scope boundary: data state is not PIT eligibility
+
+F3 answers only: "Could this exact record/version legitimately have been known and
+usable at this historical cutoff?" Its rejection reasons are temporal, version or
+integrity reasons (missing/late `known_at`, invalid or ambiguous time handling,
+validity window, unresolved source/version identity).
+
+F3 must not reinterpret `QualityState` or `ConflictState` as PIT eligibility, must
+not collapse the four F2 `DataState` axes, and must not define which data states
+block a decision. Whether data is reliable or conflict-free enough to qualify a
+decision belongs to later governed gate/qualification layers.
 
 ## Timezone policy
 
@@ -174,7 +184,7 @@ It must not depend on FastAPI or frontend code.
 10. deterministic replay produces same selected records and manifest hash.
 11. provider data with current-state-only semantics cannot masquerade as historical.
 12. DST/offset regression cases.
-13. conflict/quality blocking behavior consistent with F2 contracts.
+13. F2 `DataState` is preserved without collapsing its four axes, is not reinterpreted as PIT eligibility (records differing only in `QualityState`/`ConflictState` receive the same PIT outcome), and is passed through unchanged in the selected record / evidence lineage where applicable; business blocking semantics are left to later governed gate layers.
 14. snapshot manifest is complete.
 15. regression test for every leakage bug found later.
 
@@ -194,6 +204,7 @@ F3 does not:
 - fit models;
 - calibrate probabilities;
 - define P_safe;
+- decide data-quality/conflict blocking (NO_BET / REVIEW / BLOCKED semantics);
 - calculate no-vig;
 - select bookmakers;
 - implement backtest metrics.

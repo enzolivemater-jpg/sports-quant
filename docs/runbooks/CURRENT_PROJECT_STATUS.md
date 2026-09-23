@@ -23,7 +23,7 @@ F2 Domain Contracts:
 
 F3 Point-in-Time Kernel:
 - status: READY_TO_IMPLEMENT
-- machine authorization: OPEN (`f3.authorized = true`)
+- recorded F3 authorization: `f3.authorized = true` in `.project/PHASE_GATES.toml` (not yet machine-enforced; see below)
 - issue #6
 
 Therefore:
@@ -33,7 +33,9 @@ Therefore:
 
 Machine enforcement:
 - `.project/PHASE_GATES.toml`
-- `scripts/validate_phase_gates.py`
+- `scripts/validate_phase_gates.py` (enforces the F0 review and F2 authorization)
+
+F3 authorization is recorded in `.project/PHASE_GATES.toml` but is not yet independently machine-enforced by `scripts/validate_phase_gates.py`.
 
 ## Repository foundation
 
