@@ -1,3 +1,4 @@
-# Reserved test boundary: `contracts`
+# Tests: `contracts`
 
-Created in F1. Tests for this domain begin only when its implementation phase is authorized.
+F2 domain-contract tests (`docs/contracts/F2_READY_TO_IMPLEMENT_SPEC.md`).
+Shared valid fixtures live in `contract_builders.py`.
