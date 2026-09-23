@@ -1,6 +1,6 @@
 schema_version = "1.0"
 project = "SPORTS_QUANT"
-current_phase = "F2_DOMAIN_CONTRACTS"
+current_phase = "F3_POINT_IN_TIME_KERNEL"
 
 [foundation_review]
 status = "PASS"
@@ -16,6 +16,12 @@ authorized = true
 authorization_basis = "F0 micro re-review GO at e5220707b018dee501a2a9757c3e31d5bb41683a; P0=0; P1=0; blocking_findings_cleared=true"
 implementation_issue = 2
 spec = "docs/contracts/F2_READY_TO_IMPLEMENT_SPEC.md"
+
+[f3]
+authorized = true
+authorization_basis = "F2 merged via PR #19 at d2cc02b5f5fbfbef2100eb07395e652a731bb31d (final reviewed head 40a604d9e5ec3e3f2fe0528373f0313874667e8c); final independent F2 review GO; P0=0; P1=0; CI and Security green on the merge commit"
+implementation_issue = 6
+spec = "docs/contracts/F3_POINT_IN_TIME_KERNEL_SPEC_DRAFT.md"
 
 [notes]
 rule = "F2 authorization requires a recorded independent F0 review with no unresolved P0/P1 findings and a green machine gate on the authorization commit."

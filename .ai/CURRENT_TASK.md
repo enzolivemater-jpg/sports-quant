@@ -1,13 +1,13 @@
 # CURRENT TASK
 
 Phase:
-`F2_DOMAIN_CONTRACTS`
+`F3_POINT_IN_TIME_KERNEL`
 
 Status:
 `READY_TO_IMPLEMENT`
 
 Date:
-2026-09-22
+2026-09-23
 
 ## F0 governance
 
@@ -39,48 +39,81 @@ Machine state:
 Issue #1:
 CLOSED
 
+## F2 completion
+
+F2 Domain Contracts is complete, merged and green.
+
+Final F2 PR:
+#19
+
+Final independently reviewed HEAD:
+`40a604d9e5ec3e3f2fe0528373f0313874667e8c`
+
+Merge commit on main:
+`d2cc02b5f5fbfbef2100eb07395e652a731bb31d`
+
+Final review result:
+- independent review: GO
+- P0 open: 0
+- P1 open: 0
+
+Merge-commit validation:
+- CI quality: SUCCESS
+- PostgreSQL integration: SUCCESS
+- Security dependency audit: SUCCESS
+- Security secret scan: SUCCESS
+
+Security prerequisite:
+PR #20 (Gitleaks v3 PR scanning), merged at `b94eefdf2d6c2d54e4a2fe2c6c9910ba859bebd4`
+
+Issue #2:
+CLOSED (completed)
+
+OD-01 through OD-29:
+UNCHANGED
+
+Recorded F3 authorization (`.project/PHASE_GATES.toml`):
+- current_phase = F3_POINT_IN_TIME_KERNEL
+- [f3] authorized = true
+
+Note: F3 authorization is recorded in `.project/PHASE_GATES.toml` but is not yet independently machine-enforced by `scripts/validate_phase_gates.py`.
+
 ## Active implementation task
 
 Issue:
-#2 — F2 Domain Contracts
+#6 — F3 Point-in-Time Kernel
 
 Primary handoff:
-`.ai/handoffs/CLAUDE_F2_IMPLEMENTATION_HANDOFF.md`
+`.ai/handoffs/CLAUDE_F3_IMPLEMENTATION_HANDOFF.md`
 
 Primary spec:
-`docs/contracts/F2_READY_TO_IMPLEMENT_SPEC.md`
+`docs/contracts/F3_POINT_IN_TIME_KERNEL_SPEC_DRAFT.md`
 
-## F2 scope
+## F3 scope
 
-Implement the smallest stable domain-contract layer only.
+Implement reusable, sport-agnostic, deterministic point-in-time logic on top of the
+F2 contracts (never redefining them locally):
+- PIT eligibility with explicit rejection reasons;
+- as-of version selection;
+- validity-window enforcement;
+- deterministic historical revision selection;
+- snapshot/replay manifest;
+- timezone-safe handling;
+- raw snapshot lineage hooks.
 
-Expected modules under `src/sports_quant/contracts/`:
-- common.py
-- time.py
-- source.py
-- data_state.py
-- entity.py
-- provenance.py
-- market.py
-- probability.py
-- edge.py
-- decision.py
-- predictability.py
-
-Follow the handoff/spec if they include additional contract modules already approved.
+Football is the first consumer.
 
 ## Hard boundaries
 
 Do not implement:
-- provider ingestion;
-- F3 PIT kernel beyond contract validation;
+- provider fetching/ingestion;
 - Football feature engineering;
 - model training;
 - calibration algorithms;
 - a production P_safe formula;
-- no-vig Champion;
+- no-vig;
 - S-Tier engine;
-- backtests;
+- backtest metrics;
 - parlay optimizer;
 - API/frontend.
 
@@ -88,14 +121,15 @@ Do not resolve any OPEN_DECISION silently.
 
 ## Completion discipline
 
-F2 must:
+F3 must:
 - preserve OD-01 through OD-29;
 - pass formatter/Ruff/mypy/pytest/Alembic/PostgreSQL/CI/Security;
-- satisfy the F2 acceptance criteria;
+- satisfy the F3 acceptance criteria, including deterministic replay;
+- introduce no speculative timestamps;
 - receive independent critical review;
-- have no unresolved P0/P1 before F3.
+- have no unresolved P0/P1 before F4.
 
-Do not start F3 in the same change.
+Do not start F4 in the same change.
 
 ## Parallel non-blocking work
 

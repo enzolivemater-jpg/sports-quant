@@ -95,7 +95,7 @@ At minimum:
 - deterministic replay
 - current-state-only provider data cannot masquerade as historical
 - DST/offset regression
-- conflict/quality blocking semantics
+- F2 DataState preservation/pass-through without collapsing the four axes or reinterpreting QualityState / ConflictState as PIT eligibility; business blocking semantics (NO_BET / REVIEW / BLOCKED) remain outside F3
 - complete snapshot manifest
 - regression test for every future leakage defect
 
