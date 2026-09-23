@@ -27,9 +27,18 @@ jobs:
 
   secret-scan:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # Required to list pull-request commits for PR-scoped scans.
+      pull-requests: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Gitleaks
-        uses: gitleaks/gitleaks-action@v2
+        uses: gitleaks/gitleaks-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Findings fail the job and are reported in the job summary and SARIF
+          # artifact; PR review comments are disabled to avoid needing write scope.
+          GITLEAKS_ENABLE_COMMENTS: "false"
