@@ -66,6 +66,18 @@ def require_aware_datetime(value: object, field: str) -> datetime:
     return value
 
 
+def instant(value: datetime) -> datetime:
+    """Return ``value`` as a UTC instant for ordering/equality comparisons.
+
+    Python compares two aware datetimes that share the same ``tzinfo`` object by wall
+    time, ignoring ``fold``, so two readings inside a DST fall-back hour can compare
+    in the wrong order or as equal. Every temporal comparison in the contracts goes
+    through this function so that it is instant-based.
+    """
+
+    return value.astimezone(UTC)
+
+
 def require_non_empty(value: str, field: str) -> None:
     if not value.strip():
         raise ContractError("EMPTY_VALUE", f"{field} must be a non-empty string")
