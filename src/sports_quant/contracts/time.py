@@ -9,7 +9,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime
 
-from sports_quant.contracts.common import CanonicalEnum, Contract, ContractError
+from sports_quant.contracts.common import CanonicalEnum, Contract, ContractError, instant
 
 
 class KnownAtBasis(CanonicalEnum):
@@ -46,7 +46,9 @@ class TemporalMetadata(Contract):
         # earliest verifiable instant is the receipt itself: earlier would be a
         # speculative reconstruction, later would be an uncanonical delayed admission.
         if self.known_at_basis is KnownAtBasis.SYSTEM_RECEIPT and (
-            self.received_at is None or self.known_at != self.received_at
+            self.received_at is None
+            or self.known_at is None
+            or instant(self.known_at) != instant(self.received_at)
         ):
             raise ContractError(
                 "KNOWN_AT_RECEIPT_MISMATCH",
@@ -55,7 +57,7 @@ class TemporalMetadata(Contract):
         if (
             self.valid_from is not None
             and self.valid_to is not None
-            and self.valid_from > self.valid_to
+            and instant(self.valid_from) > instant(self.valid_to)
         ):
             raise ContractError("INVALID_VALIDITY_WINDOW", "valid_from must be <= valid_to")
 
@@ -71,7 +73,7 @@ def require_critical_known_at(temporal: TemporalMetadata, decision_cutoff_at: da
             "KNOWN_AT_MISSING",
             "critical information without a defensible known_at is not usable",
         )
-    if temporal.known_at > decision_cutoff_at:
+    if instant(temporal.known_at) > instant(decision_cutoff_at):
         raise ContractError(
             "KNOWN_AT_AFTER_CUTOFF",
             "critical information requires known_at <= decision_cutoff_at",
