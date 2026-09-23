@@ -20,7 +20,7 @@ from datetime import UTC, datetime
 from enum import StrEnum
 from typing import Any, Self, Union, get_args, get_origin, get_type_hints
 
-_REASON_CODE_RE = re.compile(r"^[A-Z][A-Z0-9_]*$")
+_IDENTIFIER_RE = re.compile(r"^[A-Z][A-Z0-9_]*$")
 
 
 class ContractError(ValueError):
@@ -76,10 +76,12 @@ def require_probability(value: float, field: str) -> None:
         raise ContractError("PROBABILITY_OUT_OF_BOUNDS", f"{field} must be in [0, 1]")
 
 
-def require_reason_code(value: str, field: str) -> None:
-    if not _REASON_CODE_RE.fullmatch(value):
+def require_identifier(value: str, field: str) -> None:
+    """Deterministic identifier: UPPER_SNAKE_CASE, e.g. reason codes and gate ids."""
+
+    if not _IDENTIFIER_RE.fullmatch(value):
         raise ContractError(
-            "INVALID_REASON_CODE",
+            "INVALID_IDENTIFIER",
             f"{field} must be an UPPER_SNAKE_CASE identifier, got {value!r}",
         )
 

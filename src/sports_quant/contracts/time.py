@@ -42,15 +42,15 @@ class TemporalMetadata(Contract):
                 "KNOWN_AT_BASIS_MISMATCH",
                 "known_at and known_at_basis must be provided together",
             )
-        if (
-            self.known_at is not None
-            and self.known_at_basis is KnownAtBasis.SYSTEM_RECEIPT
-            and self.received_at is not None
-            and self.known_at < self.received_at
+        # Under SYSTEM_RECEIPT the receipt is the only verifiable evidence, so the
+        # earliest verifiable instant is the receipt itself: earlier would be a
+        # speculative reconstruction, later would be an uncanonical delayed admission.
+        if self.known_at_basis is KnownAtBasis.SYSTEM_RECEIPT and (
+            self.received_at is None or self.known_at != self.received_at
         ):
             raise ContractError(
-                "KNOWN_AT_BEFORE_RECEIPT",
-                "known_at based on SYSTEM_RECEIPT cannot precede received_at",
+                "KNOWN_AT_RECEIPT_MISMATCH",
+                "known_at based on SYSTEM_RECEIPT must equal received_at",
             )
         if (
             self.valid_from is not None

@@ -10,6 +10,12 @@ from contract_builders import artifact, assessment, entity
 
 from sports_quant.contracts.common import ContractError
 from sports_quant.contracts.entity import CanonicalEntityId, EntityKind, Sport
+from sports_quant.contracts.market import (
+    FOOTBALL_MARKET_CATALOG,
+    MarketDescriptor,
+    MarketFamily,
+)
+from sports_quant.contracts.market_risk import MarketRiskClass
 from sports_quant.contracts.predictability import (
     EvidenceStatus,
     PredictabilityAssessment,
@@ -132,10 +138,58 @@ def test_competition_must_be_a_competition_of_the_same_sport() -> None:
         )
 
 
-def test_market_family_must_belong_to_sport() -> None:
+# Opaque, non-production scope identifiers used only by these tests. They are not
+# proposals for Handball/Volleyball/Tennis market families (none are defined).
+VALIDATION_ONLY_SCOPES = [
+    (Sport.HANDBALL, "VALIDATION_SCOPE_A"),
+    (Sport.VOLLEYBALL, "VALIDATION_SCOPE_B"),
+    (Sport.TENNIS, "VALIDATION_SCOPE_C"),
+]
+
+
+@pytest.mark.parametrize(("sport", "scope"), VALIDATION_ONLY_SCOPES)
+def test_validation_only_sports_are_assessable(sport: Sport, scope: str) -> None:
+    # Regression for review P1-01: SP scope was hard-coupled to the Football catalog.
+    value = assessment(sport=sport, market_family=scope)
+    assert value.scope_key == (sport, scope, None)
+    assert PredictabilityAssessment.from_json(value.to_json()) == value
+
+
+@pytest.mark.parametrize(("sport", "scope"), VALIDATION_ONLY_SCOPES)
+def test_assessing_a_scope_does_not_promote_it_to_the_production_catalog(
+    sport: Sport, scope: str
+) -> None:
+    assessment(sport=sport, market_family=scope)
+    with pytest.raises(ContractError):
+        MarketFamily.parse(scope)
+    assert {entry.sport for entry in FOOTBALL_MARKET_CATALOG} == {Sport.FOOTBALL}
+    assert len(FOOTBALL_MARKET_CATALOG) == 5
+    with pytest.raises(ContractError):
+        MarketDescriptor(
+            sport=sport,
+            market_family=MarketFamily.FOOTBALL_1X2,
+            market_type="T",
+            market_instance="I",
+            mr_base=MarketRiskClass.MR2,
+        )
+
+
+@pytest.mark.parametrize("family", list(MarketFamily))
+def test_football_production_families_remain_assessable(family: MarketFamily) -> None:
+    value = assessment(sport=Sport.FOOTBALL, market_family=family.value)
+    assert PredictabilityAssessment.from_json(value.to_json()).market_family == family.value
+
+
+@pytest.mark.parametrize("bad", ["", "lower_case", "WITH SPACE", "1X2", "DASH-ED"])
+def test_market_family_scope_must_be_a_deterministic_identifier(bad: str) -> None:
     with pytest.raises(ContractError) as excinfo:
-        assessment(sport=Sport.HANDBALL)
-    assert excinfo.value.code == "MARKET_SPORT_MISMATCH"
+        assessment(market_family=bad)
+    assert excinfo.value.code == "INVALID_IDENTIFIER"
+
+
+def test_market_family_scope_must_be_a_string() -> None:
+    with pytest.raises(ContractError):
+        assessment(market_family=MarketFamily.FOOTBALL_1X2)
 
 
 def test_dataset_reference_must_be_dataset_or_snapshot() -> None:
@@ -181,8 +235,7 @@ def test_revision_is_a_new_version_and_leaves_the_original_untouched() -> None:
 @pytest.mark.parametrize(
     ("changes", "code"),
     [
-        ({"assessment_version": 3}, "ASSESSMENT_VERSION_NOT_SEQUENTIAL"),
-        ({"assessment_version": 1}, "ASSESSMENT_VERSION_NOT_SEQUENTIAL"),
+        ({"assessment_version": 1}, "ASSESSMENT_VERSION_NOT_INCREASING"),
         (
             {"assessment_version": 2, "competition": entity(EntityKind.COMPETITION, "l")},
             "ASSESSMENT_SCOPE_MISMATCH",
@@ -194,6 +247,17 @@ def test_invalid_successors_are_rejected(changes: dict[str, object], code: str) 
     with pytest.raises(ContractError) as excinfo:
         require_successor(original, dataclasses.replace(original, **changes))
     assert excinfo.value.code == code
+
+
+def test_successor_version_may_skip_numbers() -> None:
+    # Regression for review P2-03: only ordering is frozen, not "+1" numbering.
+    original = assessment()
+    require_successor(original, dataclasses.replace(original, assessment_version=5))
+
+
+def test_successor_may_share_known_at() -> None:
+    original = assessment()
+    require_successor(original, dataclasses.replace(original, assessment_version=2))
 
 
 def test_successor_known_at_cannot_regress() -> None:

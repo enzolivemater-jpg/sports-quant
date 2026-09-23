@@ -5,7 +5,13 @@ prior and empirical classes. It is not P_safe, edge, uncertainty, Market Risk, o
 or profitability, and it bypasses no gate. There is no numeric SP score, no
 empirical admission threshold and no parlay aggregation.
 
-Assessments are immutable; a revision is a new assessment with the next
+The assessed market family is an opaque scope identifier, deliberately
+independent of the production market catalog (``market.MarketFamily``): the
+validation-only sports (Handball, Volleyball, Tennis) must be assessable before
+any production catalog exists, and assessing a scope never adds it to that
+catalog.
+
+Assessments are immutable; a revision is a new assessment with a higher
 ``assessment_version`` and a ``known_at`` no earlier than its predecessor's, so
 later phases can retrieve the version known at any cutoff.
 """
@@ -19,12 +25,12 @@ from sports_quant.contracts.common import (
     CanonicalEnum,
     Contract,
     ContractError,
+    require_identifier,
     require_non_empty,
     require_probability,
     require_unique,
 )
 from sports_quant.contracts.entity import CanonicalEntityId, EntityKind, Sport
-from sports_quant.contracts.market import MarketFamily, catalog_entry
 from sports_quant.contracts.reproducibility import (
     DATA_ARTIFACT_KINDS,
     ArtifactRef,
@@ -73,6 +79,10 @@ class EvaluationPeriod(Contract):
 class PredictabilityAssessment(Contract):
     """One immutable, versioned Sport Predictability assessment.
 
+    ``market_family`` is an UPPER_SNAKE_CASE scope identifier (for approved Football
+    production families it is the ``MarketFamily`` value); it is not validated
+    against, and does not extend, the production catalog.
+
     Out-of-sample metrics are ``None`` when not measured. ``stability``,
     ``data_quality`` and ``drift`` are descriptors/evidence references only; drift
     thresholds remain open (OD-09).
@@ -80,7 +90,7 @@ class PredictabilityAssessment(Contract):
 
     assessment_version: int
     sport: Sport
-    market_family: MarketFamily
+    market_family: str
     competition: CanonicalEntityId | None
     predictability_prior: SportPredictabilityClass | None
     predictability_empirical: SportPredictabilityClass | None
@@ -101,7 +111,7 @@ class PredictabilityAssessment(Contract):
     known_at: datetime
 
     @property
-    def scope_key(self) -> tuple[Sport, MarketFamily, CanonicalEntityId | None]:
+    def scope_key(self) -> tuple[Sport, str, CanonicalEntityId | None]:
         """Identity shared by all versions of the same assessment scope."""
 
         return (self.sport, self.market_family, self.competition)
@@ -109,10 +119,7 @@ class PredictabilityAssessment(Contract):
     def _validate(self) -> None:
         if self.assessment_version < 1:
             raise ContractError("INVALID_ASSESSMENT_VERSION", "assessment_version must be >= 1")
-        if catalog_entry(self.market_family).sport is not self.sport:
-            raise ContractError(
-                "MARKET_SPORT_MISMATCH", f"{self.market_family} does not belong to {self.sport}"
-            )
+        require_identifier(self.market_family, "market_family")
         if self.competition is not None and (
             self.competition.kind is not EntityKind.COMPETITION
             or self.competition.sport is not self.sport
@@ -150,14 +157,18 @@ class PredictabilityAssessment(Contract):
 def require_successor(
     previous: PredictabilityAssessment, successor: PredictabilityAssessment
 ) -> None:
-    """Validate that ``successor`` is the next immutable version of ``previous``."""
+    """Validate that ``successor`` can follow ``previous`` for as-of retrieval.
+
+    Only ordering is required: same scope, a higher version, and no ``known_at``
+    regression. Version numbering policy (e.g. gaps) is not constrained.
+    """
 
     if successor.scope_key != previous.scope_key:
         raise ContractError("ASSESSMENT_SCOPE_MISMATCH", "successor must share the same scope")
-    if successor.assessment_version != previous.assessment_version + 1:
+    if successor.assessment_version <= previous.assessment_version:
         raise ContractError(
-            "ASSESSMENT_VERSION_NOT_SEQUENTIAL",
-            "successor assessment_version must be previous + 1",
+            "ASSESSMENT_VERSION_NOT_INCREASING",
+            "successor assessment_version must be greater than previous",
         )
     if successor.known_at < previous.known_at:
         raise ContractError(

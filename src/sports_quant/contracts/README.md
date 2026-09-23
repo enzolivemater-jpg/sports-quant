@@ -20,8 +20,7 @@ Specification: `docs/contracts/F2_READY_TO_IMPLEMENT_SPEC.md`.
 | `probability.py` | `ProbabilityEstimate` (P_raw / P_calibrated / P_safe) |
 | `edge.py` | `EdgeAssessment` (edge_calibrated / edge_safe) |
 | `dependency.py` | `DependencyClass`, `DependencyAssertion` |
-| `decision.py` | `DecisionState`, precedence |
-| `gates.py` | `GateResult`, `GateEvidenceRef` |
-| `evaluation.py` | `DecisionEvaluation` (split from `decision.py` to avoid an import cycle with `gates.py`) |
+| `decision.py` | `DecisionState`, precedence, `require_edge_permits_state` (edge_safe < 0 ⇒ not QUALIFIED) |
+| `gates.py` | `GateResult`, `GateEvidenceRef` (serializable surface only; no aggregation) |
 | `reproducibility.py` | `CodeVersion`, `ArtifactRef`, `ReproducibilityRef` |
-| `predictability.py` | `PredictabilityAssessment` and SP enums |
+| `predictability.py` | `PredictabilityAssessment` (catalog-independent scope) and SP enums |

@@ -10,7 +10,7 @@ from contract_builders import probability
 
 from sports_quant.contracts.common import ContractError
 from sports_quant.contracts.edge import EdgeAssessment
-from sports_quant.contracts.probability import ProbabilityEstimate, ProbabilityProducer
+from sports_quant.contracts.probability import ProbabilityEstimate
 
 
 @pytest.mark.parametrize("field", ["p_raw", "p_calibrated", "p_safe"])
@@ -51,18 +51,26 @@ def test_three_probabilities_remain_distinct_fields() -> None:
     assert {"p_raw", "p_calibrated", "p_safe"} <= names
 
 
-@pytest.mark.parametrize("producer", [ProbabilityProducer.HUMAN, ProbabilityProducer.LLM])
-def test_human_or_llm_cannot_assign_final_p_safe(producer: ProbabilityProducer) -> None:
-    with pytest.raises(ContractError) as excinfo:
-        probability(p_safe_producer=producer)
-    assert excinfo.value.code == "P_SAFE_DIRECT_ASSIGNMENT_PROHIBITED"
+def test_probability_contract_is_minimal() -> None:
+    # No producer/method metadata (P2-02): OD-01 is open and metadata cannot prove origin.
+    assert [field.name for field in dataclasses.fields(ProbabilityEstimate)] == [
+        "selection_id",
+        "p_raw",
+        "p_calibrated",
+        "p_safe",
+    ]
 
 
-def test_human_or_llm_p_safe_is_rejected_on_deserialization() -> None:
+@pytest.mark.parametrize(
+    "field",
+    ["p_safe_override", "manual_p_safe", "assigned_by", "p_safe_producer", "p_safe_method"],
+)
+def test_no_override_or_assignment_channel_for_p_safe(field: str) -> None:
     payload = probability().to_dict()
-    payload["p_safe_producer"] = "LLM"
-    with pytest.raises(ContractError):
+    payload[field] = "LLM" if "by" in field or "producer" in field else 0.9
+    with pytest.raises(ContractError) as excinfo:
         ProbabilityEstimate.from_dict(payload)
+    assert excinfo.value.code == "UNKNOWN_FIELD"
 
 
 def test_probability_estimate_is_immutable() -> None:

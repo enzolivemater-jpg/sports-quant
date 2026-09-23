@@ -66,11 +66,32 @@ def test_known_at_and_basis_must_be_provided_together() -> None:
         temporal(known_at=None)
 
 
-def test_system_receipt_known_at_cannot_precede_receipt() -> None:
+def test_system_receipt_known_at_equals_received_at() -> None:
+    received = CUTOFF - timedelta(hours=2)
+    assert temporal(received_at=received, known_at=received).known_at == received
+
+
+@pytest.mark.parametrize(
+    "offset", [timedelta(seconds=-1), timedelta(seconds=1), timedelta(hours=1)]
+)
+def test_system_receipt_known_at_must_not_differ_from_receipt(offset: timedelta) -> None:
+    # Earlier = speculative reconstruction; later = uncanonical delayed admission.
     received = CUTOFF - timedelta(hours=2)
     with pytest.raises(ContractError) as excinfo:
-        temporal(received_at=received, known_at=received - timedelta(seconds=1))
-    assert excinfo.value.code == "KNOWN_AT_BEFORE_RECEIPT"
+        temporal(received_at=received, known_at=received + offset)
+    assert excinfo.value.code == "KNOWN_AT_RECEIPT_MISMATCH"
+
+
+def test_system_receipt_requires_received_at() -> None:
+    with pytest.raises(ContractError) as excinfo:
+        temporal(received_at=None)
+    assert excinfo.value.code == "KNOWN_AT_RECEIPT_MISMATCH"
+
+
+def test_system_receipt_equality_is_instant_based() -> None:
+    received = CUTOFF - timedelta(hours=2)
+    plus_two = timezone(timedelta(hours=2))
+    temporal(received_at=received, known_at=received.astimezone(plus_two))
 
 
 def test_verified_source_availability_may_precede_receipt() -> None:
@@ -149,8 +170,11 @@ def test_non_critical_provenance_may_lack_known_at_but_stays_unusable_for_critic
 
 
 def test_provenance_requires_received_at() -> None:
+    no_receipt = temporal(
+        received_at=None, known_at_basis=KnownAtBasis.VERIFIED_SOURCE_AVAILABILITY
+    )
     with pytest.raises(ContractError) as excinfo:
-        provenance(temporal=temporal(received_at=None))
+        provenance(temporal=no_receipt)
     assert excinfo.value.code == "RECEIVED_AT_MISSING"
 
 

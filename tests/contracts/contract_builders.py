@@ -14,9 +14,7 @@ from sports_quant.contracts.data_state import (
     VerificationState,
 )
 from sports_quant.contracts.decision import DecisionState
-from sports_quant.contracts.edge import EdgeAssessment
 from sports_quant.contracts.entity import CanonicalEntityId, EntityKind, Sport
-from sports_quant.contracts.evaluation import DecisionEvaluation
 from sports_quant.contracts.gates import GateEvidenceRef, GateResult
 from sports_quant.contracts.market import MarketDescriptor, MarketFamily
 from sports_quant.contracts.market_risk import MarketRiskClass
@@ -27,7 +25,7 @@ from sports_quant.contracts.predictability import (
     SampleSize,
     SportPredictabilityClass,
 )
-from sports_quant.contracts.probability import ProbabilityEstimate, ProbabilityProducer
+from sports_quant.contracts.probability import ProbabilityEstimate
 from sports_quant.contracts.provenance import Provenance
 from sports_quant.contracts.reproducibility import (
     ArtifactKind,
@@ -91,8 +89,6 @@ def probability(**overrides: Any) -> ProbabilityEstimate:
         p_raw=0.58,
         p_calibrated=0.55,
         p_safe=0.52,
-        p_safe_producer=ProbabilityProducer.SYSTEM_PIPELINE,
-        p_safe_method=artifact(ArtifactKind.CALIBRATOR, "p-safe-method"),
     )
     return replace(base, **overrides)
 
@@ -132,26 +128,11 @@ def gate(
     )
 
 
-def evaluation(**overrides: Any) -> DecisionEvaluation:
-    base = DecisionEvaluation(
-        evaluation_id="eval-1",
-        market=market(),
-        decision_cutoff_at=CUTOFF,
-        evaluated_at=CUTOFF - timedelta(minutes=5),
-        edge=EdgeAssessment.from_probabilities(probability(), 0.5),
-        gate_results=(gate(),),
-        state=DecisionState.QUALIFIED,
-        reason_codes=(),
-        reproducibility=reproducibility(),
-    )
-    return replace(base, **overrides)
-
-
 def assessment(**overrides: Any) -> PredictabilityAssessment:
     base = PredictabilityAssessment(
         assessment_version=1,
         sport=Sport.FOOTBALL,
-        market_family=MarketFamily.FOOTBALL_1X2,
+        market_family=MarketFamily.FOOTBALL_1X2.value,
         competition=None,
         predictability_prior=SportPredictabilityClass.SP3,
         predictability_empirical=None,

@@ -21,7 +21,6 @@ from contract_builders import (
     assessment,
     data_state,
     entity,
-    evaluation,
     gate,
     market,
     probability,
@@ -59,7 +58,6 @@ def _samples() -> list[Contract]:
         EdgeAssessment.from_probabilities(probability(), 0.5),
         gate(),
         reproducibility(),
-        evaluation(),
         assessment(),
     ]
 
@@ -92,7 +90,7 @@ def test_unknown_fields_are_rejected(contract: Contract) -> None:
 def test_digest_is_stable_across_processes() -> None:
     script = (
         "import sys; sys.path.insert(0, 'tests/contracts');"
-        "from contract_builders import evaluation; print(evaluation().content_digest())"
+        "from contract_builders import assessment; print(assessment().content_digest())"
     )
     outputs = {
         subprocess.run(
@@ -105,7 +103,7 @@ def test_digest_is_stable_across_processes() -> None:
         ).stdout.strip()
         for seed in ("0", "1", "12345")
     }
-    assert outputs == {evaluation().content_digest()}
+    assert outputs == {assessment().content_digest()}
 
 
 def test_equal_instants_in_different_timezones_serialize_identically() -> None:
