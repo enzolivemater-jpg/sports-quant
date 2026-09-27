@@ -9,9 +9,10 @@ import pytest
 from pit_builders import CUTOFF, at, data_state, version
 
 from sports_quant.contracts.common import ContractError
-from sports_quant.contracts.data_state import ConflictState, QualityState
+from sports_quant.contracts.data_state import ConflictState, DataState, QualityState
 from sports_quant.contracts.time import KnownAtBasis
 from sports_quant.data.point_in_time.eligibility import PitRejectionReason
+from sports_quant.data.point_in_time.records import PitRecord, SourceVersionRef
 from sports_quant.data.point_in_time.selection import (
     AsOfSelection,
     RecordDisposition,
@@ -35,7 +36,7 @@ def test_correction_after_cutoff_never_leaks_backward() -> None:
     assert _dispositions(replay) == {"v1": D.SELECTED, "v2": D.REJECTED}
     later = select_as_of([v1, v2], at(15))
     assert later.selected == v2
-    assert _dispositions(later) == {"v1": D.SUPERSEDED, "v2": D.SELECTED}
+    assert _dispositions(later) == {"v1": D.ELIGIBLE_NOT_LATEST, "v2": D.SELECTED}
 
 
 def test_only_the_late_correction_exists_so_nothing_is_fabricated() -> None:
@@ -174,25 +175,43 @@ def test_undated_version_is_rejected_and_does_not_block() -> None:
     assert _dispositions(selection)["v?"] is D.REJECTED
 
 
-def test_current_version_not_yet_valid_does_not_fall_back_to_superseded() -> None:
+# P1-02 regressions: knowing a newer version that is not valid at the cutoff does not
+# supersede an older version that is. There is no supersession field in F2/F3.
+
+
+def test_newer_version_not_yet_valid_does_not_displace_older_valid_version() -> None:
     v1 = version(at(9), revision_id="v1")
     v2 = version(at(11), revision_id="v2", valid_from=at(13))
     selection = select_as_of([v1, v2], CUTOFF)
-    assert selection.status is SelectionStatus.NO_ELIGIBLE_VERSION
-    assert selection.selected is None
-    assert _dispositions(selection) == {"v1": D.SUPERSEDED, "v2": D.REJECTED}
+    assert selection.status is SelectionStatus.SELECTED
+    assert selection.selected == v1
+    assert _dispositions(selection) == {"v1": D.SELECTED, "v2": D.REJECTED}
     decision = next(d for d in selection.decisions if d.revision_id == "v2")
     assert decision.reasons == (PitRejectionReason.NOT_YET_VALID_AT_CUTOFF,)
     assert select_as_of([v1, v2], at(13)).selected == v2
 
 
-def test_expired_current_version_does_not_fall_back_to_superseded() -> None:
+@pytest.mark.parametrize(
+    "bound", [{"expires_at": at(11.5)}, {"expires_at": CUTOFF}, {"valid_to": at(11.5)}]
+)
+def test_newer_version_expired_at_cutoff_does_not_displace_older_valid_version(
+    bound: dict[str, datetime],
+) -> None:
     v1 = version(at(9), revision_id="v1")
-    v2 = version(at(11), revision_id="v2", expires_at=at(11.5))
+    v2 = version(at(11), revision_id="v2", **bound)  # type: ignore[arg-type]
+    selection = select_as_of([v1, v2], CUTOFF)
+    assert selection.status is SelectionStatus.SELECTED
+    assert selection.selected == v1
+    assert _dispositions(selection) == {"v1": D.SELECTED, "v2": D.REJECTED}
+    assert select_as_of([v1, v2], at(11.25)).selected == v2
+
+
+def test_older_version_expired_at_cutoff_is_not_selected() -> None:
+    v1 = version(at(9), revision_id="v1", expires_at=at(10))
+    v2 = version(at(11), revision_id="v2", valid_from=at(13))
     selection = select_as_of([v1, v2], CUTOFF)
     assert selection.status is SelectionStatus.NO_ELIGIBLE_VERSION
-    assert _dispositions(selection) == {"v1": D.SUPERSEDED, "v2": D.REJECTED}
-    assert select_as_of([v1, v2], at(11.25)).selected == v2
+    assert _dispositions(selection) == {"v1": D.REJECTED, "v2": D.REJECTED}
 
 
 def test_older_version_rejected_on_its_own_does_not_block_current() -> None:
@@ -201,10 +220,157 @@ def test_older_version_rejected_on_its_own_does_not_block_current() -> None:
     assert select_as_of([v1, v2], CUTOFF).selected == v2
 
 
-def test_tie_including_an_invalid_version_is_still_unresolved() -> None:
+def test_same_latest_known_at_only_the_valid_candidate_is_selected() -> None:
     a = version(at(11), revision_id="a", payload="A")
     b = version(at(11), revision_id="b", payload="B", expires_at=at(11.5))
+    older = version(at(9), revision_id="old")
+    selection = select_as_of([older, a, b], CUTOFF)
+    assert selection.status is SelectionStatus.SELECTED
+    assert selection.selected == a
+    assert _dispositions(selection) == {
+        "a": D.SELECTED,
+        "b": D.REJECTED,
+        "old": D.ELIGIBLE_NOT_LATEST,
+    }
+
+
+def test_same_latest_known_at_with_source_content_conflict_stays_unresolved() -> None:
+    a = version(at(11), revision_id="a", payload="A")
+    a_rewritten = version(at(11), revision_id="a", payload="A'", expires_at=at(11.5))
+    selection = select_as_of([a, a_rewritten], CUTOFF)
+    assert selection.status is SelectionStatus.UNRESOLVED
+    assert selection.selected is None
+
+
+def test_invalid_revision_known_after_cutoff_cannot_affect_earlier_replay() -> None:
+    v1 = version(at(9), revision_id="v1")
+    later = [
+        version(at(14), revision_id="v2"),
+        version(at(14), revision_id="v1", payload="v1 rewritten"),
+        version(at(15), revision_id=None),
+        version(at(15), revision_id="v3", valid_from=at(10)),
+    ]
+    replay = select_as_of([v1, *later], CUTOFF)
+    assert replay.status is SelectionStatus.SELECTED
+    assert replay.selected == v1
+    assert {
+        d.disposition for d in replay.decisions if d.revision_id != "v1" or d.known_at != at(9)
+    } == {D.REJECTED}
+
+
+def test_older_version_observed_again_after_newer_one_is_unresolved() -> None:
+    # Without supersession semantics the order of v1 and v2 at 12:00 is ambiguous.
+    v1 = version(at(9), revision_id="v1", payload="A")
+    v2 = version(at(10), revision_id="v2", payload="B")
+    v1_again = version(at(11), revision_id="v1", payload="A")
+    selection = select_as_of([v1, v2, v1_again], CUTOFF)
+    assert selection.status is SelectionStatus.UNRESOLVED
+    assert select_as_of([v1, v2, v1_again], at(10.5)).selected == v2
+
+
+# P1-03 regressions: source-version identity is (source_id, revision_id) with content
+# payload_sha256; DataState, receipt and raw lineage belong to the observation.
+
+
+def test_same_source_version_with_different_data_state_is_not_unresolved() -> None:
+    first = version(at(10), revision_id="v1", payload="A")
+    restated = version(
+        at(10),
+        revision_id="v1",
+        payload="A",
+        state=data_state(quality=QualityState.PARTIAL, conflict=ConflictState.OPEN),
+    )
+    assert first.content_digest() != restated.content_digest()
+    selection = select_as_of([first, restated], CUTOFF)
+    assert selection.status is SelectionStatus.SELECTED
+    assert selection.selected is not None
+    assert selection.selected.source_version() == first.source_version()
+    assert sorted(d.disposition for d in selection.decisions) == sorted(
+        [D.SELECTED, D.DUPLICATE_OBSERVATION]
+    )
+
+
+def test_same_source_version_with_different_receipt_and_raw_lineage_is_not_unresolved() -> None:
+    first = version(at(10), revision_id="v1", payload="A", raw=True)
+    refetched = version(at(11), revision_id="v1", payload="A", raw=True)
+    verified = version(
+        at(10),
+        revision_id="v1",
+        payload="A",
+        basis=KnownAtBasis.VERIFIED_SOURCE_AVAILABILITY,
+        received_at=at(11.5),
+    )
+    assert first.raw_snapshot != refetched.raw_snapshot
+    selection = select_as_of([refetched, verified, first], CUTOFF)
+    assert selection.status is SelectionStatus.SELECTED
+    # The earliest eligible observation is selected; ties break on the record digest.
+    assert selection.selected == min(first, verified, key=lambda r: r.content_digest())
+    assert sorted(d.disposition for d in selection.decisions) == sorted(
+        [D.SELECTED, D.DUPLICATE_OBSERVATION, D.DUPLICATE_OBSERVATION]
+    )
+
+
+def test_same_source_version_with_different_payload_is_unresolved() -> None:
+    first = version(at(10), revision_id="v1", payload="A")
+    conflicting = version(at(10), revision_id="v1", payload="B")
+    selection = select_as_of([first, conflicting], CUTOFF)
+    assert selection.status is SelectionStatus.UNRESOLVED
+    assert {d.disposition for d in selection.decisions} == {D.UNRESOLVED}
+
+
+def test_revision_ids_are_scoped_by_source() -> None:
+    a = version(at(9), revision_id="1", payload="A", source_id="provider-a")
+    b = version(at(10), revision_id="1", payload="B", source_id="provider-b")
+    assert a.source_version() != b.source_version()
+    selection = select_as_of([a, b], CUTOFF)
+    assert selection.status is SelectionStatus.SELECTED
+    assert selection.selected == b
+    assert selection.selected.source_version() == SourceVersionRef(
+        source_id="provider-b", revision_id="1"
+    )
+
+
+def test_same_revision_label_from_two_sources_at_the_same_instant_is_a_tie() -> None:
+    a = version(at(10), revision_id="1", payload="A", source_id="provider-a")
+    b = version(at(10), revision_id="1", payload="A", source_id="provider-b")
     assert select_as_of([a, b], CUTOFF).status is SelectionStatus.UNRESOLVED
+
+
+def test_observation_identity_results_are_independent_of_input_order() -> None:
+    records = [
+        version(at(9), revision_id="v1", payload="A", raw=True),
+        version(at(10), revision_id="v2", payload="B"),
+        version(at(10.5), revision_id="v2", payload="B", raw=True),
+        version(at(10), revision_id="v2", payload="B", state=data_state(QualityState.ERROR)),
+        version(at(10), revision_id="1", payload="X", source_id="provider-b", expires_at=at(11)),
+        version(at(13), revision_id="v3", payload="C"),
+    ]
+    results = {select_as_of(p, CUTOFF).to_json() for p in itertools.permutations(records)}
+    assert len(results) == 1
+    selection = select_as_of(records, CUTOFF)
+    assert selection.selected is not None
+    assert selection.selected.source_version() == SourceVersionRef(
+        source_id="provider-a", revision_id="v2"
+    )
+
+
+def test_changing_only_data_state_keeps_status_and_selected_source_version() -> None:
+    def history(state: DataState) -> list[PitRecord]:
+        return [
+            version(at(9), revision_id="v1", state=state),
+            version(at(10), revision_id="v2", state=state),
+            version(at(10.5), revision_id="v2", payload="value@" + at(10).isoformat()),
+        ]
+
+    good = select_as_of(history(data_state()), CUTOFF)
+    bad = select_as_of(
+        history(data_state(QualityState.UNAVAILABLE, conflict=ConflictState.OPEN)), CUTOFF
+    )
+    assert good.status is bad.status is SelectionStatus.SELECTED
+    assert good.selected is not None and bad.selected is not None
+    assert good.selected.source_version() == bad.selected.source_version()
+    assert good.selected.payload_sha256 == bad.selected.payload_sha256
+    assert good.selected.provenance.data_state != bad.selected.provenance.data_state
 
 
 def test_selected_version_identity_and_lineage_are_preserved() -> None:
@@ -214,6 +380,7 @@ def test_selected_version_identity_and_lineage_are_preserved() -> None:
     (decision,) = selection.decisions
     assert decision.revision_id == "v1"
     assert decision.source_id == "provider-b"
+    assert decision.payload_sha256 == v1.payload_sha256
     assert decision.record_digest == v1.content_digest()
     assert v1.raw_snapshot is not None
     assert decision.raw_payload_sha256 == v1.raw_snapshot.payload_sha256
@@ -251,7 +418,7 @@ def test_selection_contract_rejects_inconsistent_payloads() -> None:
     with pytest.raises(ContractError):
         AsOfSelection.from_dict(payload)
     payload = select_as_of([version(at(9), revision_id="v1")], CUTOFF).to_dict()
-    payload["decisions"][0]["disposition"] = "SUPERSEDED"
+    payload["decisions"][0]["disposition"] = "ELIGIBLE_NOT_LATEST"
     with pytest.raises(ContractError):
         AsOfSelection.from_dict(payload)
 

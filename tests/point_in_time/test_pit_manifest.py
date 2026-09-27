@@ -82,7 +82,8 @@ def test_manifest_is_complete() -> None:
     counts = {c.disposition: c.count for c in body.disposition_counts}
     assert counts == {
         RecordDisposition.SELECTED: 2,
-        RecordDisposition.SUPERSEDED: 2,
+        RecordDisposition.DUPLICATE_OBSERVATION: 0,
+        RecordDisposition.ELIGIBLE_NOT_LATEST: 2,
         RecordDisposition.REJECTED: 3,
         RecordDisposition.UNRESOLVED: 2,
     }

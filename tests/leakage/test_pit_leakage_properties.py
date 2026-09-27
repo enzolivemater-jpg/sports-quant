@@ -17,11 +17,15 @@ from pit_builders import at, data_state, version  # noqa: E402
 from sports_quant.contracts.common import instant  # noqa: E402
 from sports_quant.contracts.data_state import (  # noqa: E402
     ConflictState,
+    DataState,
     FreshnessState,
     QualityState,
     VerificationState,
 )
-from sports_quant.data.point_in_time.eligibility import rejection_reasons  # noqa: E402
+from sports_quant.data.point_in_time.eligibility import (  # noqa: E402
+    PitRejectionReason,
+    rejection_reasons,
+)
 from sports_quant.data.point_in_time.records import PitRecord  # noqa: E402
 from sports_quant.data.point_in_time.selection import (  # noqa: E402
     AsOfSelection,
@@ -30,6 +34,7 @@ from sports_quant.data.point_in_time.selection import (  # noqa: E402
 )
 
 SEEDS = range(300)
+UNIDENTIFIED_ONLY = (PitRejectionReason.SOURCE_VERSION_UNRESOLVED,)
 
 
 def _random_version(rng: random.Random, *, known_at: datetime | None) -> PitRecord:
@@ -96,16 +101,48 @@ def test_a_selected_version_was_known_by_the_cutoff_and_is_fully_eligible(seed: 
     history = _history(rng, cutoff) or [_random_version(rng, known_at=at(0))]
     selection = select_as_of(history, cutoff)
     if selection.selected is not None:
-        known_at = selection.selected.provenance.temporal.known_at
+        chosen = selection.selected
+        known_at = chosen.provenance.temporal.known_at
         assert known_at is not None and instant(known_at) <= instant(cutoff)
-        assert rejection_reasons(selection.selected, cutoff) == ()
-        later_known = [
-            r
-            for r in history
-            if r.provenance.temporal.known_at is not None
-            and known_at < r.provenance.temporal.known_at <= cutoff
-        ]
-        assert later_known == []
+        assert rejection_reasons(chosen, cutoff) == ()
+        for record in history:
+            if rejection_reasons(record, cutoff) in ((), UNIDENTIFIED_ONLY):
+                other_known_at = record.provenance.temporal.known_at
+                assert other_known_at is not None
+                if record.source_version() == chosen.source_version():
+                    # The selected observation is the earliest eligible one of its version.
+                    assert other_known_at >= known_at
+                else:
+                    # Every other eligible (or unidentified) version was known strictly before.
+                    assert other_known_at < known_at
+
+
+@pytest.mark.parametrize("seed", SEEDS)
+def test_versions_invalid_at_the_cutoff_never_displace_an_eligible_one(seed: int) -> None:
+    # P1-02: knowing a version that is not yet valid / expired at the cutoff does not
+    # supersede anything; it is rejected and the outcome is unchanged.
+    rng = random.Random(seed)
+    cutoff = _cutoff(rng)
+    history = _history(rng, cutoff) or [_random_version(rng, known_at=at(0))]
+    known = [at(h / 2) for h in range(48) if at(h / 2) <= cutoff]
+    invalid = [
+        version(
+            rng.choice(known),
+            revision_id=f"fresh-{index}",
+            payload=f"fresh-{index}",
+            **rng.choice(
+                [
+                    {"valid_from": cutoff + (at(rng.randrange(1, 8)) - at(0))},
+                    {"expires_at": cutoff - (at(rng.randrange(0, 4)) - at(0))},
+                    {"valid_to": cutoff - (at(rng.randrange(1, 4)) - at(0))},
+                ]
+            ),
+        )
+        for index in range(rng.randrange(1, 4))
+    ]
+    base = select_as_of(history, cutoff)
+    with_invalid = select_as_of(history + invalid, cutoff)
+    assert _outcome(with_invalid) == _outcome(base)
 
 
 @pytest.mark.parametrize("seed", SEEDS)
@@ -119,35 +156,39 @@ def test_outcome_is_independent_of_input_order(seed: int) -> None:
         assert select_as_of(history, cutoff) == reference
 
 
+def _random_state(rng: random.Random) -> DataState:
+    return data_state(
+        rng.choice(list(QualityState)),
+        rng.choice(list(FreshnessState)),
+        rng.choice(list(VerificationState)),
+        rng.choice(list(ConflictState)),
+    )
+
+
 @pytest.mark.parametrize("seed", SEEDS)
-def test_data_state_never_changes_status_or_selected_revision(seed: int) -> None:
+def test_data_state_never_changes_status_or_selected_source_version(seed: int) -> None:
+    # P1-03: DataState belongs to the observation, not to the source version, so
+    # restating it (even merging observations) never changes the PIT outcome.
     rng = random.Random(seed)
     cutoff = _cutoff(rng)
     history = _history(rng, cutoff) or [_random_version(rng, known_at=at(0))]
-    restated = [
-        dataclasses.replace(
-            r,
-            provenance=dataclasses.replace(
-                r.provenance,
-                data_state=data_state(
-                    QualityState.ERROR,
-                    FreshnessState.STALE,
-                    VerificationState.UNVERIFIED,
-                    ConflictState.OPEN,
-                ),
-            ),
-        )
-        for r in history
-    ]
+    uniform = _random_state(rng)
 
-    def summary(selection: AsOfSelection) -> tuple[SelectionStatus, str | None]:
+    def restate(record: PitRecord, state: DataState) -> PitRecord:
+        provenance = dataclasses.replace(record.provenance, data_state=state)
+        return dataclasses.replace(record, provenance=provenance)
+
+    def summary(selection: AsOfSelection) -> tuple[object, ...]:
         chosen = selection.selected
-        return selection.status, None if chosen is None else chosen.payload_sha256
+        if chosen is None:
+            return (selection.status,)
+        return selection.status, chosen.source_version(), chosen.payload_sha256
 
-    # Restating the data state can merge versions that differed only in data state,
-    # so compare only when the distinct-version structure is unchanged.
-    if len({r.content_digest() for r in restated}) == len({r.content_digest() for r in history}):
-        assert summary(select_as_of(restated, cutoff)) == summary(select_as_of(history, cutoff))
+    reference = summary(select_as_of(history, cutoff))
+    assert summary(select_as_of([restate(r, uniform) for r in history], cutoff)) == reference
+    randomized = [restate(r, _random_state(rng)) for r in history]
+    assert summary(select_as_of(randomized, cutoff)) == reference
+    assert summary(select_as_of(history + randomized, cutoff)) == reference
 
 
 @pytest.mark.parametrize("seed", SEEDS)
