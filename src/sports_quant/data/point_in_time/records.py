@@ -21,7 +21,7 @@ import re
 from dataclasses import dataclass
 from datetime import datetime
 
-from sports_quant.contracts.common import Contract, ContractError, require_non_empty
+from sports_quant.contracts.common import Contract, ContractError, instant, require_non_empty
 from sports_quant.contracts.provenance import Provenance
 
 _SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
@@ -82,6 +82,23 @@ class PitRecord(Contract):
         if self.revision_id is not None:
             require_non_empty(self.revision_id, "revision_id")
         require_sha256(self.payload_sha256, "payload_sha256")
+        # The raw snapshot is the response this record was normalized from, so it must
+        # come from the same source and the same receipt. Its payload digest covers the
+        # raw response, not the normalized payload, and is not compared.
+        if self.raw_snapshot is not None:
+            if self.raw_snapshot.source_id != self.provenance.source.source_id:
+                raise ContractError(
+                    "RAW_SNAPSHOT_SOURCE_MISMATCH",
+                    "raw_snapshot.source_id must equal provenance.source.source_id",
+                )
+            received_at = self.provenance.temporal.received_at
+            if received_at is None or instant(self.raw_snapshot.received_at) != instant(
+                received_at
+            ):
+                raise ContractError(
+                    "RAW_SNAPSHOT_RECEIVED_AT_MISMATCH",
+                    "raw_snapshot.received_at must be the instant of provenance received_at",
+                )
 
     def source_version(self) -> SourceVersionRef | None:
         """Source-version identity, or ``None`` when the source gives no revision."""

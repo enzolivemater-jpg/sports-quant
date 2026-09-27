@@ -40,19 +40,24 @@ times (`INVALID_TIMEZONE`). A `PitRecord` therefore cannot carry an invalid time
 
 A `revision_id` is always scoped by its `source_id`. A source-content conflict is one
 source version with different `payload_sha256`; different `DataState`, receipt or
-raw-snapshot lineage alone never is.
+raw-snapshot lineage alone never is. A `raw_snapshot` must come from the record's
+source (`RAW_SNAPSHOT_SOURCE_MISMATCH`) and share the instant of its `received_at`
+(`RAW_SNAPSHOT_RECEIVED_AT_MISMATCH`); its payload digest covers the raw response
+and is not compared with the normalized `payload_sha256`.
 
 ## As-of selection (`select_as_of`)
 
-Only observations known at or before the cutoff can influence the outcome. The
-selected source version is the latest-usable one among those with an eligible
-observation; an observation that is not yet valid or expired at the cutoff is
-`REJECTED` and does not supersede an older valid version (F2/F3 define no
-supersession). The key is `UNRESOLVED`, and nothing is selected, when a visible
-source version has conflicting content, when the order of the candidate versions is
-ambiguous (tie, or an older version observed again afterwards), or when an
+Only observations known at or before the cutoff can influence the outcome. A source
+version is usable from its first eligible observation; later observations of it are
+duplicates and never move it. The selected source version is the latest-usable one
+among those with an eligible observation; an observation that is not yet valid or
+expired at the cutoff is `REJECTED` and does not supersede an older valid version
+(F2/F3 define no supersession). The key is `UNRESOLVED`, and nothing is selected,
+when a visible source version has conflicting content, when eligible versions come
+from more than one `source_id` (F3 does not arbitrate between sources; that belongs
+to a later provider layer), when distinct candidate versions tie, or when an
 otherwise-eligible unidentified observation is at least as recent as the candidate.
-The earliest eligible observation of the selected version is `SELECTED` (ties:
+The first eligible observation of the selected version is `SELECTED` (ties:
 smallest record digest); its other eligible observations are
 `DUPLICATE_OBSERVATION`, other eligible versions `ELIGIBLE_NOT_LATEST`. All
 temporal comparisons are instant-based (`contracts.common.instant`, which rejects

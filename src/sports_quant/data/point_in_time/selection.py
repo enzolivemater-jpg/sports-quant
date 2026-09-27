@@ -16,15 +16,16 @@ Algorithm for the observations of one ``logical_key`` at a cutoff:
 4. Source-content conflict: if one source version has visible observations with
    different ``payload_sha256``, the key is UNRESOLVED.
 5. Candidates are the source versions with at least one eligible visible
-   observation. A source version is usable from its earliest eligible observation.
-   The selected source version is the candidate usable latest, provided every
-   eligible observation of every other candidate is known strictly before that
-   instant. Otherwise the order of the candidates is ambiguous (a tie, or an older
-   version observed again afterwards) and the key is UNRESOLVED.
+   observation. A source version is usable from its first eligible observation;
+   later observations of the same source version are duplicates and never move
+   it. If the candidates come from more than one ``source_id`` the key is
+   UNRESOLVED: F3 does not arbitrate between sources. Otherwise the selected
+   source version is the candidate usable latest; a tie between distinct source
+   versions is UNRESOLVED.
 6. An unidentified observation (no ``revision_id``) that is visible and otherwise
    eligible, known at or after the selected version became usable (or at all, when
    no candidate exists), makes the key UNRESOLVED: it may be a newer version.
-7. Otherwise the earliest eligible observation of the selected source version is
+7. Otherwise the first eligible observation of the selected source version is
    SELECTED (ties: smallest record digest); its other eligible observations are
    DUPLICATE_OBSERVATION and eligible observations of other source versions are
    ELIGIBLE_NOT_LATEST. With no candidate the key is NO_ELIGIBLE_VERSION.
@@ -178,15 +179,17 @@ def select_as_of(records: Iterable[PitRecord], decision_cutoff_at: datetime) -> 
         for source_version, digests in eligible.items()
     }
 
+    # F3 does not arbitrate between sources: several eligible source chains for one
+    # logical key are left to a later provider layer.
+    if len({source_version.source_id for source_version in eligible}) > 1:
+        unresolved = True
+
     selected_version: SourceVersionRef | None = None
     if not unresolved and eligible:
-        latest = max(usable_from, key=usable_from.__getitem__)
-        last_seen = {
-            source_version: max(_known_at(observations[digest]) for digest in digests)
-            for source_version, digests in eligible.items()
-        }
-        if all(last_seen[other] < usable_from[latest] for other in eligible if other != latest):
-            selected_version = latest
+        latest = max(usable_from.values())
+        candidates = [sv for sv, usable in usable_from.items() if usable == latest]
+        if len(candidates) == 1:
+            selected_version = candidates[0]
         else:
             unresolved = True
 

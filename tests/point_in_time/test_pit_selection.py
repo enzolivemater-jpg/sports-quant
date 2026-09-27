@@ -258,14 +258,39 @@ def test_invalid_revision_known_after_cutoff_cannot_affect_earlier_replay() -> N
     } == {D.REJECTED}
 
 
-def test_older_version_observed_again_after_newer_one_is_unresolved() -> None:
-    # Without supersession semantics the order of v1 and v2 at 12:00 is ambiguous.
+def test_older_version_observed_again_after_newer_one_keeps_newer_selected() -> None:
+    # P1-04 regression: a re-observation of v1 is the same source version (same source,
+    # revision and payload), so it does not move v1's chronology past v2.
     v1 = version(at(9), revision_id="v1", payload="A")
     v2 = version(at(10), revision_id="v2", payload="B")
-    v1_again = version(at(11), revision_id="v1", payload="A")
+    v1_again = version(at(11), revision_id="v1", payload="A", raw=True)
     selection = select_as_of([v1, v2, v1_again], CUTOFF)
-    assert selection.status is SelectionStatus.UNRESOLVED
+    assert selection.status is SelectionStatus.SELECTED
+    assert selection.selected == v2
+    dispositions = {d.record_digest: d.disposition for d in selection.decisions}
+    assert dispositions == {
+        v1.content_digest(): D.ELIGIBLE_NOT_LATEST,
+        v1_again.content_digest(): D.ELIGIBLE_NOT_LATEST,
+        v2.content_digest(): D.SELECTED,
+    }
     assert select_as_of([v1, v2, v1_again], at(10.5)).selected == v2
+
+
+def test_later_eligible_observation_does_not_move_a_version_first_seen_invalid() -> None:
+    # v1 first seen 09:00 but expired in that observation; its first *eligible*
+    # observation (11:00) is what makes it usable, so it is the latest candidate.
+    v1_expired = version(at(9), revision_id="v1", payload="A", expires_at=at(9.5))
+    v2 = version(at(10), revision_id="v2", payload="B")
+    v1_valid = version(at(11), revision_id="v1", payload="A")
+    selection = select_as_of([v1_expired, v2, v1_valid], CUTOFF)
+    assert selection.selected == v1_valid
+
+
+def test_distinct_source_versions_first_usable_together_stay_unresolved() -> None:
+    a = version(at(10), revision_id="a", payload="A")
+    b = version(at(10), revision_id="b", payload="B")
+    a_again = version(at(11), revision_id="a", payload="A")
+    assert select_as_of([a, b, a_again], CUTOFF).status is SelectionStatus.UNRESOLVED
 
 
 # P1-03 regressions: source-version identity is (source_id, revision_id) with content
@@ -319,21 +344,50 @@ def test_same_source_version_with_different_payload_is_unresolved() -> None:
 
 
 def test_revision_ids_are_scoped_by_source() -> None:
+    # A rejected provider-b record reusing the label "1" with other content is not a
+    # conflict with provider-a's "1": the namespaces are distinct.
     a = version(at(9), revision_id="1", payload="A", source_id="provider-a")
-    b = version(at(10), revision_id="1", payload="B", source_id="provider-b")
+    b = version(at(10), revision_id="1", payload="B", source_id="provider-b", expires_at=at(11))
     assert a.source_version() != b.source_version()
     selection = select_as_of([a, b], CUTOFF)
     assert selection.status is SelectionStatus.SELECTED
-    assert selection.selected == b
+    assert selection.selected == a
     assert selection.selected.source_version() == SourceVersionRef(
-        source_id="provider-b", revision_id="1"
+        source_id="provider-a", revision_id="1"
     )
 
 
-def test_same_revision_label_from_two_sources_at_the_same_instant_is_a_tie() -> None:
+# P1-05 regressions: F3 does not arbitrate between sources.
+
+
+@pytest.mark.parametrize(("known_a", "known_b"), [(9, 10), (10, 9), (10, 10)])
+def test_eligible_versions_from_two_sources_are_not_arbitrated(
+    known_a: float, known_b: float
+) -> None:
+    a = version(at(known_a), revision_id="a1", payload="A", source_id="provider-a")
+    b = version(at(known_b), revision_id="b1", payload="B", source_id="provider-b")
+    selection = select_as_of([a, b], CUTOFF)
+    assert selection.status is SelectionStatus.UNRESOLVED
+    assert selection.selected is None
+    assert {d.disposition for d in selection.decisions} == {D.UNRESOLVED}
+
+
+def test_same_revision_label_from_two_sources_is_not_arbitrated() -> None:
     a = version(at(10), revision_id="1", payload="A", source_id="provider-a")
     b = version(at(10), revision_id="1", payload="A", source_id="provider-b")
     assert select_as_of([a, b], CUTOFF).status is SelectionStatus.UNRESOLVED
+
+
+def test_second_source_known_after_cutoff_does_not_affect_replay() -> None:
+    a = version(at(9), revision_id="a1", source_id="provider-a")
+    b = version(at(14), revision_id="b1", source_id="provider-b")
+    assert select_as_of([a, b], CUTOFF).selected == a
+
+
+def test_second_source_rejected_at_cutoff_does_not_block() -> None:
+    a = version(at(9), revision_id="a1", source_id="provider-a")
+    b = version(at(10), revision_id="b1", source_id="provider-b", valid_from=at(13))
+    assert select_as_of([a, b], CUTOFF).selected == a
 
 
 def test_observation_identity_results_are_independent_of_input_order() -> None:

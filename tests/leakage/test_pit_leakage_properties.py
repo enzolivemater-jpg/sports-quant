@@ -26,7 +26,7 @@ from sports_quant.data.point_in_time.eligibility import (  # noqa: E402
     PitRejectionReason,
     rejection_reasons,
 )
-from sports_quant.data.point_in_time.records import PitRecord  # noqa: E402
+from sports_quant.data.point_in_time.records import PitRecord, SourceVersionRef  # noqa: E402
 from sports_quant.data.point_in_time.selection import (  # noqa: E402
     AsOfSelection,
     SelectionStatus,
@@ -105,16 +105,75 @@ def test_a_selected_version_was_known_by_the_cutoff_and_is_fully_eligible(seed: 
         known_at = chosen.provenance.temporal.known_at
         assert known_at is not None and instant(known_at) <= instant(cutoff)
         assert rejection_reasons(chosen, cutoff) == ()
+        first_eligible: dict[object, datetime] = {}
         for record in history:
-            if rejection_reasons(record, cutoff) in ((), UNIDENTIFIED_ONLY):
-                other_known_at = record.provenance.temporal.known_at
-                assert other_known_at is not None
-                if record.source_version() == chosen.source_version():
-                    # The selected observation is the earliest eligible one of its version.
-                    assert other_known_at >= known_at
-                else:
-                    # Every other eligible (or unidentified) version was known strictly before.
-                    assert other_known_at < known_at
+            record_known_at = record.provenance.temporal.known_at
+            assert record_known_at is not None
+            reasons = rejection_reasons(record, cutoff)
+            if reasons == UNIDENTIFIED_ONLY:
+                # An otherwise-eligible unidentified observation was known strictly before.
+                assert record_known_at < known_at
+            elif reasons == ():
+                key = record.source_version()
+                first_eligible[key] = min(first_eligible.get(key, record_known_at), record_known_at)
+        # The selected observation is the first eligible one of its version; every other
+        # eligible source version (necessarily from the same source) became usable before.
+        assert first_eligible.pop(chosen.source_version()) == known_at
+        for other_version, usable_from in first_eligible.items():
+            assert isinstance(other_version, SourceVersionRef)
+            assert other_version.source_id == chosen.provenance.source.source_id
+            assert usable_from < known_at
+
+
+@pytest.mark.parametrize("seed", SEEDS)
+def test_later_duplicate_observations_never_change_the_outcome(seed: int) -> None:
+    # P1-04: observing an already-known source version again (same source, revision and
+    # payload, possibly different DataState/receipt) never moves its chronology.
+    rng = random.Random(seed)
+    cutoff = _cutoff(rng)
+    history = _history(rng, cutoff) or [_random_version(rng, known_at=at(0))]
+    duplicates: list[PitRecord] = []
+    for record in history:
+        known_at = record.provenance.temporal.known_at
+        if known_at is None or record.revision_id is None or rng.random() < 0.3:
+            continue
+        later = known_at + (at(rng.randrange(1, 12) / 2) - at(0))
+        temporal = dataclasses.replace(
+            record.provenance.temporal, known_at=later, received_at=later
+        )
+        provenance = dataclasses.replace(
+            record.provenance, temporal=temporal, data_state=_random_state(rng)
+        )
+        duplicates.append(dataclasses.replace(record, provenance=provenance))
+
+    def summary(selection: AsOfSelection) -> tuple[object, ...]:
+        chosen = selection.selected
+        return selection.status, None if chosen is None else chosen.source_version()
+
+    base = select_as_of(history, cutoff)
+    assert summary(select_as_of(history + duplicates, cutoff)) == summary(base)
+
+
+@pytest.mark.parametrize("seed", SEEDS)
+def test_an_eligible_second_source_is_never_arbitrated(seed: int) -> None:
+    # P1-05: F3 never ranks source chains against each other.
+    rng = random.Random(seed)
+    cutoff = _cutoff(rng)
+    history = _history(rng, cutoff) or [_random_version(rng, known_at=at(0))]
+    half_hours = int((cutoff - at(0)) / (at(0.5) - at(0)))
+    other = version(
+        at(rng.randrange(0, half_hours + 1) / 2),
+        revision_id="other-rev",
+        payload=rng.choice(["A", "B", "C"]),
+        source_id="provider-b",
+    )
+    selection = select_as_of(history + [other], cutoff)
+    if any(rejection_reasons(record, cutoff) == () for record in history):
+        # Two eligible source chains: never resolved by picking one.
+        assert selection.status is SelectionStatus.UNRESOLVED
+        assert selection.selected is None
+    elif selection.selected is not None:
+        assert selection.selected == other
 
 
 @pytest.mark.parametrize("seed", SEEDS)
