@@ -9,7 +9,13 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime
 
-from sports_quant.contracts.common import CanonicalEnum, Contract, ContractError, instant
+from sports_quant.contracts.common import (
+    CanonicalEnum,
+    Contract,
+    ContractError,
+    instant,
+    require_aware_datetime,
+)
 
 
 class KnownAtBasis(CanonicalEnum):
@@ -65,9 +71,11 @@ class TemporalMetadata(Contract):
 def require_critical_known_at(temporal: TemporalMetadata, decision_cutoff_at: datetime) -> None:
     """Enforce the critical PIT rule ``known_at <= decision_cutoff_at``.
 
-    Missing ``known_at`` is rejected rather than treated as usable.
+    Missing ``known_at`` is rejected rather than treated as usable. A naive cutoff is
+    rejected (``NAIVE_DATETIME``) before anything else is checked.
     """
 
+    require_aware_datetime(decision_cutoff_at, "decision_cutoff_at")
     if temporal.known_at is None:
         raise ContractError(
             "KNOWN_AT_MISSING",
