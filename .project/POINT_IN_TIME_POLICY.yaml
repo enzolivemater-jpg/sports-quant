@@ -1,7 +1,148 @@
 schema_version: "1.0"
-status: REPOSITORY_SLOT_ONLY
+policy: SPORTS_QUANT_POINT_IN_TIME
+status: APPROVED_F3_POLICY
 canonical_authority: FOUNDATION_DECISIONS_v0.1.yaml
-implementation_due_phase: F3
-rule: >-
-  This F1 file reserves the canonical repository path only. It introduces no new policy and must not
-  be treated as resolving any OPEN_DECISION. Populate only in the phase authorized by the handover.
+implementation_phase: F3
+
+purpose: >-
+  Define the canonical point-in-time rules used to determine whether an exact
+  record/source version could legitimately have been known and usable at a
+  historical SPORTS QUANT decision cutoff, without introducing provider
+  arbitration, data-quality gating, model logic, or speculative timestamps.
+
+core_invariants:
+  - known_at_must_be_defensible
+  - known_at_must_not_be_reconstructed_speculatively
+  - critical_historical_use_requires_known_at_lte_decision_cutoff_at
+  - missing_defensible_known_at_is_not_pit_eligible
+  - timestamps_are_timezone_aware_at_domain_boundaries
+  - temporal_ordering_is_by_instant_not_wall_clock
+  - later_information_must_not_change_an_earlier_replay
+  - no_missing_temporal_value_is_replaced_with_zero_or_an_implicit_estimate
+
+known_at:
+  canonical_definition: >-
+    Earliest verifiable instant at which the information could legitimately be
+    used by SPORTS QUANT.
+  allowed_basis:
+    - SYSTEM_RECEIPT
+    - VERIFIED_SOURCE_AVAILABILITY
+  speculative_fallback: PROHIBITED
+
+eligibility:
+  required_rejection_semantics:
+    - MISSING_KNOWN_AT
+    - KNOWN_AFTER_CUTOFF
+    - INVALID_TIMEZONE
+    - EXPIRED_AT_CUTOFF
+    - NOT_YET_VALID_AT_CUTOFF
+    - SOURCE_VERSION_UNRESOLVED
+  rule: >-
+    PIT eligibility is determined only from temporal, validity, version-identity
+    and integrity semantics defined for F3. Data-quality/conflict business
+    qualification is outside this layer.
+
+validity_windows:
+  valid_from: INCLUSIVE
+  valid_to: INCLUSIVE
+  expires_at: EXCLUSIVE
+  missing_optional_boundary_creates_implicit_timestamp: false
+  rule: >-
+    A version rejected by its validity window does not implicitly supersede or
+    invalidate another source version that remains PIT-eligible at the cutoff.
+
+source_version_identity:
+  identity_fields:
+    - source_id
+    - revision_id
+  content_identity_field: payload_sha256
+  full_record_digest_is_source_version_identity: false
+  rule: >-
+    A source-content conflict exists when the same source_id and revision_id
+    refer to different normalized payload_sha256 values. Observation metadata,
+    DataState, receipt metadata and raw-snapshot lineage alone do not redefine
+    source-version identity.
+
+observation_semantics:
+  later_duplicate_observation_moves_source_version_chronology: false
+  source_version_usable_from: FIRST_DEFENSIBLE_ELIGIBLE_OBSERVATION
+  rule: >-
+    Re-observing the same source version and content does not create a newer
+    source version and must not alter historical source-version ordering.
+
+cross_source_behavior:
+  arbitration_in_f3: PROHIBITED
+  multiple_eligible_source_chains: UNRESOLVED
+  rule: >-
+    F3 must not select between different source_id chains using known_at,
+    SourceTier, provider rank or any other preference. Provider/source arbitration
+    belongs to a later governed provider/data layer.
+
+unidentified_versions:
+  rule: >-
+    A visible otherwise-usable observation whose source version cannot be
+    defensibly identified must not be silently ordered as a known source version.
+    Ambiguity must fail closed.
+
+raw_snapshot_lineage:
+  raw_snapshot_optional: true
+  when_present:
+    source_id_must_equal_provenance_source_id: true
+    received_at_must_equal_provenance_received_at_by_instant: true
+    raw_payload_digest_may_differ_from_normalized_payload_digest: true
+  purpose: >-
+    Preserve immutable source evidence linking normalized PIT records to the raw
+    response or legally permitted equivalent from which they were derived.
+
+data_state_separation:
+  quality_state_affects_pit_eligibility: false
+  conflict_state_affects_pit_eligibility: false
+  freshness_state_affects_pit_eligibility: false
+  verification_state_affects_pit_eligibility: false
+  preserve_all_four_axes: true
+  rule: >-
+    F3 preserves F2 DataState without collapsing or reinterpreting its dimensions.
+    Later governed qualification/gate layers decide whether data quality or
+    conflicts imply REVIEW, NO_BET or BLOCKED.
+
+replay:
+  deterministic: true
+  input_order_must_not_change_logical_result: true
+  revision_first_known_after_cutoff_may_change_earlier_replay: false
+  current_state_only_data_may_masquerade_as_historical: false
+  rule: >-
+    If a historical version was not stored or cannot be reconstructed with
+    defensible point-in-time evidence, F3 must fail closed rather than fabricate it.
+
+manifest:
+  deterministic_content_hash_required: true
+  created_at_excluded_from_deterministic_content_hash: true
+  must_preserve:
+    - decision_cutoff_at
+    - selected_source_version_identity
+    - record_decisions
+    - rejection_reasons
+    - raw_lineage_when_available
+    - code_version
+    - dataset_or_snapshot_reference
+
+non_goals:
+  - provider_fetching
+  - provider_preference_or_arbitration
+  - football_feature_engineering
+  - model_training
+  - calibration
+  - P_safe
+  - no_vig
+  - S_Tier
+  - business_data_quality_gating
+  - backtest_metrics
+  - optimizer
+  - frontend
+  - automated_wagering
+
+governance:
+  F3_may_not_create_new_known_at_basis_without_approval: true
+  F3_may_not_invent_provider_priority: true
+  F3_may_not_resolve_OPEN_DECISIONS_silently: true
+  later_layers_may_not_weaken_PIT_invariants: true
