@@ -1,13 +1,13 @@
 # CURRENT TASK
 
 Phase:
-`F3_POINT_IN_TIME_KERNEL`
+`F4_FOOTBALL_DATA_LAYER`
 
 Status:
 `READY_TO_IMPLEMENT`
 
 Date:
-2026-09-23
+2026-10-02
 
 ## F0 governance
 
@@ -72,43 +72,95 @@ CLOSED (completed)
 OD-01 through OD-29:
 UNCHANGED
 
-Recorded F3 authorization (`.project/PHASE_GATES.toml`):
-- current_phase = F3_POINT_IN_TIME_KERNEL
-- [f3] authorized = true
+## F3 completion
 
-Note: F3 authorization is recorded in `.project/PHASE_GATES.toml` but is not yet independently machine-enforced by `scripts/validate_phase_gates.py`.
+F3 Point-in-Time Kernel is complete, merged and green.
+
+Final F3 PR:
+#22
+
+Final independently reviewed HEAD:
+`43a15d88b5a5837c54057f26aa50c9b1f1b2e497`
+
+Merge commit on main:
+`3304c17d1204ec835a6ef21bb2845639b93cd33f`
+
+Final review result:
+- independent review: GO
+- P0 open: 0
+- P1 open: 0
+
+Merge-commit validation:
+- CI quality: SUCCESS
+- PostgreSQL integration: SUCCESS
+- Security dependency audit: SUCCESS
+- Security secret scan: SUCCESS
+
+Canonical PIT policy:
+`.project/POINT_IN_TIME_POLICY.yaml` status = `APPROVED_F3_POLICY`
+
+Issue #6:
+CLOSED (completed)
+
+OD-01 through OD-29:
+UNCHANGED
+
+Recorded F4 authorization (`.project/PHASE_GATES.toml`):
+- current_phase = F4_FOOTBALL_DATA_LAYER
+- [f4] authorized = true
+
+Note: F3 and F4 authorization are recorded in `.project/PHASE_GATES.toml` but are not independently machine-enforced by `scripts/validate_phase_gates.py`.
 
 ## Active implementation task
 
 Issue:
-#6 — F3 Point-in-Time Kernel
+#7 — F4 Football Data Layer
 
 Primary handoff:
-`.ai/handoffs/CLAUDE_F3_IMPLEMENTATION_HANDOFF.md`
+`.ai/handoffs/CLAUDE_F4_IMPLEMENTATION_HANDOFF.md`
 
 Primary spec:
-`docs/contracts/F3_POINT_IN_TIME_KERNEL_SPEC_DRAFT.md`
+`docs/contracts/F4_FOOTBALL_DATA_LAYER_SPEC_DRAFT.md`
 
-## F3 scope
+## F4 objective
 
-Implement reusable, sport-agnostic, deterministic point-in-time logic on top of the
-F2 contracts (never redefining them locally):
-- PIT eligibility with explicit rejection reasons;
-- as-of version selection;
-- validity-window enforcement;
-- deterministic historical revision selection;
-- snapshot/replay manifest;
-- timezone-safe handling;
-- raw snapshot lineage hooks.
+Build the first provider-backed, provenance-complete, PIT-safe Football data layer on
+top of the F2 contracts and the F3 PIT kernel (never bypassing or redefining either):
 
-Football is the first consumer.
+provider -> immutable raw capture -> provider normalization -> canonical Football records
+-> F3 PIT materialization -> feature-ready dataset
+
+Football remains the first end-to-end pilot.
+
+## Phase 1 market scope
+
+Phase 1 markets ONLY:
+- `FOOTBALL_1X2`
+- `FOOTBALL_TOTAL_GOALS_MAIN`
+
+No Phase 2 Football market implementation.
+
+## Provider boundaries
+
+OD-24 remains OPEN.
+
+No provider is approved by this transition.
+
+- StatsBomb Open Data: `VERIFIED_RESEARCH_SANDBOX` only. It is NOT an approved
+  production provider, NOT an EPL 2024/25 provider, and NOT a standalone historical
+  context PIT source.
+- The Odds API: candidate historical odds provider only.
+- API-Football / Sportmonks / Sportradar: candidates only.
+
+No provider preference is resolved here. Any adapter built before OD-24 is resolved
+stays experimental with an explicit provider role and must not hardwire architecture
+to that provider.
 
 ## Hard boundaries
 
 Do not implement:
-- provider fetching/ingestion;
-- Football feature engineering;
-- model training;
+- Football feature engineering beyond validated materialization plumbing;
+- model training / Champion selection;
 - calibration algorithms;
 - a production P_safe formula;
 - no-vig;
@@ -121,15 +173,16 @@ Do not resolve any OPEN_DECISION silently.
 
 ## Completion discipline
 
-F3 must:
+F4 must:
 - preserve OD-01 through OD-29;
+- materialize PIT views through F3 only (no provider-specific as-of shortcut);
 - pass formatter/Ruff/mypy/pytest/Alembic/PostgreSQL/CI/Security;
-- satisfy the F3 acceptance criteria, including deterministic replay;
-- introduce no speculative timestamps;
+- satisfy the F4 acceptance criteria, including deterministic rebuild from fixed raw snapshots;
+- keep credentials out of the repository and logs;
 - receive independent critical review;
-- have no unresolved P0/P1 before F4.
+- have no unresolved P0/P1 before F5.
 
-Do not start F4 in the same change.
+Do not start F5 in the same change.
 
 ## Parallel non-blocking work
 
@@ -137,4 +190,4 @@ Issue #17:
 repository privacy / main protection remains admin work.
 
 Issue #18:
-provider trials/credentials remain relevant for later F4 work.
+provider trials/credentials — now relevant for F4 provider work.
