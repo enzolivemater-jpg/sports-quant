@@ -1,3 +1,3 @@
-# Reserved test boundary: `entity_resolution`
+# Tests: `entity_resolution`
 
-Created in F1. Tests for this domain begin only when its implementation phase is authorized.
+F4 deterministic provider-identifier to canonical-identifier mapping.

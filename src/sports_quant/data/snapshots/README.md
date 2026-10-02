@@ -1,3 +1,11 @@
-# Reserved package boundary: `data/snapshots`
+# `data/snapshots` — F4 immutable raw zone
 
-This directory is created by F1 as repository structure only. Its domain/business implementation belongs to F2 or a later authorized phase.
+| Module | Contents |
+| --- | --- |
+| `raw.py` | `RawCapture` (source, resource, redacted request parameters, `received_at`, provider timestamps, source revision, payload SHA-256/size, media type, HTTP status, ingestion version); `capture()`; `snapshot_ref()` → F3 `RawSnapshotRef` |
+| `store.py` | `RawSnapshotStore`: write-once, content-addressed filesystem store; re-verifies hashes on every read |
+
+Captures are never edited: a re-fetch or correction is a new capture. Credential-like
+request parameters are redacted at capture time and an unredacted one cannot be
+constructed; credentials in the resource string are rejected. See
+`data/ingestion/README.md` for the full F4 flow.
