@@ -1,3 +1,4 @@
-# Reserved test boundary: `leakage`
+# Tests: `leakage`
 
-Created in F1. Tests for this domain begin only when its implementation phase is authorized.
+Seeded property tests proving that information known after a decision cutoff never
+reaches a point-in-time replay.

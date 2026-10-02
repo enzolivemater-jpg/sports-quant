@@ -25,6 +25,7 @@ from sports_quant.contracts.common import (
     CanonicalEnum,
     Contract,
     ContractError,
+    instant,
     require_identifier,
     require_non_empty,
     require_probability,
@@ -71,7 +72,7 @@ class EvaluationPeriod(Contract):
     end: datetime
 
     def _validate(self) -> None:
-        if self.start > self.end:
+        if instant(self.start) > instant(self.end):
             raise ContractError("INVALID_EVALUATION_PERIOD", "start must be <= end")
 
 
@@ -147,7 +148,7 @@ class PredictabilityAssessment(Contract):
         require_artifact_kind(
             self.dataset_version_or_snapshot, DATA_ARTIFACT_KINDS, "dataset_version_or_snapshot"
         )
-        if self.known_at < self.evaluation_period.end:
+        if instant(self.known_at) < instant(self.evaluation_period.end):
             raise ContractError(
                 "KNOWN_AT_BEFORE_EVALUATION_END",
                 "an assessment cannot be known before its evaluation period ends",
@@ -170,7 +171,7 @@ def require_successor(
             "ASSESSMENT_VERSION_NOT_INCREASING",
             "successor assessment_version must be greater than previous",
         )
-    if successor.known_at < previous.known_at:
+    if instant(successor.known_at) < instant(previous.known_at):
         raise ContractError(
             "ASSESSMENT_KNOWN_AT_REGRESSION",
             "successor known_at cannot precede previous known_at",
