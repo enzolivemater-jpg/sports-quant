@@ -2,7 +2,7 @@
 
 Date: 2026-09-22
 
-Status: READY_AFTER_F3_ACCEPTANCE
+Status: READY_TO_IMPLEMENT
 
 Repository: `enzolivemater-jpg/sports-quant`
 Implementation issue: #7
@@ -15,6 +15,23 @@ Do not begin unless:
 - F3 merged/accepted;
 - current main CI/Security green;
 - no unresolved P0/P1 in PIT contracts.
+
+### Start condition status (recorded 2026-10-02)
+
+SATISFIED by:
+- F0 review gate passed (`foundation_review.status = PASS`, issue #1 closed);
+- F2 merged/accepted (PR #19, merge commit `d2cc02b5f5fbfbef2100eb07395e652a731bb31d`, review GO, P0=0, P1=0);
+- F3 merged/accepted (PR #22, final reviewed head `43a15d88b5a5837c54057f26aa50c9b1f1b2e497`, merge commit `3304c17d1204ec835a6ef21bb2845639b93cd33f`, independent review GO, issue #6 closed);
+- current main green (quality, postgres-integration, dependency-audit, secret-scan: SUCCESS on `3304c17d1204ec835a6ef21bb2845639b93cd33f`);
+- no unresolved F3 P0/P1 (P0=0, P1=0);
+- PIT policy approved (`.project/POINT_IN_TIME_POLICY.yaml` status `APPROVED_F3_POLICY`).
+
+Machine record: `[f4] authorized = true` in `.project/PHASE_GATES.toml` (recorded, not independently machine-enforced by `scripts/validate_phase_gates.py`).
+
+This transition approves no provider. OD-24 remains OPEN. Existing provider status is unchanged:
+- StatsBomb Open Data: `VERIFIED_RESEARCH_SANDBOX` only — not an approved production provider, not an EPL 2024/25 provider, not a standalone historical context PIT source;
+- The Odds API: candidate historical odds provider only;
+- API-Football / Sportmonks / Sportradar: candidates only.
 
 ## Primary spec
 

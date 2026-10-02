@@ -1,6 +1,6 @@
 # SPORTS QUANT — Current Execution Status
 
-Date: 2026-09-23
+Date: 2026-10-02
 
 Status: ACTIVE
 
@@ -22,20 +22,31 @@ F2 Domain Contracts:
 - issue #2: CLOSED
 
 F3 Point-in-Time Kernel:
-- status: READY_TO_IMPLEMENT
-- recorded F3 authorization: `f3.authorized = true` in `.project/PHASE_GATES.toml` (not yet machine-enforced; see below)
-- issue #6
+- status: COMPLETE / MERGED / GREEN
+- PR #22, final reviewed head `43a15d88b5a5837c54057f26aa50c9b1f1b2e497`
+- merge commit `3304c17d1204ec835a6ef21bb2845639b93cd33f`
+- independent review: GO (P0=0, P1=0)
+- post-merge checks on the merge commit: quality, postgres-integration, dependency-audit, secret-scan — all SUCCESS
+- canonical PIT policy: `.project/POINT_IN_TIME_POLICY.yaml` = `APPROVED_F3_POLICY`
+- issue #6: CLOSED
+
+F4 Football Data Layer:
+- status: READY_TO_IMPLEMENT once the F3 -> F4 transition PR merges
+- recorded F4 authorization: `f4.authorized = true` in `.project/PHASE_GATES.toml` (not machine-enforced; see below)
+- issue #7
+- Phase 1 markets only: `FOOTBALL_1X2`, `FOOTBALL_TOTAL_GOALS_MAIN`
+- OD-24 remains OPEN; no provider is approved by the transition
 
 Therefore:
-- F3 PIT kernel implementation: ALLOWED (issue #6)
-- F4+ implementation: BLOCKED until F3 acceptance
+- F4 Football Data Layer implementation: ALLOWED after the transition merges (issue #7)
+- F5+ implementation: BLOCKED until F4 acceptance
 - research/specification/provider probes: ALLOWED
 
 Machine enforcement:
 - `.project/PHASE_GATES.toml`
 - `scripts/validate_phase_gates.py` (enforces the F0 review and F2 authorization)
 
-F3 authorization is recorded in `.project/PHASE_GATES.toml` but is not yet independently machine-enforced by `scripts/validate_phase_gates.py`.
+F3 and F4 authorization are recorded in `.project/PHASE_GATES.toml` but are not independently machine-enforced by `scripts/validate_phase_gates.py`.
 
 ## Repository foundation
 
@@ -118,13 +129,21 @@ Current candidates:
 - Sportmonks
 - Sportradar
 
-The Odds API is deliberately separated because historical requests may consume paid quota.
+These remain candidates only; none is approved.
+
+StatsBomb Open Data:
+- `VERIFIED_RESEARCH_SANDBOX` only
+- NOT an approved production provider
+- NOT an EPL 2024/25 provider
+- NOT a standalone historical context PIT source
+
+The Odds API is deliberately separated because historical requests may consume paid quota. It remains a candidate historical odds provider only.
 
 Credentials/spend tracker:
 - issue #18
 
 OD-24:
-OPEN
+OPEN — no provider preference is resolved by the F3 -> F4 transition.
 
 ## Football model research readiness
 
@@ -146,8 +165,8 @@ No Champion model has been selected.
 ## Prepared implementation chain
 
 - F2 Contracts — issue #2 — COMPLETE
-- F3 PIT Kernel — #6 — READY_TO_IMPLEMENT (current critical path)
-- F4 Football Data Layer — #7
+- F3 PIT Kernel — #6 — COMPLETE
+- F4 Football Data Layer — #7 — READY_TO_IMPLEMENT (current critical path)
 - F5 Modeling Harness — #8
 - F6 Market Engine — #9
 - F7 Calibration / Uncertainty / P_safe — #10
@@ -164,14 +183,21 @@ Claude handoffs are prepared through F12.
 
 ## Immediate external blockers/actions
 
-### A. F3 PIT Kernel implementation
+### A. F4 Football Data Layer implementation
 Use:
-`.ai/handoffs/CLAUDE_F3_IMPLEMENTATION_HANDOFF.md`
+`.ai/handoffs/CLAUDE_F4_IMPLEMENTATION_HANDOFF.md`
 
 Spec:
-`docs/contracts/F3_POINT_IN_TIME_KERNEL_SPEC_DRAFT.md`
+`docs/contracts/F4_FOOTBALL_DATA_LAYER_SPEC_DRAFT.md`
 
-Requires independent critical review before F4.
+Issue:
+- #7
+
+Must consume F2 contracts and the F3 PIT kernel without bypassing either.
+
+OD-24 remains OPEN: provider adapters stay experimental with explicit roles until resolved.
+
+Requires independent critical review before F5.
 
 ### B. Repository hardening
 Make repository private and protect main.
@@ -207,7 +233,7 @@ Allowed research:
 - source/version manifests
 
 Not allowed before their phase gates:
-- production provider adapters
+- production (approved) provider adapters while OD-24 is OPEN
 - model implementation
 - production calibration/P_safe
 - S-Tier engine
@@ -216,10 +242,10 @@ Not allowed before their phase gates:
 
 ## Current project conclusion
 
-F0 and F2 gates are closed successfully; F3 is authorized.
+F0, F2 and F3 gates are closed successfully; F4 is authorized once the transition merges.
 
 Critical path:
-**F3 PIT Kernel -> F4 Football Data Layer -> F5 Modeling Harness -> ...**
+**F4 Football Data Layer -> F5 Modeling Harness -> ...**
 
 Primary data execution blocker:
 **provider credentials / later historical-odds spend**

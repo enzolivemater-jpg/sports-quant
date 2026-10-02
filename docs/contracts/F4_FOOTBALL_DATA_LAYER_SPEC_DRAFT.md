@@ -2,7 +2,7 @@
 
 Date: 2026-09-22
 
-Status: DRAFT_READY__BLOCKED_BY_F0_REVIEW_F2_F3
+Status: READY_TO_IMPLEMENT
 
 Pilot sport: FOOTBALL
 

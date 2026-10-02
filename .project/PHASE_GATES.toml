@@ -1,6 +1,6 @@
 schema_version = "1.0"
 project = "SPORTS_QUANT"
-current_phase = "F3_POINT_IN_TIME_KERNEL"
+current_phase = "F4_FOOTBALL_DATA_LAYER"
 
 [foundation_review]
 status = "PASS"
@@ -22,6 +22,12 @@ authorized = true
 authorization_basis = "F2 merged via PR #19 at d2cc02b5f5fbfbef2100eb07395e652a731bb31d (final reviewed head 40a604d9e5ec3e3f2fe0528373f0313874667e8c); final independent F2 review GO; P0=0; P1=0; CI and Security green on the merge commit"
 implementation_issue = 6
 spec = "docs/contracts/F3_POINT_IN_TIME_KERNEL_SPEC_DRAFT.md"
+
+[f4]
+authorized = true
+authorization_basis = "F3 merged via PR #22 at 3304c17d1204ec835a6ef21bb2845639b93cd33f (final reviewed head 43a15d88b5a5837c54057f26aa50c9b1f1b2e497); final independent F3 review GO; P0=0; P1=0; canonical PIT policy .project/POINT_IN_TIME_POLICY.yaml status APPROVED_F3_POLICY; post-merge checks on the merge commit SUCCESS: quality, postgres-integration, dependency-audit, secret-scan"
+implementation_issue = 7
+spec = "docs/contracts/F4_FOOTBALL_DATA_LAYER_SPEC_DRAFT.md"
 
 [notes]
 rule = "F2 authorization requires a recorded independent F0 review with no unresolved P0/P1 findings and a green machine gate on the authorization commit."
